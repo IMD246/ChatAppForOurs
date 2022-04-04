@@ -7,7 +7,7 @@ ThemeData lightThemeData(BuildContext context) {
   return ThemeData.light().copyWith(
     primaryColor: kPrimaryColor,
     scaffoldBackgroundColor: Colors.white,
-    appBarTheme: appBarTheme,
+    appBarTheme: appbarTheme(context: context, color: kPrimaryColor),
     iconTheme: const IconThemeData(color: kContentColorLightTheme),
     textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme)
         .apply(bodyColor: kContentColorLightTheme),
@@ -32,7 +32,7 @@ ThemeData darkThemeData(BuildContext context) {
   return ThemeData.dark().copyWith(
     primaryColor: kPrimaryColor,
     scaffoldBackgroundColor: kContentColorLightTheme,
-    appBarTheme: appBarTheme,
+    appBarTheme: appbarTheme(context: context, color: kPrimaryColor),
     iconTheme: const IconThemeData(color: kContentColorDarkTheme),
     textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme)
         .apply(bodyColor: kContentColorDarkTheme),
@@ -51,4 +51,8 @@ ThemeData darkThemeData(BuildContext context) {
   );
 }
 
-const appBarTheme = AppBarTheme(centerTitle: false, elevation: 0);
+AppBarTheme appbarTheme({required BuildContext context, required Color color}) {
+  final appBarTheme =
+      AppBarTheme(centerTitle: false, elevation: 0, backgroundColor: color);
+  return appBarTheme;
+}

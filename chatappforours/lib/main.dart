@@ -9,14 +9,13 @@ void main() {
 class StartApp extends StatelessWidget {
   const StartApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: lightThemeData(context),
       darkTheme: darkThemeData(context),
-      home: WelcomePage(),
+      home: const WelcomePage(),
     );
   }
 }

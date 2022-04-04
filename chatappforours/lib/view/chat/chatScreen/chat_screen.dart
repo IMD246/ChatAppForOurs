@@ -24,7 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         backgroundColor: Theme.of(context).brightness == Brightness.light
             ? kPrimaryColor
-            : kColorDarkMode.withOpacity(0.7),
+            : Theme.of(context).scaffoldBackgroundColor,
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
@@ -59,9 +59,16 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           const SizedBox(width: kDefaultPadding * 0.7),
-          const Text(
+          Text(
             'Chat',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: textColorMode(context).withOpacity(
+                MediaQuery.of(context).platformBrightness == Brightness.light
+                    ? 0.6
+                    : 0.8,
+              ),
+            ),
           ),
         ],
       ),

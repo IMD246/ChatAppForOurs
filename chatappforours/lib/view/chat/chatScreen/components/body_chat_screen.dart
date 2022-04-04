@@ -2,6 +2,7 @@ import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/models/chat.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/chat_card.dart';
+import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:flutter/material.dart';
 
 class BodyChatScreen extends StatelessWidget {
@@ -12,9 +13,7 @@ class BodyChatScreen extends StatelessWidget {
     return Column(
       children: [
         Container(
-          color: Theme.of(context).brightness == Brightness.light
-              ? kPrimaryColor
-              : kColorDarkMode.withOpacity(0.7),
+          color: kPrimaryColor,
           padding: const EdgeInsets.fromLTRB(
             kDefaultPadding,
             0,
@@ -43,7 +42,17 @@ class BodyChatScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               return ChatCard(
                 chat: chatsData[index],
-                press: () {},
+                press: () async {
+                  final chatData = await chatsData[index];
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MesssageScreen(chat: chatData);
+                      },
+                    ),
+                  );
+                },
               );
             },
           ),
