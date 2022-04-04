@@ -1,5 +1,6 @@
-import 'package:chatappforours/view/welcome/signInOrSignUp/sign_in_or_sign_up.dart';
 import 'package:flutter/material.dart';
+
+import '../signInOrSignUp/sign_in_or_sign_up.dart';
 
 class WelcomePage extends StatelessWidget {
   @override

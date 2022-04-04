@@ -45,7 +45,7 @@ ThemeData darkThemeData(BuildContext context) {
       backgroundColor: kContentColorLightTheme,
       selectedItemColor: Colors.white70,
       unselectedItemColor: kContentColorDarkTheme.withOpacity(0.32),
-      selectedIconTheme: const IconThemeData(color: kPrimaryColor),
+      selectedIconTheme: const IconThemeData(color: Colors.white70),
       showUnselectedLabels: true,
     ),
   );
