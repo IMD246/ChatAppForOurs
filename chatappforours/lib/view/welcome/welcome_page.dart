@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../signInOrSignUp/sign_in_or_sign_up.dart';
+import '../signInOrSignUp/signIn/sign_in.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -24,14 +24,14 @@ class WelcomePage extends StatelessWidget {
                   .headline5
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
-            const Spacer(),
+            const Spacer(),            
             FittedBox(
               child: TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const SignInOrSignUp(),
+                      builder: (context) => const SignIn(),
                     ),
                   );
                 },
