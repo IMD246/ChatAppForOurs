@@ -1,5 +1,6 @@
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
+import 'package:chatappforours/view/chat/contacts/contact_screen.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -14,8 +15,8 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppbar(),
-      body: const BodyChatScreen(),
+      appBar: buildAppbar(currentIndex),
+      body: currentIndex == 0 ? const BodyChatScreen() : const ContactScreen(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         child: const Icon(
@@ -47,7 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  AppBar buildAppbar() {
+  AppBar buildAppbar(int currentIndex) {
     return AppBar(
       automaticallyImplyLeading: false,
       title: Row(
@@ -60,7 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           const SizedBox(width: kDefaultPadding * 0.7),
           Text(
-            'Chat',
+            currentIndex == 0 ? 'Chat' : 'Contacts',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: textColorMode(context).withOpacity(

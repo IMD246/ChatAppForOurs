@@ -1,6 +1,7 @@
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
 import 'package:chatappforours/utilities/validator/check_format_field.dart';
+import 'package:chatappforours/view/chat/chatScreen/chat_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
 import 'package:chatappforours/view/signInOrSignUp/text_field_container.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,6 @@ class _BodySignInState extends State<BodySignIn> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController email;
   late final TextEditingController password;
-  late String passWord;
   bool isVisiblePassWord = false;
   @override
   void initState() {
@@ -105,12 +105,12 @@ class _BodySignInState extends State<BodySignIn> {
               text: 'Sign In',
               press: () {
                 if (_formKey.currentState!.validate()) {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const ChatScreen(),
-                  //   ),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ChatScreen(),
+                    ),
+                  );
                 }
               },
               context: context,

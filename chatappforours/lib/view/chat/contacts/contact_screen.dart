@@ -1,18 +1,16 @@
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/models/chat.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
-import 'package:chatappforours/view/chat/chatScreen/components/chat_card.dart';
-import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:flutter/material.dart';
 
-class BodyChatScreen extends StatefulWidget {
-  const BodyChatScreen({Key? key}) : super(key: key);
+class ContactScreen extends StatefulWidget {
+  const ContactScreen({Key? key}) : super(key: key);
 
   @override
-  State<BodyChatScreen> createState() => _BodyChatScreenState();
+  State<ContactScreen> createState() => _ContactScreenState();
 }
 
-class _BodyChatScreenState extends State<BodyChatScreen> {
+class _ContactScreenState extends State<ContactScreen> {
   List<dynamic> listChatData = [];
   bool isFilledRecent = true;
   bool isFilledActive = false;
@@ -46,13 +44,13 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
     return Column(
       children: [
         Container(
-          color: kPrimaryColor,
           padding: const EdgeInsets.fromLTRB(
             kDefaultPadding,
             0,
             kDefaultPadding,
             kDefaultPadding,
           ),
+          color: kPrimaryColor,
           child: Row(
             children: [
               FillOutlineButton(
@@ -68,7 +66,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                 },
                 text: "Recent Contact",
               ),
-              const SizedBox(width: kDefaultPadding),
+              const SizedBox(width: kDefaultPadding * 0.7),
               FillOutlineButton(
                 press: () {
                   setState(() {
@@ -87,24 +85,77 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
           child: ListView.builder(
             itemCount: listChatData.length,
             itemBuilder: (context, index) {
-              return ChatCard(
+              return ContactCard(
                 chat: listChatData[index],
-                press: () async {
-                  final chatData = await listChatData[index];
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return MesssageScreen(chat: chatData);
-                      },
-                    ),
-                  );
-                },
               );
             },
           ),
         ),
       ],
+    );
+  }
+}
+
+class ContactCard extends StatelessWidget {
+  const ContactCard({
+    Key? key,
+    required this.chat,
+  }) : super(key: key);
+  final Chat chat;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: kDefaultPadding,
+        vertical: kDefaultPadding * 0.75,
+      ),
+      child: Row(
+        children: [
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                backgroundImage: AssetImage(chat.image),
+              ),
+              if (chat.isActive)
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    width: 16,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: kPrimaryColor,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        width: 3,
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                      ),
+                    ),
+                  ),
+                )
+            ],
+          ),
+          const SizedBox(width: kDefaultPadding / 2),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+            child: Text(
+              chat.name,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          const Spacer(),
+          Opacity(
+            opacity: 0.64,
+            child: Text(
+              chat.time,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
