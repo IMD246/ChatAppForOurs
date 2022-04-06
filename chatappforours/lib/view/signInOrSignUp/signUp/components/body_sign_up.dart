@@ -1,29 +1,35 @@
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
 import 'package:chatappforours/utilities/validator/check_format_field.dart';
-import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
+import 'package:chatappforours/view/chat/chatScreen/chat_screen.dart';
+import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
+import 'package:chatappforours/view/signInOrSignUp/signUp/components/or_divider.dart';
+import 'package:chatappforours/view/signInOrSignUp/signUp/components/social_icon.dart';
 import 'package:chatappforours/view/signInOrSignUp/text_field_container.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../constants/constants.dart';
 
-class BodySignIn extends StatefulWidget {
-  const BodySignIn({Key? key}) : super(key: key);
+class BodySignUp extends StatefulWidget {
+  const BodySignUp({Key? key}) : super(key: key);
 
   @override
-  State<BodySignIn> createState() => _BodySignInState();
+  State<BodySignUp> createState() => _BodySignUpState();
 }
 
-class _BodySignInState extends State<BodySignIn> {
+class _BodySignUpState extends State<BodySignUp> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController email;
   late final TextEditingController password;
-  late String passWord;
+  late final TextEditingController firstName;
+  late final TextEditingController lastName;
+
   bool isVisiblePassWord = false;
   @override
   void initState() {
     email = TextEditingController();
     password = TextEditingController();
+    firstName = TextEditingController();
+    lastName = TextEditingController();
     super.initState();
   }
 
@@ -31,6 +37,8 @@ class _BodySignInState extends State<BodySignIn> {
   void dispose() {
     email.dispose();
     password.dispose();
+    firstName.dispose();
+    lastName.dispose();
     super.dispose();
   }
 
@@ -44,15 +52,46 @@ class _BodySignInState extends State<BodySignIn> {
             Center(
               child: Image.asset(
                 MediaQuery.of(context).platformBrightness == Brightness.light
-                    ? "assets/images/chat_logo_white.png"
+                    ? "assets/images/Register_Image.png"
                     : "assets/images/chat_logo_dark.png",
-                height: 246,
+                height: 200,
+                colorBlendMode: BlendMode.darken,
               ),
             ),
             Form(
               key: _formKey,
               child: Column(
                 children: [
+                  TextFieldContainer(
+                    child: TextFormField(
+                      textInputAction: TextInputAction.next,
+                      validator: (val) {
+                        return checkFormatEmail(val!);
+                      },
+                      decoration: inputDecoration(
+                        context: context,
+                        textHint: 'Type Your First Name',
+                        icon: Icons.account_circle,
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      controller: firstName,
+                    ),
+                  ),
+                  TextFieldContainer(
+                    child: TextFormField(
+                      textInputAction: TextInputAction.next,
+                      validator: (val) {
+                        return checkName(val!);
+                      },
+                      decoration: inputDecoration(
+                        context: context,
+                        textHint: 'Type Your Last Name',
+                        icon: Icons.account_circle,
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      controller: lastName,
+                    ),
+                  ),
                   TextFieldContainer(
                     child: TextFormField(
                       textInputAction: TextInputAction.next,
@@ -71,7 +110,9 @@ class _BodySignInState extends State<BodySignIn> {
                   TextFieldContainer(
                     child: TextFormField(
                       textInputAction: TextInputAction.done,
-                      validator: (val) => checkPassword(val!),
+                      validator: (val) {
+                        return checkPassword(val!);
+                      },
                       decoration: inputDecoration(
                         context: context,
                         textHint: 'Type Your Password',
@@ -101,25 +142,28 @@ class _BodySignInState extends State<BodySignIn> {
               ),
             ),
             SizedBox(height: size.height * 0.03),
-            PrimaryButton(
-              text: 'Sign In',
-              press: () {
-                if (_formKey.currentState!.validate()) {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const ChatScreen(),
-                  //   ),
-                  // );
-                }
-              },
-              context: context,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+              child: PrimaryButton(
+                text: 'Sign Up',
+                press: () {
+                  if (_formKey.currentState!.validate()) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ChatScreen(),
+                      ),
+                    );
+                  }
+                },
+                context: context,
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Don't have account!",
+                  "Already have an account!",
                   style: TextStyle(
                     color: textColorMode(context),
                   ),
@@ -129,12 +173,12 @@ class _BodySignInState extends State<BodySignIn> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const SignUp(),
+                        builder: (context) => const SignIn(),
                       ),
                     );
                   },
                   child: const Text(
-                    "Sign Up",
+                    "Sign In",
                     style: TextStyle(
                       color: kPrimaryColor,
                       fontWeight: FontWeight.bold,
@@ -143,10 +187,15 @@ class _BodySignInState extends State<BodySignIn> {
                 ),
               ],
             ),
-            TextButton(
-              onPressed: () {},
-              child: const Text('Forgot Password'),
-            )
+            const OrDivider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                SocialIcon(urlImage: "assets/icons/facebook.svg"),
+                SizedBox(width: kDefaultPadding),
+                SocialIcon(urlImage: "assets/icons/google-dark.svg"),
+              ],
+            ),
           ],
         ),
       ),

@@ -7,10 +7,11 @@ class PrimaryButton extends StatelessWidget {
     Key? key,
     required this.text,
     required this.press,
+    required this.context,
     this.color = kPrimaryColor,
     this.padding = const EdgeInsets.all(kDefaultPadding * 0.75),
   }) : super(key: key);
-
+  final BuildContext context;
   final String text;
   final VoidCallback press;
   final Color color;
@@ -28,7 +29,9 @@ class PrimaryButton extends StatelessWidget {
       onPressed: press,
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(
+          color: textColorMode(context),
+        ),
       ),
     );
   }

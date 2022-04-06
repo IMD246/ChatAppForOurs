@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 InputDecoration inputDecoration({
   required BuildContext context,
   required String textHint,
-  required IconData icon,
+  required IconData? icon,
 }) {
   return InputDecoration(
     prefixIcon: Icon(
