@@ -15,15 +15,14 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
-     return BlocBuilder<ThemeBloc, ThemeState>(
+    return BlocBuilder<ThemeBloc, ThemeState>(
       builder: (context, state) {
-          return Scaffold(
-      appBar: buildAppbar(themeMode: state.themeMode),
-      body:const BodySetting(),
-    );
+        return Scaffold(
+          appBar: buildAppbar(themeMode: state.themeMode),
+          body: const BodySetting(),
+        );
       },
     );
-  
   }
 
   AppBar buildAppbar({required ThemeMode themeMode}) {

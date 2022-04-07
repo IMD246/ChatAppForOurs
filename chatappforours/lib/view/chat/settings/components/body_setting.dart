@@ -46,27 +46,45 @@ class _BodySettingState extends State<BodySetting> {
                 ),
               ),
             ),
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundImage:
-                      const AssetImage('assets/icons/dakrmode.png'),
-                  backgroundColor: textColorMode(state.themeMode),
-                ),
-                Switch(
-                  value: isSelectedDarkMode,
-                  onChanged: (val) {
-                    setState(
-                      () {
-                        isSelectedDarkMode = val;
-                        context.read<ThemeBloc>().add(
-                              ChangeDarkModeThemeEvent(val),
-                            );
-                      },
-                    );
-                  },
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage:
+                        const AssetImage('assets/icons/dakrmode.png'),
+                    backgroundColor: textColorMode(state.themeMode),
+                  ),
+                  const SizedBox(width: kDefaultPadding * 0.5),
+                  Text(
+                    "Chế độ tối",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: textColorMode(
+                        (state is ThemeStateValid)
+                            ? state.themeMode
+                            : ThemeMode.light,
+                      ),
+                    ),
+                  ),
+                  Switch(
+                    inactiveTrackColor: kPrimaryColor.withOpacity(0.5),
+                    value: isSelectedDarkMode,
+                    activeColor: kPrimaryColor,
+                    onChanged: (val) {
+                      setState(
+                        () {
+                          isSelectedDarkMode = val;
+                          context.read<ThemeBloc>().add(
+                                ChangeDarkModeThemeEvent(val),
+                              );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         );

@@ -1,8 +1,10 @@
 import 'package:chatappforours/services/bloc/theme/theme_bloc.dart';
 import 'package:chatappforours/services/bloc/theme/theme_state.dart';
+import 'package:chatappforours/services/bloc/validator/check_format_field_bloc.dart';
+import 'package:chatappforours/services/bloc/validator/check_format_field_event.dart';
+import 'package:chatappforours/services/bloc/validator/check_format_field_state.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
-import 'package:chatappforours/utilities/validator/check_format_field.dart';
 import 'package:chatappforours/view/chat/chat_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
 import 'package:chatappforours/view/signInOrSignUp/text_field_container.dart';
@@ -19,7 +21,6 @@ class BodySignIn extends StatefulWidget {
 }
 
 class _BodySignInState extends State<BodySignIn> {
-  final _formKey = GlobalKey<FormState>();
   late final TextEditingController email;
   late final TextEditingController password;
   bool isVisiblePassWord = false;
@@ -40,123 +41,173 @@ class _BodySignInState extends State<BodySignIn> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return BlocBuilder<ThemeBloc, ThemeState>(
-      builder: (context, state) {
-        return  SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Center(
-              child: Image.asset(
-                MediaQuery.of(context).platformBrightness == Brightness.light
-                    ? "assets/images/chat_logo_white.png"
-                    : "assets/images/chat_logo_dark.png",
-                height: 246,
-              ),
-            ),
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFieldContainer(
-                    child: TextFormField(
-                      textInputAction: TextInputAction.next,
-                      validator: (val) {
-                        return checkFormatEmail(val!);
-                      },
-                      decoration: inputDecoration(
-                        context: context,
-                        textHint: 'Type Your Email',
-                        icon: Icons.email, color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      controller: email,
-                    ),
+    return BlocBuilder<ThemeBloc, ThemeState>(builder: (context, state) {
+      final themeMode =
+          (state is ThemeStateValid) ? state.themeMode : ThemeMode.light;
+      return BlocBuilder<CheckFormatFieldBloc, CheckFormatFieldState>(
+          builder: (context, state) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Center(
+                  child: Image.asset(
+                    MediaQuery.of(context).platformBrightness ==
+                            Brightness.light
+                        ? "assets/images/chat_logo_white.png"
+                        : "assets/images/chat_logo_dark.png",
+                    height: 246,
                   ),
-                  TextFieldContainer(
-                    child: TextFormField(
-                      textInputAction: TextInputAction.done,
-                      validator: (val) => checkPassword(val!),
-                      decoration: inputDecoration(
-                        context: context,
-                        textHint: 'Type Your Password',
-                        icon: Icons.lock, color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
-                      ).copyWith(
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(
-                              () {
-                                isVisiblePassWord = !isVisiblePassWord;
-                              },
-                            );
-                          },
-                          icon: Icon(
-                            isVisiblePassWord
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
+                ),
+                Column(
+                  children: [
+                    TextFieldContainer(
+                      child: Column(
+                        children: [
+                          TextField(
+                            textInputAction: TextInputAction.next,
+                            onChanged: (val) {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatEmailFieldEvent(val),
+                                  );
+                            },
+                            decoration: inputDecoration(
+                              context: context,
+                              textHint: 'Type Your Email',
+                              icon: Icons.email,
+                              color: textColorMode((state is ThemeStateValid)
+                                  ? themeMode
+                                  : ThemeMode.light),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            controller: email,
                           ),
+                          Visibility(
+                            visible: (state is CheckFormatFieldEmailState)
+                                ? state.value.isNotEmpty
+                                : false,
+                            child: Text(
+                              state.value,
+                              style: const TextStyle(
+                                color: kErrorColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextFieldContainer(
+                      child: Column(
+                        children: [
+                          TextField(
+                            textInputAction: TextInputAction.done,
+                            onChanged: (val) {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatPasswordFieldEvent(val),
+                                  );
+                            },
+                            decoration: inputDecoration(
+                              context: context,
+                              textHint: 'Type Your Password',
+                              icon: Icons.lock,
+                              color: textColorMode((state is ThemeStateValid)
+                                  ? themeMode
+                                  : ThemeMode.light),
+                            ).copyWith(
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(
+                                    () {
+                                      isVisiblePassWord = !isVisiblePassWord;
+                                    },
+                                  );
+                                },
+                                icon: Icon(
+                                  isVisiblePassWord
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: textColorMode(
+                                      (state is ThemeStateValid)
+                                          ? themeMode
+                                          : ThemeMode.light),
+                                ),
+                              ),
+                            ),
+                            controller: password,
+                            obscureText: !isVisiblePassWord ? true : false,
+                          ),
+                          Visibility(
+                            visible: (state is CheckFormatFieldPasswordState)
+                                ? state.value.isNotEmpty
+                                : false,
+                            child: Text(
+                              state.value,
+                              style: const TextStyle(
+                                color: kErrorColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: size.height * 0.03),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                  child: PrimaryButton(
+                    text: 'Sign In',
+                    press: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChatScreen(),
+                        ),
+                      );
+                    },
+                    context: context,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have account!",
+                      style: TextStyle(
+                        color: textColorMode((state is ThemeStateValid)
+                            ? themeMode
+                            : ThemeMode.light),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignUp(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Sign Up",
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      controller: password,
-                      obscureText: !isVisiblePassWord ? true : false,
                     ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: size.height * 0.03),
-            PrimaryButton(
-              text: 'Sign In',
-              press: () {
-                if (_formKey.currentState!.validate()) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ChatScreen(),
-                    ),
-                  );
-                }
-              },
-              context: context,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Don't have account!",
-                  style: TextStyle(
-                    color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
-                  ),
+                  ],
                 ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SignUp(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    "Sign Up",
-                    style: TextStyle(
-                      color: kPrimaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                  onPressed: () {},
+                  child: const Text('Forgot Password'),
+                )
               ],
             ),
-            TextButton(
-              onPressed: () {},
-              child: const Text('Forgot Password'),
-            )
-          ],
-        ),
-      ),
-    );
-      }
-    );
+          ),
+        );
+      });
+    });
   }
 }
