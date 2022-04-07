@@ -2,7 +2,7 @@ import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/bloc/theme/theme_bloc.dart';
 import 'package:chatappforours/services/bloc/theme/theme_state.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
-import 'package:chatappforours/view/chat/contacts/contact_screen.dart';
+import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
 import 'package:chatappforours/view/chat/settings/setting_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,7 +22,7 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (context, state) {
       return  Scaffold(
       appBar: buildAppbar(currentIndex,(state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
-      body: currentIndex == 0 ? const BodyChatScreen() : const ContactScreen(),
+      body: currentIndex == 0 ? const BodyChatScreen() : const BodyContactScreen(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         child: const Icon(
