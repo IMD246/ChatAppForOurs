@@ -1,6 +1,9 @@
 import 'package:chatappforours/models/chat.dart';
+import 'package:chatappforours/services/bloc/theme/theme_bloc.dart';
+import 'package:chatappforours/services/bloc/theme/theme_state.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/body_mesasge.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../constants/constants.dart';
 
@@ -10,15 +13,20 @@ class MesssageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildAppbar(chat, context),
-      body: BodyMessage(
-        chat: chat,
-      ),
-    );
+    return BlocBuilder<ThemeBloc, ThemeState>(builder: (context, state) {
+      return Scaffold(
+        appBar: buildAppbar(
+            chat,
+            (state is ThemeStateValid) ? state.themeMode : ThemeMode.light,
+            context),
+        body: BodyMessage(
+          chat: chat,
+        ),
+      );
+    });
   }
 
-  AppBar buildAppbar(Chat chat, BuildContext context) {
+  AppBar buildAppbar(Chat chat, ThemeMode themeMode, BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
       title: Row(
@@ -56,17 +64,14 @@ class MesssageScreen extends StatelessWidget {
               Text(
                 chat.name,
                 style: TextStyle(
-                    color: textColorMode(context).withOpacity(0.8),
+                    color: textColorMode(themeMode).withOpacity(0.8),
                     fontSize: 16),
               ),
               Text(
                 chat.isActive ? 'Online' : 'Online ${chat.time}',
                 style: TextStyle(
                   color: Colors.black.withOpacity(
-                    MediaQuery.of(context).platformBrightness ==
-                            Brightness.light
-                        ? 0.4
-                        : 0.6,
+                    themeMode == ThemeMode.light ? 0.4 : 0.6,
                   ),
                   fontSize: 12,
                 ),

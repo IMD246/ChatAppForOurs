@@ -1,10 +1,13 @@
+import 'package:chatappforours/services/bloc/theme/theme_bloc.dart';
+import 'package:chatappforours/services/bloc/theme/theme_state.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
 import 'package:chatappforours/utilities/validator/check_format_field.dart';
-import 'package:chatappforours/view/chat/chatScreen/chat_screen.dart';
+import 'package:chatappforours/view/chat/chat_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
 import 'package:chatappforours/view/signInOrSignUp/text_field_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../constants/constants.dart';
 
@@ -37,7 +40,9 @@ class _BodySignInState extends State<BodySignIn> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return SafeArea(
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, state) {
+        return  SafeArea(
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -62,7 +67,7 @@ class _BodySignInState extends State<BodySignIn> {
                       decoration: inputDecoration(
                         context: context,
                         textHint: 'Type Your Email',
-                        icon: Icons.email,
+                        icon: Icons.email, color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
                       ),
                       keyboardType: TextInputType.emailAddress,
                       controller: email,
@@ -75,7 +80,7 @@ class _BodySignInState extends State<BodySignIn> {
                       decoration: inputDecoration(
                         context: context,
                         textHint: 'Type Your Password',
-                        icon: Icons.lock,
+                        icon: Icons.lock, color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
                       ).copyWith(
                         suffixIcon: IconButton(
                           onPressed: () {
@@ -89,7 +94,7 @@ class _BodySignInState extends State<BodySignIn> {
                             isVisiblePassWord
                                 ? Icons.visibility
                                 : Icons.visibility_off,
-                            color: textColorMode(context),
+                            color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
                           ),
                         ),
                       ),
@@ -121,7 +126,7 @@ class _BodySignInState extends State<BodySignIn> {
                 Text(
                   "Don't have account!",
                   style: TextStyle(
-                    color: textColorMode(context),
+                    color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
                   ),
                 ),
                 TextButton(
@@ -150,6 +155,8 @@ class _BodySignInState extends State<BodySignIn> {
           ],
         ),
       ),
+    );
+      }
     );
   }
 }

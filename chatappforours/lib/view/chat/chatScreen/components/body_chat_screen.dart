@@ -66,7 +66,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                     },
                   );
                 },
-                text: "Recent Contact",
+                text: "Recent Message",
               ),
               const SizedBox(width: kDefaultPadding),
               FillOutlineButton(
