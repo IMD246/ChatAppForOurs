@@ -10,18 +10,19 @@ class SocialIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         border: Border.all(
           width: 2,
-          color: Colors.black,
+          color: Colors.black.withOpacity(0.5),
         ),
         shape: BoxShape.circle,
       ),
       child: SvgPicture.asset(
         urlImage,
-        height: 20,
+        height: 26,
         width: 20,
+        color: Colors.blue,
       ),
     );
   }

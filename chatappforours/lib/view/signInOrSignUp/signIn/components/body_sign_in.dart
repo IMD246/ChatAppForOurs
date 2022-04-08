@@ -42,8 +42,6 @@ class _BodySignInState extends State<BodySignIn> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return BlocBuilder<ThemeBloc, ThemeState>(builder: (context, state) {
-      final themeMode =
-          (state is ThemeStateValid) ? state.themeMode : ThemeMode.light;
       return BlocBuilder<CheckFormatFieldBloc, CheckFormatFieldState>(
           builder: (context, state) {
         return SafeArea(
@@ -52,10 +50,7 @@ class _BodySignInState extends State<BodySignIn> {
               children: [
                 Center(
                   child: Image.asset(
-                    MediaQuery.of(context).platformBrightness ==
-                            Brightness.light
-                        ? "assets/images/chat_logo_white.png"
-                        : "assets/images/chat_logo_dark.png",
+                    "assets/images/chat_logo_white.png",
                     height: 246,
                   ),
                 ),
@@ -75,9 +70,7 @@ class _BodySignInState extends State<BodySignIn> {
                               context: context,
                               textHint: 'Type Your Email',
                               icon: Icons.email,
-                              color: textColorMode((state is ThemeStateValid)
-                                  ? themeMode
-                                  : ThemeMode.light),
+                              color: textColorMode(ThemeMode.light),
                             ),
                             keyboardType: TextInputType.emailAddress,
                             controller: email,
@@ -110,9 +103,7 @@ class _BodySignInState extends State<BodySignIn> {
                               context: context,
                               textHint: 'Type Your Password',
                               icon: Icons.lock,
-                              color: textColorMode((state is ThemeStateValid)
-                                  ? themeMode
-                                  : ThemeMode.light),
+                              color: textColorMode(ThemeMode.light),
                             ).copyWith(
                               suffixIcon: IconButton(
                                 onPressed: () {
@@ -126,10 +117,7 @@ class _BodySignInState extends State<BodySignIn> {
                                   isVisiblePassWord
                                       ? Icons.visibility
                                       : Icons.visibility_off,
-                                  color: textColorMode(
-                                      (state is ThemeStateValid)
-                                          ? themeMode
-                                          : ThemeMode.light),
+                                  color: textColorMode(ThemeMode.light),
                                 ),
                               ),
                             ),
@@ -175,9 +163,7 @@ class _BodySignInState extends State<BodySignIn> {
                     Text(
                       "Don't have account!",
                       style: TextStyle(
-                        color: textColorMode((state is ThemeStateValid)
-                            ? themeMode
-                            : ThemeMode.light),
+                        color: textColorMode(ThemeMode.light),
                       ),
                     ),
                     TextButton(

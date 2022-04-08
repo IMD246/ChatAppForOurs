@@ -16,6 +16,7 @@ class _SignInState extends State<SignIn> {
     return BlocProvider(
       create: (context) => CheckFormatFieldBloc(),
       child: const Scaffold(
+        backgroundColor: Colors.white,
         body: BodySignIn(),
       ),
     );

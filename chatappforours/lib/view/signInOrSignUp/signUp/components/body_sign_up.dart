@@ -48,164 +48,164 @@ class _BodySignUpState extends State<BodySignUp> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return BlocBuilder<ThemeBloc, ThemeState>(
-      builder: (context, state) {
-        return SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Center(
-              child: Image.asset(
-                MediaQuery.of(context).platformBrightness == Brightness.light
-                    ? "assets/images/Register_Image.png"
-                    : "assets/images/chat_logo_dark.png",
-                height: 200,
-                colorBlendMode: BlendMode.darken,
+    return BlocBuilder<ThemeBloc, ThemeState>(builder: (context, state) {
+      return SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Center(
+                child: Image.asset(
+                  "assets/images/Register_Image.png",
+                  height: 200,
+                ),
               ),
-            ),
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFieldContainer(
-                    child: TextFormField(
-                      textInputAction: TextInputAction.next,
-                      validator: (val) {
-                        return checkFormatEmail(val!);
-                      },
-                      decoration: inputDecoration(
-                        context: context,
-                        textHint: 'Type Your First Name',
-                        icon: Icons.account_circle, color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFieldContainer(
+                      child: TextFormField(
+                        textInputAction: TextInputAction.next,
+                        validator: (val) {
+                          return checkFormatEmail(val!);
+                        },
+                        decoration: inputDecoration(
+                          context: context,
+                          textHint: 'Type Your First Name',
+                          icon: Icons.account_circle,
+                          color: textColorMode(ThemeMode.light),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        controller: firstName,
                       ),
-                      keyboardType: TextInputType.emailAddress,
-                      controller: firstName,
                     ),
-                  ),
-                  TextFieldContainer(
-                    child: TextFormField(
-                      textInputAction: TextInputAction.next,
-                      validator: (val) {
-                        return checkName(val!);
-                      },
-                      decoration: inputDecoration(
-                        context: context,
-                        textHint: 'Type Your Last Name',
-                        icon: Icons.account_circle, color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
+                    TextFieldContainer(
+                      child: TextFormField(
+                        textInputAction: TextInputAction.next,
+                        validator: (val) {
+                          return checkName(val!);
+                        },
+                        decoration: inputDecoration(
+                          context: context,
+                          textHint: 'Type Your Last Name',
+                          icon: Icons.account_circle,
+                          color: textColorMode(ThemeMode.light),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        controller: lastName,
                       ),
-                      keyboardType: TextInputType.emailAddress,
-                      controller: lastName,
                     ),
-                  ),
-                  TextFieldContainer(
-                    child: TextFormField(
-                      textInputAction: TextInputAction.next,
-                      validator: (val) {
-                        return checkFormatEmail(val!);
-                      },
-                      decoration: inputDecoration(
-                        context: context,
-                        textHint: 'Type Your Email',
-                        icon: Icons.email, color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
+                    TextFieldContainer(
+                      child: TextFormField(
+                        textInputAction: TextInputAction.next,
+                        validator: (val) {
+                          return checkFormatEmail(val!);
+                        },
+                        decoration: inputDecoration(
+                          context: context,
+                          textHint: 'Type Your Email',
+                          icon: Icons.email,
+                          color: textColorMode(ThemeMode.light),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        controller: email,
                       ),
-                      keyboardType: TextInputType.emailAddress,
-                      controller: email,
                     ),
-                  ),
-                  TextFieldContainer(
-                    child: TextFormField(
-                      textInputAction: TextInputAction.done,
-                      validator: (val) {
-                        return checkPassword(val!);
-                      },
-                      decoration: inputDecoration(
-                        context: context,
-                        textHint: 'Type Your Password',
-                        icon: Icons.lock, color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
-                      ).copyWith(
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(
-                              () {
-                                isVisiblePassWord = !isVisiblePassWord;
-                              },
-                            );
-                          },
-                          icon: Icon(
-                            isVisiblePassWord
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
+                    TextFieldContainer(
+                      child: TextFormField(
+                        textInputAction: TextInputAction.done,
+                        validator: (val) {
+                          return checkPassword(val!);
+                        },
+                        decoration: inputDecoration(
+                          context: context,
+                          textHint: 'Type Your Password',
+                          icon: Icons.lock,
+                          color: textColorMode(ThemeMode.light),
+                        ).copyWith(
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(
+                                () {
+                                  isVisiblePassWord = !isVisiblePassWord;
+                                },
+                              );
+                            },
+                            icon: Icon(
+                              isVisiblePassWord
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: textColorMode(ThemeMode.light),
+                            ),
                           ),
                         ),
+                        controller: password,
+                        obscureText: !isVisiblePassWord ? true : false,
                       ),
-                      controller: password,
-                      obscureText: !isVisiblePassWord ? true : false,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: size.height * 0.03),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                child: PrimaryButton(
+                  text: 'Sign Up',
+                  press: () {
+                    if (_formKey.currentState!.validate()) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChatScreen(),
+                        ),
+                      );
+                    }
+                  },
+                  context: context,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Already have an account!",
+                    style: TextStyle(
+                      color: textColorMode(ThemeMode.light),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SignIn(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Sign In",
+                      style: TextStyle(
+                        color: kPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            SizedBox(height: size.height * 0.03),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
-              child: PrimaryButton(
-                text: 'Sign Up',
-                press: () {
-                  if (_formKey.currentState!.validate()) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ChatScreen(),
-                      ),
-                    );
-                  }
-                },
-                context: context,
+              const OrDivider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  SocialIcon(urlImage: "assets/icons/facebook-white.svg"),
+                  SizedBox(width: kDefaultPadding),
+                  SocialIcon(urlImage: "assets/icons/google-light.svg"),
+                ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Already have an account!",
-                  style: TextStyle(
-                    color: textColorMode((state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SignIn(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    "Sign In",
-                    style: TextStyle(
-                      color: kPrimaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const OrDivider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                SocialIcon(urlImage: "assets/icons/facebook.svg"),
-                SizedBox(width: kDefaultPadding),
-                SocialIcon(urlImage: "assets/icons/google-dark.svg"),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
-      }
-    );
+      );
+    });
   }
 }

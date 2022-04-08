@@ -1,3 +1,4 @@
+import 'package:chatappforours/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 import '../signInOrSignUp/signIn/sign_in.dart';
@@ -8,6 +9,7 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -19,12 +21,13 @@ class WelcomePage extends StatelessWidget {
             Text(
               "Welcome to chat app \nfor ours",
               textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .headline5
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: textColorMode(ThemeMode.light),
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
             ),
-            const Spacer(),            
+            const Spacer(),
             FittedBox(
               child: TextButton(
                 onPressed: () {
@@ -39,21 +42,14 @@ class WelcomePage extends StatelessWidget {
                   children: [
                     Text(
                       'Skip',
-                      style: Theme.of(context).textTheme.bodyText1?.copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .bodyText1
-                                ?.color
-                                ?.withOpacity(0.8),
-                          ),
+                      style: TextStyle(
+                        color: textColorMode(ThemeMode.light).withOpacity(0.8),
+                        fontSize: 24,
+                      ),
                     ),
                     Icon(
                       Icons.arrow_forward_ios_outlined,
-                      color: Theme.of(context)
-                          .textTheme
-                          .bodyText1
-                          ?.color
-                          ?.withOpacity(0.8),
+                      color: textColorMode(ThemeMode.light).withOpacity(0.7),
                     ),
                   ],
                 ),
