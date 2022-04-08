@@ -9,11 +9,9 @@ class CheckFormatFieldBloc
     on<CheckFormatEmailFieldEvent>(
       (event, emit) {
         final errorString = checkFormatEmail(event.value);
-        if (errorString.isNotEmpty) {
-          emit(
-            CheckFormatFieldEmailState(errorString),
-          );
-        }
+        emit(
+          CheckFormatFieldEmailState(errorString),
+        );
       },
     );
     on<CheckFormatPasswordFieldEvent>(
@@ -24,11 +22,19 @@ class CheckFormatFieldBloc
         );
       },
     );
-    on<CheckFormatNameFieldEvent>(
+    on<CheckFormatFirstNameFieldEvent>(
       (event, emit) {
         final errorString = checkName(event.value);
         emit(
-          CheckFormatFieldNameState(errorString),
+          CheckFormatFieldFirstNameState(errorString),
+        );
+      },
+    );
+    on<CheckFormatLastNameFieldEvent>(
+      (event, emit) {
+        final errorString = checkName(event.value);
+        emit(
+          CheckFormatFieldLastNameState(errorString),
         );
       },
     );

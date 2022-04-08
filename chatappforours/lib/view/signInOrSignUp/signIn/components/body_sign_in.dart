@@ -23,11 +23,14 @@ class BodySignIn extends StatefulWidget {
 class _BodySignInState extends State<BodySignIn> {
   late final TextEditingController email;
   late final TextEditingController password;
+  late FocusNode focusNode;
   bool isVisiblePassWord = false;
   @override
   void initState() {
     email = TextEditingController();
     password = TextEditingController();
+    focusNode = FocusNode();
+    focusNode.requestFocus();
     super.initState();
   }
 
@@ -35,6 +38,7 @@ class _BodySignInState extends State<BodySignIn> {
   void dispose() {
     email.dispose();
     password.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -61,6 +65,12 @@ class _BodySignInState extends State<BodySignIn> {
                         children: [
                           TextField(
                             textInputAction: TextInputAction.next,
+                            focusNode: focusNode,
+                            onTap: () {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatEmailFieldEvent(email.text),
+                                  );
+                            },
                             onChanged: (val) {
                               context.read<CheckFormatFieldBloc>().add(
                                     CheckFormatEmailFieldEvent(val),
@@ -94,6 +104,12 @@ class _BodySignInState extends State<BodySignIn> {
                         children: [
                           TextField(
                             textInputAction: TextInputAction.done,
+                            onTap: () {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatPasswordFieldEvent(
+                                        password.text),
+                                  );
+                            },
                             onChanged: (val) {
                               context.read<CheckFormatFieldBloc>().add(
                                     CheckFormatPasswordFieldEvent(val),
@@ -147,12 +163,22 @@ class _BodySignInState extends State<BodySignIn> {
                   child: PrimaryButton(
                     text: 'Sign In',
                     press: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChatScreen(),
-                        ),
-                      );
+                      if (email.text.isEmpty) {
+                        context.read<CheckFormatFieldBloc>().add(
+                              CheckFormatEmailFieldEvent(email.text),
+                            );
+                      } else if (password.text.isEmpty) {
+                        context.read<CheckFormatFieldBloc>().add(
+                              CheckFormatPasswordFieldEvent(password.text),
+                            );
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChatScreen(),
+                          ),
+                        );
+                      }
                     },
                     context: context,
                   ),

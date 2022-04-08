@@ -12,6 +12,9 @@ class CheckFormatEmailFieldEvent extends CheckFormatFieldEvent{
 class CheckFormatPasswordFieldEvent extends CheckFormatFieldEvent{
   const CheckFormatPasswordFieldEvent(String value) : super(value);  
 }
-class CheckFormatNameFieldEvent extends CheckFormatFieldEvent{
-  const CheckFormatNameFieldEvent(String value) : super(value);
+class CheckFormatFirstNameFieldEvent extends CheckFormatFieldEvent{
+  const CheckFormatFirstNameFieldEvent(String value) : super(value);
+}
+class CheckFormatLastNameFieldEvent extends CheckFormatFieldEvent{
+  const CheckFormatLastNameFieldEvent(String value) : super(value);
 }

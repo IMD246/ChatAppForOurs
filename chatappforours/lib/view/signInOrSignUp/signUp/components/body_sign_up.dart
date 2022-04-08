@@ -1,8 +1,8 @@
-import 'package:chatappforours/services/bloc/theme/theme_bloc.dart';
-import 'package:chatappforours/services/bloc/theme/theme_state.dart';
+import 'package:chatappforours/services/bloc/validator/check_format_field_bloc.dart';
+import 'package:chatappforours/services/bloc/validator/check_format_field_event.dart';
+import 'package:chatappforours/services/bloc/validator/check_format_field_state.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
-import 'package:chatappforours/utilities/validator/check_format_field.dart';
 import 'package:chatappforours/view/chat/chat_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/components/or_divider.dart';
@@ -25,6 +25,7 @@ class _BodySignUpState extends State<BodySignUp> {
   late final TextEditingController password;
   late final TextEditingController firstName;
   late final TextEditingController lastName;
+  late FocusNode focusNode;
 
   bool isVisiblePassWord = false;
   @override
@@ -33,6 +34,8 @@ class _BodySignUpState extends State<BodySignUp> {
     password = TextEditingController();
     firstName = TextEditingController();
     lastName = TextEditingController();
+    focusNode = FocusNode();
+    focusNode.requestFocus();
     super.initState();
   }
 
@@ -42,13 +45,15 @@ class _BodySignUpState extends State<BodySignUp> {
     password.dispose();
     firstName.dispose();
     lastName.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return BlocBuilder<ThemeBloc, ThemeState>(builder: (context, state) {
+    return BlocBuilder<CheckFormatFieldBloc, CheckFormatFieldState>(
+        builder: (context, state) {
       return SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -64,83 +69,175 @@ class _BodySignUpState extends State<BodySignUp> {
                 child: Column(
                   children: [
                     TextFieldContainer(
-                      child: TextFormField(
-                        textInputAction: TextInputAction.next,
-                        validator: (val) {
-                          return checkFormatEmail(val!);
-                        },
-                        decoration: inputDecoration(
-                          context: context,
-                          textHint: 'Type Your First Name',
-                          icon: Icons.account_circle,
-                          color: textColorMode(ThemeMode.light),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        controller: firstName,
-                      ),
-                    ),
-                    TextFieldContainer(
-                      child: TextFormField(
-                        textInputAction: TextInputAction.next,
-                        validator: (val) {
-                          return checkName(val!);
-                        },
-                        decoration: inputDecoration(
-                          context: context,
-                          textHint: 'Type Your Last Name',
-                          icon: Icons.account_circle,
-                          color: textColorMode(ThemeMode.light),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        controller: lastName,
-                      ),
-                    ),
-                    TextFieldContainer(
-                      child: TextFormField(
-                        textInputAction: TextInputAction.next,
-                        validator: (val) {
-                          return checkFormatEmail(val!);
-                        },
-                        decoration: inputDecoration(
-                          context: context,
-                          textHint: 'Type Your Email',
-                          icon: Icons.email,
-                          color: textColorMode(ThemeMode.light),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        controller: email,
-                      ),
-                    ),
-                    TextFieldContainer(
-                      child: TextFormField(
-                        textInputAction: TextInputAction.done,
-                        validator: (val) {
-                          return checkPassword(val!);
-                        },
-                        decoration: inputDecoration(
-                          context: context,
-                          textHint: 'Type Your Password',
-                          icon: Icons.lock,
-                          color: textColorMode(ThemeMode.light),
-                        ).copyWith(
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(
-                                () {
-                                  isVisiblePassWord = !isVisiblePassWord;
-                                },
-                              );
+                      child: Column(
+                        children: [
+                          TextField(
+                            focusNode: focusNode,
+                            textInputAction: TextInputAction.next,
+                            onTap: () {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatFirstNameFieldEvent(
+                                        firstName.text),
+                                  );
                             },
-                            icon: Icon(
-                              isVisiblePassWord
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
+                            onChanged: (val) {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatFirstNameFieldEvent(val),
+                                  );
+                            },
+                            decoration: inputDecoration(
+                              context: context,
+                              textHint: 'Type Your First Name',
+                              icon: Icons.account_circle,
                               color: textColorMode(ThemeMode.light),
                             ),
+                            keyboardType: TextInputType.text,
+                            controller: firstName,
                           ),
-                        ),
-                        controller: password,
-                        obscureText: !isVisiblePassWord ? true : false,
+                          Visibility(
+                            visible: (state is CheckFormatFieldFirstNameState)
+                                ? state.value.isNotEmpty
+                                : false,
+                            child: Text(
+                              state.value,
+                              style: const TextStyle(
+                                color: kErrorColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextFieldContainer(
+                      child: Column(
+                        children: [
+                          TextField(
+                            textInputAction: TextInputAction.next,
+                            onTap: () {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatLastNameFieldEvent(
+                                        lastName.text),
+                                  );
+                            },
+                            onChanged: (val) {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatLastNameFieldEvent(val),
+                                  );
+                            },
+                            decoration: inputDecoration(
+                              context: context,
+                              textHint: 'Type Your Last Name',
+                              icon: Icons.account_circle,
+                              color: textColorMode(ThemeMode.light),
+                            ),
+                            keyboardType: TextInputType.text,
+                            controller: lastName,
+                          ),
+                          Visibility(
+                            visible: (state is CheckFormatFieldLastNameState)
+                                ? state.value.isNotEmpty
+                                : false,
+                            child: Text(
+                              state.value,
+                              style: const TextStyle(
+                                color: kErrorColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextFieldContainer(
+                      child: Column(
+                        children: [
+                          TextField(
+                            textInputAction: TextInputAction.next,
+                            onTap: () {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatEmailFieldEvent(email.text),
+                                  );
+                            },
+                            onChanged: (val) {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatEmailFieldEvent(val),
+                                  );
+                            },
+                            decoration: inputDecoration(
+                              context: context,
+                              textHint: 'Type Your Email',
+                              icon: Icons.email,
+                              color: textColorMode(ThemeMode.light),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            controller: email,
+                          ),
+                          Visibility(
+                            visible: (state is CheckFormatFieldEmailState)
+                                ? state.value.isNotEmpty
+                                : false,
+                            child: Text(
+                              state.value,
+                              style: const TextStyle(
+                                color: kErrorColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextFieldContainer(
+                      child: Column(
+                        children: [
+                          TextField(
+                            textInputAction: TextInputAction.done,
+                            onTap: () {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatPasswordFieldEvent(
+                                        password.text),
+                                  );
+                            },
+                            onChanged: (val) {
+                              context.read<CheckFormatFieldBloc>().add(
+                                    CheckFormatPasswordFieldEvent(val),
+                                  );
+                            },
+                            decoration: inputDecoration(
+                              context: context,
+                              textHint: 'Type Your Password',
+                              icon: Icons.lock,
+                              color: textColorMode(ThemeMode.light),
+                            ).copyWith(
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(
+                                    () {
+                                      isVisiblePassWord = !isVisiblePassWord;
+                                    },
+                                  );
+                                },
+                                icon: Icon(
+                                  isVisiblePassWord
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: textColorMode(ThemeMode.light),
+                                ),
+                              ),
+                            ),
+                            controller: password,
+                            obscureText: !isVisiblePassWord ? true : false,
+                          ),
+                          Visibility(
+                            visible: (state is CheckFormatFieldPasswordState)
+                                ? state.value.isNotEmpty
+                                : false,
+                            child: Text(
+                              state.value,
+                              style: const TextStyle(
+                                color: kErrorColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -153,7 +250,23 @@ class _BodySignUpState extends State<BodySignUp> {
                 child: PrimaryButton(
                   text: 'Sign Up',
                   press: () {
-                    if (_formKey.currentState!.validate()) {
+                    if (firstName.text.isEmpty) {
+                      context.read<CheckFormatFieldBloc>().add(
+                            CheckFormatFirstNameFieldEvent(firstName.text),
+                          );
+                    } else if (lastName.text.isEmpty) {
+                      context.read<CheckFormatFieldBloc>().add(
+                            CheckFormatLastNameFieldEvent(lastName.text),
+                          );
+                    } else if (email.text.isEmpty) {
+                      context.read<CheckFormatFieldBloc>().add(
+                            CheckFormatEmailFieldEvent(email.text),
+                          );
+                    } else if (password.text.isEmpty) {
+                      context.read<CheckFormatFieldBloc>().add(
+                            CheckFormatPasswordFieldEvent(password.text),
+                          );
+                    } else {
                       Navigator.push(
                         context,
                         MaterialPageRoute(

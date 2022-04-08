@@ -6,8 +6,11 @@ abstract class CheckFormatFieldState{
 
   const CheckFormatFieldState(this.value);
 }
-class CheckFormatFieldNameState extends CheckFormatFieldState{
-  const CheckFormatFieldNameState(String value) : super(value);
+class CheckFormatFieldFirstNameState extends CheckFormatFieldState{
+  const CheckFormatFieldFirstNameState(String value) : super(value);
+}
+class CheckFormatFieldLastNameState extends CheckFormatFieldState{
+  const CheckFormatFieldLastNameState(String value) : super(value);
 }
 class CheckFormatFieldPasswordState extends CheckFormatFieldState{
   const CheckFormatFieldPasswordState(String value) : super(value);
