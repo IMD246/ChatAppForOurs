@@ -24,7 +24,7 @@ class CheckFormatFieldBloc
     );
     on<CheckFormatFirstNameFieldEvent>(
       (event, emit) {
-        final errorString = checkName(event.value);
+        final errorString = checkFirstName(event.value);
         emit(
           CheckFormatFieldFirstNameState(errorString),
         );
@@ -32,7 +32,7 @@ class CheckFormatFieldBloc
     );
     on<CheckFormatLastNameFieldEvent>(
       (event, emit) {
-        final errorString = checkName(event.value);
+        final errorString = checkLastName(event.value);
         emit(
           CheckFormatFieldLastNameState(errorString),
         );

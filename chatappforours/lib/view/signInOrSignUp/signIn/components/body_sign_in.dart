@@ -23,14 +23,11 @@ class BodySignIn extends StatefulWidget {
 class _BodySignInState extends State<BodySignIn> {
   late final TextEditingController email;
   late final TextEditingController password;
-  late FocusNode focusNode;
   bool isVisiblePassWord = false;
   @override
   void initState() {
     email = TextEditingController();
     password = TextEditingController();
-    focusNode = FocusNode();
-    focusNode.requestFocus();
     super.initState();
   }
 
@@ -38,7 +35,6 @@ class _BodySignInState extends State<BodySignIn> {
   void dispose() {
     email.dispose();
     password.dispose();
-    focusNode.dispose();
     super.dispose();
   }
 
@@ -65,7 +61,6 @@ class _BodySignInState extends State<BodySignIn> {
                         children: [
                           TextField(
                             textInputAction: TextInputAction.next,
-                            focusNode: focusNode,
                             onTap: () {
                               context.read<CheckFormatFieldBloc>().add(
                                     CheckFormatEmailFieldEvent(email.text),

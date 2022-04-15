@@ -25,7 +25,6 @@ class _BodySignUpState extends State<BodySignUp> {
   late final TextEditingController password;
   late final TextEditingController firstName;
   late final TextEditingController lastName;
-  late FocusNode focusNode;
 
   bool isVisiblePassWord = false;
   @override
@@ -34,8 +33,6 @@ class _BodySignUpState extends State<BodySignUp> {
     password = TextEditingController();
     firstName = TextEditingController();
     lastName = TextEditingController();
-    focusNode = FocusNode();
-    focusNode.requestFocus();
     super.initState();
   }
 
@@ -45,7 +42,6 @@ class _BodySignUpState extends State<BodySignUp> {
     password.dispose();
     firstName.dispose();
     lastName.dispose();
-    focusNode.dispose();
     super.dispose();
   }
 
@@ -72,7 +68,6 @@ class _BodySignUpState extends State<BodySignUp> {
                       child: Column(
                         children: [
                           TextField(
-                            focusNode: focusNode,
                             textInputAction: TextInputAction.next,
                             onTap: () {
                               context.read<CheckFormatFieldBloc>().add(

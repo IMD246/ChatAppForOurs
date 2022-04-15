@@ -12,8 +12,13 @@ String checkPassword(String val) {
   return val.isEmpty ? "Enter Your Password" : '';
 }
 
-String checkName(String val) {
+String checkFirstName(String val) {
   return val.isEmpty
       ? "Enter Your First Name"
+      : (val.length < 3 ? "Your First Name Length Need To > 3" : '');
+}
+String checkLastName(String val) {
+  return val.isEmpty
+      ? "Enter Your Last Name"
       : (val.length < 3 ? "Your Last Name Length Need To > 3" : '');
 }
