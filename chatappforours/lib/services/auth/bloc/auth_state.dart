@@ -1,4 +1,5 @@
 import 'package:chatappforours/services/auth/auth_user.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
 @immutable
@@ -26,10 +27,13 @@ class AuthStateLogginFailure extends AuthState {
   const AuthStateLogginFailure(this.exception);
 }
 
-class AuthStateLoggedOut extends AuthState {
+class AuthStateLoggedOut extends AuthState with EquatableMixin {
   final Exception? exception;
   final bool isLoading;
   const AuthStateLoggedOut({required this.exception, required this.isLoading});
+
+  @override
+  List<Object?> get props => [exception, isLoading];
 }
 
 class AuthStateRegistering extends AuthState {

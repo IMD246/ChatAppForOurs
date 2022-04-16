@@ -1,7 +1,6 @@
 import 'package:chatappforours/models/chat.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/body_mesasge.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../constants/constants.dart';
 

@@ -16,10 +16,10 @@ class WelcomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        if (state is AuthStateLoggedOut) {
-          return const SignIn();
-        } else if (state is AuthStateLoggedIn) {
+        if (state is AuthStateLoggedIn) {
           return const ChatScreen();
+        } else if (state is AuthStateLoggedOut) {
+          return const SignIn();
         } else if (state is AuthStateRegistering) {
           return const SignUp();
         } else if (state is AuthStateSetting) {

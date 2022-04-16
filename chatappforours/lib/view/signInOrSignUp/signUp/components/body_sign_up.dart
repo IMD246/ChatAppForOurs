@@ -4,8 +4,6 @@ import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
 import 'package:chatappforours/utilities/validator/check_format_field.dart';
-import 'package:chatappforours/view/chat/chat_screen.dart';
-import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/components/or_divider.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/components/social_icon.dart';
 import 'package:chatappforours/view/signInOrSignUp/text_field_container.dart';

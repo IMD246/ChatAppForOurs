@@ -16,6 +16,7 @@ class StartApp extends StatefulWidget {
   @override
   State<StartApp> createState() => _StartAppState();
 }
+
 class _StartAppState extends State<StartApp> {
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class _StartAppState extends State<StartApp> {
       darkTheme: darkThemeData(context),
       themeMode: ThemeMode.light,
       home: BlocProvider<AuthBloc>(
-        create: (context) => AuthBloc(FirebaseAuthProvider(),context),
+        create: (context) => AuthBloc(FirebaseAuthProvider(), context),
         child: const WelcomePage(),
       ),
     );
