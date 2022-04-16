@@ -1,8 +1,9 @@
-import 'package:chatappforours/services/bloc/validator/check_format_field_bloc.dart';
-import 'package:chatappforours/services/bloc/validator/check_format_field_event.dart';
-import 'package:chatappforours/services/bloc/validator/check_format_field_state.dart';
+import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
+import 'package:chatappforours/services/auth/bloc/auth_event.dart';
+import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
+import 'package:chatappforours/utilities/validator/check_format_field.dart';
 import 'package:chatappforours/view/chat/chat_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/components/or_divider.dart';
@@ -20,12 +21,14 @@ class BodySignUp extends StatefulWidget {
 }
 
 class _BodySignUpState extends State<BodySignUp> {
-  final _formKey = GlobalKey<FormState>();
   late final TextEditingController email;
   late final TextEditingController password;
   late final TextEditingController firstName;
   late final TextEditingController lastName;
-
+  String errorStringEmail = '';
+  String errorStringPassWord = '';
+  String errorStringFirstName = '';
+  String errorStringLastName = '';
   bool isVisiblePassWord = false;
   @override
   void initState() {
@@ -48,21 +51,20 @@ class _BodySignUpState extends State<BodySignUp> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return BlocBuilder<CheckFormatFieldBloc, CheckFormatFieldState>(
-        builder: (context, state) {
-      return SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Center(
-                child: Image.asset(
-                  "assets/images/Register_Image.png",
-                  height: 200,
+
+    return BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {},
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Center(
+                  child: Image.asset(
+                    "assets/images/Register_Image.png",
+                    height: 200,
+                  ),
                 ),
-              ),
-              Form(
-                key: _formKey,
-                child: Column(
+                Column(
                   children: [
                     TextFieldContainer(
                       child: Column(
@@ -70,15 +72,15 @@ class _BodySignUpState extends State<BodySignUp> {
                           TextField(
                             textInputAction: TextInputAction.next,
                             onTap: () {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatFirstNameFieldEvent(
-                                        firstName.text),
-                                  );
+                              setState(() {
+                                errorStringFirstName =
+                                    checkFirstName(firstName.text);
+                              });
                             },
                             onChanged: (val) {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatFirstNameFieldEvent(val),
-                                  );
+                              setState(() {
+                                errorStringFirstName = checkFirstName(val);
+                              });
                             },
                             decoration: inputDecoration(
                               context: context,
@@ -90,11 +92,9 @@ class _BodySignUpState extends State<BodySignUp> {
                             controller: firstName,
                           ),
                           Visibility(
-                            visible: (state is CheckFormatFieldFirstNameState)
-                                ? state.value.isNotEmpty
-                                : false,
+                            visible: errorStringFirstName.isNotEmpty,
                             child: Text(
-                              state.value,
+                              errorStringFirstName,
                               style: const TextStyle(
                                 color: kErrorColor,
                               ),
@@ -109,15 +109,15 @@ class _BodySignUpState extends State<BodySignUp> {
                           TextField(
                             textInputAction: TextInputAction.next,
                             onTap: () {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatLastNameFieldEvent(
-                                        lastName.text),
-                                  );
+                              setState(() {
+                                errorStringLastName =
+                                    checkFirstName(lastName.text);
+                              });
                             },
                             onChanged: (val) {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatLastNameFieldEvent(val),
-                                  );
+                              setState(() {
+                                errorStringLastName = checkFirstName(val);
+                              });
                             },
                             decoration: inputDecoration(
                               context: context,
@@ -129,11 +129,9 @@ class _BodySignUpState extends State<BodySignUp> {
                             controller: lastName,
                           ),
                           Visibility(
-                            visible: (state is CheckFormatFieldLastNameState)
-                                ? state.value.isNotEmpty
-                                : false,
+                            visible: errorStringLastName.isNotEmpty,
                             child: Text(
-                              state.value,
+                              errorStringLastName,
                               style: const TextStyle(
                                 color: kErrorColor,
                               ),
@@ -148,14 +146,14 @@ class _BodySignUpState extends State<BodySignUp> {
                           TextField(
                             textInputAction: TextInputAction.next,
                             onTap: () {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatEmailFieldEvent(email.text),
-                                  );
+                              setState(() {
+                                errorStringEmail = checkFormatEmail(email.text);
+                              });
                             },
                             onChanged: (val) {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatEmailFieldEvent(val),
-                                  );
+                              setState(() {
+                                errorStringEmail = checkFormatEmail(val);
+                              });
                             },
                             decoration: inputDecoration(
                               context: context,
@@ -167,11 +165,9 @@ class _BodySignUpState extends State<BodySignUp> {
                             controller: email,
                           ),
                           Visibility(
-                            visible: (state is CheckFormatFieldEmailState)
-                                ? state.value.isNotEmpty
-                                : false,
+                            visible: errorStringEmail.isNotEmpty,
                             child: Text(
-                              state.value,
+                              errorStringEmail,
                               style: const TextStyle(
                                 color: kErrorColor,
                               ),
@@ -186,15 +182,15 @@ class _BodySignUpState extends State<BodySignUp> {
                           TextField(
                             textInputAction: TextInputAction.done,
                             onTap: () {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatPasswordFieldEvent(
-                                        password.text),
-                                  );
+                              setState(() {
+                                errorStringPassWord =
+                                    checkPassword(password.text);
+                              });
                             },
                             onChanged: (val) {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatPasswordFieldEvent(val),
-                                  );
+                              setState(() {
+                                errorStringPassWord = checkPassword(val);
+                              });
                             },
                             decoration: inputDecoration(
                               context: context,
@@ -222,11 +218,9 @@ class _BodySignUpState extends State<BodySignUp> {
                             obscureText: !isVisiblePassWord ? true : false,
                           ),
                           Visibility(
-                            visible: (state is CheckFormatFieldPasswordState)
-                                ? state.value.isNotEmpty
-                                : false,
+                            visible: errorStringPassWord.isNotEmpty,
                             child: Text(
-                              state.value,
+                              errorStringPassWord,
                               style: const TextStyle(
                                 color: kErrorColor,
                               ),
@@ -237,83 +231,71 @@ class _BodySignUpState extends State<BodySignUp> {
                     ),
                   ],
                 ),
-              ),
-              SizedBox(height: size.height * 0.03),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: kDefaultPadding),
-                child: PrimaryButton(
-                  text: 'Sign Up',
-                  press: () {
-                    if (firstName.text.isEmpty) {
-                      context.read<CheckFormatFieldBloc>().add(
-                            CheckFormatFirstNameFieldEvent(firstName.text),
-                          );
-                    } else if (lastName.text.isEmpty) {
-                      context.read<CheckFormatFieldBloc>().add(
-                            CheckFormatLastNameFieldEvent(lastName.text),
-                          );
-                    } else if (email.text.isEmpty) {
-                      context.read<CheckFormatFieldBloc>().add(
-                            CheckFormatEmailFieldEvent(email.text),
-                          );
-                    } else if (password.text.isEmpty) {
-                      context.read<CheckFormatFieldBloc>().add(
-                            CheckFormatPasswordFieldEvent(password.text),
-                          );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChatScreen(),
-                        ),
-                      );
-                    }
-                  },
-                  context: context,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Already have an account!",
-                    style: TextStyle(
-                      color: textColorMode(ThemeMode.light),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SignIn(),
-                        ),
-                      );
+                SizedBox(height: size.height * 0.03),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                  child: PrimaryButton(
+                    text: 'Sign Up',
+                    press: () {
+                      if (errorStringEmail.isEmpty &&
+                          errorStringFirstName.isEmpty &&
+                          errorStringLastName.isEmpty &&
+                          errorStringPassWord.isEmpty) {
+                        context
+                            .read<AuthBloc>()
+                            .add(AuthEventRegister(email.text, password.text));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChatScreen(),
+                          ),
+                        );
+                      }
                     },
-                    child: const Text(
-                      "Sign In",
+                    context: context,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have an account!",
                       style: TextStyle(
-                        color: kPrimaryColor,
-                        fontWeight: FontWeight.bold,
+                        color: textColorMode(ThemeMode.light),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const OrDivider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  SocialIcon(urlImage: "assets/icons/facebook-white.svg"),
-                  SizedBox(width: kDefaultPadding),
-                  SocialIcon(urlImage: "assets/icons/google-light.svg"),
-                ],
-              ),
-            ],
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignIn(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Sign In",
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const OrDivider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    SocialIcon(urlImage: "assets/icons/facebook-white.svg"),
+                    SizedBox(width: kDefaultPadding),
+                    SocialIcon(urlImage: "assets/icons/google-light.svg"),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      );
-    });
+        ));
   }
 }

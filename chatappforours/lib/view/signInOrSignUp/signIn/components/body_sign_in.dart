@@ -1,12 +1,12 @@
-import 'package:chatappforours/services/bloc/theme/theme_bloc.dart';
-import 'package:chatappforours/services/bloc/theme/theme_state.dart';
-import 'package:chatappforours/services/bloc/validator/check_format_field_bloc.dart';
-import 'package:chatappforours/services/bloc/validator/check_format_field_event.dart';
-import 'package:chatappforours/services/bloc/validator/check_format_field_state.dart';
+import 'package:chatappforours/services/auth/auth_exception.dart';
+import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
+import 'package:chatappforours/services/auth/bloc/auth_event.dart';
+import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
+import 'package:chatappforours/utilities/dialogs/error_dialog.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
+import 'package:chatappforours/utilities/validator/check_format_field.dart';
 import 'package:chatappforours/view/chat/chat_screen.dart';
-import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
 import 'package:chatappforours/view/signInOrSignUp/text_field_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +23,8 @@ class BodySignIn extends StatefulWidget {
 class _BodySignInState extends State<BodySignIn> {
   late final TextEditingController email;
   late final TextEditingController password;
+  String errorStringEmail = '';
+  String errorStringPassWord = '';
   bool isVisiblePassWord = false;
   @override
   void initState() {
@@ -41,10 +43,33 @@ class _BodySignInState extends State<BodySignIn> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return BlocBuilder<ThemeBloc, ThemeState>(builder: (context, state) {
-      return BlocBuilder<CheckFormatFieldBloc, CheckFormatFieldState>(
-          builder: (context, state) {
-        return SafeArea(
+    return BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) async {
+          if (state is AuthStateLoggedOut) {
+            if (state.exception is UserNotFoundAuthException) {
+              await showErrorDialog(
+                context,
+                'User Not Found',
+              );
+            } else if (state.exception is WrongPasswordAuthException) {
+              await showErrorDialog(
+                context,
+                'Wrong Password',
+              );
+            } else if (state.exception is GenericAuthException) {
+              await showErrorDialog(
+                context,
+                'Login Auth Error',
+              );
+            } else {
+              await showErrorDialog(
+                context,
+                'Login Auth Error1',
+              );
+            }
+          }
+        },
+        child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -62,14 +87,14 @@ class _BodySignInState extends State<BodySignIn> {
                           TextField(
                             textInputAction: TextInputAction.next,
                             onTap: () {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatEmailFieldEvent(email.text),
-                                  );
+                              setState(() {
+                                errorStringEmail = checkFormatEmail(email.text);
+                              });
                             },
                             onChanged: (val) {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatEmailFieldEvent(val),
-                                  );
+                              setState(() {
+                                errorStringEmail = checkFormatEmail(val);
+                              });
                             },
                             decoration: inputDecoration(
                               context: context,
@@ -81,11 +106,9 @@ class _BodySignInState extends State<BodySignIn> {
                             controller: email,
                           ),
                           Visibility(
-                            visible: (state is CheckFormatFieldEmailState)
-                                ? state.value.isNotEmpty
-                                : false,
+                            visible: errorStringEmail.isNotEmpty,
                             child: Text(
-                              state.value,
+                              errorStringEmail,
                               style: const TextStyle(
                                 color: kErrorColor,
                               ),
@@ -100,15 +123,15 @@ class _BodySignInState extends State<BodySignIn> {
                           TextField(
                             textInputAction: TextInputAction.done,
                             onTap: () {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatPasswordFieldEvent(
-                                        password.text),
-                                  );
+                              setState(() {
+                                errorStringPassWord =
+                                    checkPassword(password.text);
+                              });
                             },
                             onChanged: (val) {
-                              context.read<CheckFormatFieldBloc>().add(
-                                    CheckFormatPasswordFieldEvent(val),
-                                  );
+                              setState(() {
+                                errorStringPassWord = checkPassword(val);
+                              });
                             },
                             decoration: inputDecoration(
                               context: context,
@@ -136,11 +159,9 @@ class _BodySignInState extends State<BodySignIn> {
                             obscureText: !isVisiblePassWord ? true : false,
                           ),
                           Visibility(
-                            visible: (state is CheckFormatFieldPasswordState)
-                                ? state.value.isNotEmpty
-                                : false,
+                            visible: errorStringPassWord.isNotEmpty,
                             child: Text(
-                              state.value,
+                              errorStringPassWord,
                               style: const TextStyle(
                                 color: kErrorColor,
                               ),
@@ -156,26 +177,33 @@ class _BodySignInState extends State<BodySignIn> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: kDefaultPadding),
                   child: PrimaryButton(
+                    context: context,
                     text: 'Sign In',
-                    press: () {
-                      if (email.text.isEmpty) {
-                        context.read<CheckFormatFieldBloc>().add(
-                              CheckFormatEmailFieldEvent(email.text),
-                            );
-                      } else if (password.text.isEmpty) {
-                        context.read<CheckFormatFieldBloc>().add(
-                              CheckFormatPasswordFieldEvent(password.text),
-                            );
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ChatScreen(),
-                          ),
-                        );
+                    press: () async {
+                      if (errorStringEmail.isEmpty &&
+                          errorStringPassWord.isEmpty) {
+                        try {
+                          context.read<AuthBloc>().add(
+                                AuthEventLogIn(email.text, password.text),
+                              );
+                        } on UserNotFoundAuthException {
+                          await showErrorDialog(
+                            context,
+                            'User Not Found',
+                          );
+                        } on WrongPasswordAuthException {
+                          await showErrorDialog(
+                            context,
+                            'Wrong Password',
+                          );
+                        } on GenericAuthException {
+                          await showErrorDialog(
+                            context,
+                            'Error',
+                          );
+                        }
                       }
                     },
-                    context: context,
                   ),
                 ),
                 Row(
@@ -189,12 +217,9 @@ class _BodySignInState extends State<BodySignIn> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SignUp(),
-                          ),
-                        );
+                        context.read<AuthBloc>().add(
+                              const AuthEventShouldRegister(),
+                            );
                       },
                       child: const Text(
                         "Sign Up",
@@ -213,8 +238,6 @@ class _BodySignInState extends State<BodySignIn> {
               ],
             ),
           ),
-        );
-      });
-    });
+        ));
   }
 }

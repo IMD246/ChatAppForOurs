@@ -1,6 +1,4 @@
 import 'package:chatappforours/models/chat.dart';
-import 'package:chatappforours/services/bloc/theme/theme_bloc.dart';
-import 'package:chatappforours/services/bloc/theme/theme_state.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/body_mesasge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,17 +11,12 @@ class MesssageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeBloc, ThemeState>(builder: (context, state) {
-      return Scaffold(
-        appBar: buildAppbar(
-            chat,
-            (state is ThemeStateValid) ? state.themeMode : ThemeMode.light,
-            context),
-        body: BodyMessage(
-          chat: chat,
-        ),
-      );
-    });
+    return Scaffold(
+      appBar: buildAppbar(chat, ThemeMode.light, context),
+      body: BodyMessage(
+        chat: chat,
+      ),
+    );
   }
 
   AppBar buildAppbar(Chat chat, ThemeMode themeMode, BuildContext context) {

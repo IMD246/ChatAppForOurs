@@ -1,6 +1,4 @@
 import 'package:chatappforours/constants/constants.dart';
-import 'package:chatappforours/services/bloc/theme/theme_bloc.dart';
-import 'package:chatappforours/services/bloc/theme/theme_state.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
 import 'package:chatappforours/view/chat/settings/setting_screen.dart';
@@ -18,11 +16,11 @@ class _ChatScreenState extends State<ChatScreen> {
   int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeBloc, ThemeState>(
-      builder: (context, state) {
-      return  Scaffold(
-      appBar: buildAppbar(currentIndex,(state is ThemeStateValid) ? state.themeMode : ThemeMode.light),
-      body: currentIndex == 0 ? const BodyChatScreen() : const BodyContactScreen(),
+    return Scaffold(
+      appBar: buildAppbar(currentIndex, ThemeMode.light),
+      body: currentIndex == 0
+          ? const BodyChatScreen()
+          : const BodyContactScreen(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         child: const Icon(
@@ -52,8 +50,6 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
-      },
-    );
   }
 
   AppBar buildAppbar(int currentIndex, ThemeMode themeMode) {
@@ -81,8 +77,7 @@ class _ChatScreenState extends State<ChatScreen> {
             currentIndex == 0 ? 'Chat' : 'Contacts',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: 
-              textColorMode(themeMode).withOpacity(
+              color: textColorMode(themeMode).withOpacity(
                 MediaQuery.of(context).platformBrightness == Brightness.light
                     ? 0.6
                     : 0.8,

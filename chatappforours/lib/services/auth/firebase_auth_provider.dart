@@ -57,8 +57,8 @@ class FirebaseAuthProvider implements AuthProvider {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         throw UserNotFoundAuthException();
-      } else if (e.code == 'email-already-in-use') {
-        throw EmailAlreadyInUseAuthException();
+      } else if (e.code == 'wrong-password') {
+        throw WrongPasswordAuthException();
       } else {
         throw GenericAuthException();
       }
@@ -89,6 +89,16 @@ class FirebaseAuthProvider implements AuthProvider {
       }
     } catch (_) {
       throw GenericAuthException();
+    }
+  }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await user.sendEmailVerification();
+    } else {
+      throw UserNotLoggedInAuthException();
     }
   }
 }

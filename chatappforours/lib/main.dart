@@ -1,6 +1,6 @@
-import 'package:chatappforours/services/bloc/theme/theme_bloc.dart';
+import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
+import 'package:chatappforours/services/auth/firebase_auth_provider.dart';
 import 'package:chatappforours/utilities/theme/theme_data.dart';
-import 'package:chatappforours/services/bloc/theme/theme_state.dart';
 import 'package:chatappforours/view/welcome/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,18 +20,14 @@ class StartApp extends StatefulWidget {
 class _StartAppState extends State<StartApp> {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ThemeBloc(),
-      child: BlocBuilder<ThemeBloc, ThemeState>(
-        builder: (context, state) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: lightThemeData(context),
-            darkTheme: darkThemeData(context),
-            themeMode: (state is ThemeStateValid) ? state.themeMode : ThemeMode.light,
-            home: const WelcomePage(),
-          );
-        },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: lightThemeData(context),
+      darkTheme: darkThemeData(context),
+      themeMode: ThemeMode.light,
+      home: BlocProvider<AuthBloc>(
+        create: (context) => AuthBloc(FirebaseAuthProvider(),context),
+        child: const WelcomePage(),
       ),
     );
   }
