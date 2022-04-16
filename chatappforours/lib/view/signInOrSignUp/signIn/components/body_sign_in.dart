@@ -43,33 +43,9 @@ class _BodySignInState extends State<BodySignIn> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) async {
-          if (state is AuthStateLoggedOut) {
-            if (state.exception is UserNotFoundAuthException) {
-              await showErrorDialog(
-                context,
-                'User Not Found',
-              );
-            } else if (state.exception is WrongPasswordAuthException) {
-              await showErrorDialog(
-                context,
-                'Wrong Password',
-              );
-            } else if (state.exception is GenericAuthException) {
-              await showErrorDialog(
-                context,
-                'Login Auth Error',
-              );
-            } else {
-              await showErrorDialog(
-                context,
-                'Login Auth Error1',
-              );
-            }
-          }
-        },
-        child: SafeArea(
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -182,25 +158,10 @@ class _BodySignInState extends State<BodySignIn> {
                     press: () async {
                       if (errorStringEmail.isEmpty &&
                           errorStringPassWord.isEmpty) {
-                        try {
+                        {
                           context.read<AuthBloc>().add(
                                 AuthEventLogIn(email.text, password.text),
                               );
-                        } on UserNotFoundAuthException {
-                          await showErrorDialog(
-                            context,
-                            'User Not Found',
-                          );
-                        } on WrongPasswordAuthException {
-                          await showErrorDialog(
-                            context,
-                            'Wrong Password',
-                          );
-                        } on GenericAuthException {
-                          await showErrorDialog(
-                            context,
-                            'Error',
-                          );
                         }
                       }
                     },
@@ -238,6 +199,8 @@ class _BodySignInState extends State<BodySignIn> {
               ],
             ),
           ),
-        ));
+        );
+      },
+    );
   }
 }

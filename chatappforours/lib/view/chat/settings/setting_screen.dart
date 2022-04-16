@@ -1,4 +1,6 @@
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
+import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 
 import 'package:chatappforours/view/chat/settings/components/body_setting.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +16,13 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildAppbar(themeMode: ThemeMode.light),
-      body: const BodySetting(),
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: buildAppbar(themeMode: ThemeMode.light),
+          body: const BodySetting(),
+        );
+      },
     );
   }
 
@@ -25,7 +31,9 @@ class _SettingScreenState extends State<SettingScreen> {
       automaticallyImplyLeading: false,
       title: Row(
         children: [
-          BackButton(color: textColorMode(themeMode)),
+          BackButton(
+            color: textColorMode(themeMode),
+          ),
           Text(
             'Me',
             style: TextStyle(

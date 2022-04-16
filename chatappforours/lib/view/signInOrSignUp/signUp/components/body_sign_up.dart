@@ -115,9 +115,11 @@ class _BodySignUpState extends State<BodySignUp> {
                               });
                             },
                             onChanged: (val) {
-                              setState(() {
-                                errorStringLastName = checkFirstName(val);
-                              });
+                              setState(
+                                () {
+                                  errorStringLastName = checkFirstName(val);
+                                },
+                              );
                             },
                             decoration: inputDecoration(
                               context: context,
@@ -242,15 +244,9 @@ class _BodySignUpState extends State<BodySignUp> {
                           errorStringFirstName.isEmpty &&
                           errorStringLastName.isEmpty &&
                           errorStringPassWord.isEmpty) {
-                        context
-                            .read<AuthBloc>()
-                            .add(AuthEventRegister(email.text, password.text));
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ChatScreen(),
-                          ),
-                        );
+                        context.read<AuthBloc>().add(
+                              AuthEventRegister(email.text, password.text),
+                            );
                       }
                     },
                     context: context,
@@ -267,12 +263,9 @@ class _BodySignUpState extends State<BodySignUp> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SignIn(),
-                          ),
-                        );
+                        context.read<AuthBloc>().add(
+                              const AuthEventLogOut(),
+                            );
                       },
                       child: const Text(
                         "Sign In",

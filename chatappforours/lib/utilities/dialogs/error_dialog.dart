@@ -1,12 +1,13 @@
 import 'package:chatappforours/utilities/dialogs/generic_dialog.dart';
 import 'package:flutter/material.dart';
 Future<void> showErrorDialog(
-  BuildContext context,
-  String text,
+  {required BuildContext context,
+  required String text,required String title}
+  
 ) {
   return showGenericDialog<void>(
     context: context,
-    title: 'Generic Error',
+    title: title,
     content: text,
     optionsBuilder: () => {
       'Ok': null,

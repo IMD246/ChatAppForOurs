@@ -16,7 +16,6 @@ class StartApp extends StatefulWidget {
   @override
   State<StartApp> createState() => _StartAppState();
 }
-
 class _StartAppState extends State<StartApp> {
   @override
   Widget build(BuildContext context) {

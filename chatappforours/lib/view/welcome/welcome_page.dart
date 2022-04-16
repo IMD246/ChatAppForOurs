@@ -3,6 +3,7 @@ import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/view/chat/chat_screen.dart';
+import 'package:chatappforours/view/chat/settings/setting_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,8 @@ class WelcomePage extends StatelessWidget {
           return const ChatScreen();
         } else if (state is AuthStateRegistering) {
           return const SignUp();
+        } else if (state is AuthStateSetting) {
+          return const SettingScreen();
         } else {
           return Scaffold(
             backgroundColor: Colors.white,

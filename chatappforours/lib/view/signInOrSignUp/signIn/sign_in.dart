@@ -16,13 +16,29 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        return const Scaffold(
-          backgroundColor: Colors.white,
-          body: BodySignIn(),
-        );
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) async {
+        if (state is AuthStateLoggedOut) {
+          if (state.exception is UserNotFoundAuthException) {
+            await showErrorDialog(
+                context: context,
+                title: 'User not found error',
+                text: "User not found in Database");
+          } else if (state.exception is WrongPasswordAuthException) {
+            await showErrorDialog(
+                context: context,
+                title: 'Wrong password error',
+                text: "Wrong password");
+          } else if (state.exception is GenericAuthException) {
+            await showErrorDialog(
+                context: context, title: 'Generic error', text: "Login failed");
+          }
+        }
       },
+      child: const Scaffold(
+        backgroundColor: Colors.white,
+        body: BodySignIn(),
+      ),
     );
   }
 }
