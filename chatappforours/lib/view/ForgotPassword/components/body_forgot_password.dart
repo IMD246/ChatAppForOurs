@@ -55,7 +55,7 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
             children: [
               Center(
                 child: Image.asset(
-                  "assets/images/chat_logo_white.png",
+                  "chatappforours/assets/images/reset-password.png",
                   height: 246,
                 ),
               ),
