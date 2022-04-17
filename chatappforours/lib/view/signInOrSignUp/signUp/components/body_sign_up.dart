@@ -1,3 +1,4 @@
+import 'package:chatappforours/services/auth/auth_exception.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -49,10 +50,18 @@ class _BodySignUpState extends State<BodySignUp> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        return SafeArea(
+    return BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) async {
+          if (state is AuthStateRegistering) {
+            if (state.exception is AuthEmailNeedsVefiricationException) {
+              email.clear();
+              password.clear();
+              firstName.clear();
+              lastName.clear();
+            }
+          }
+        },
+        child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -287,8 +296,6 @@ class _BodySignUpState extends State<BodySignUp> {
               ],
             ),
           ),
-        );
-      },
-    );
+        ));
   }
 }
