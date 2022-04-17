@@ -26,7 +26,7 @@ class _StartAppState extends State<StartApp> {
       darkTheme: darkThemeData(context),
       themeMode: ThemeMode.light,
       home: BlocProvider<AuthBloc>(
-        create: (context) => AuthBloc(FirebaseAuthProvider(), context),
+        create: (context) => AuthBloc(FirebaseAuthProvider()),
         child: const WelcomePage(),
       ),
     );

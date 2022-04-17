@@ -50,9 +50,9 @@ class _BodySignUpState extends State<BodySignUp> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {},
-        child: SafeArea(
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -287,6 +287,8 @@ class _BodySignUpState extends State<BodySignUp> {
               ],
             ),
           ),
-        ));
+        );
+      },
+    );
   }
 }

@@ -1,12 +1,11 @@
+import 'package:chatappforours/services/auth/auth_exception.dart';
 import 'package:chatappforours/services/auth/auth_provider.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
-import 'package:chatappforours/utilities/dialogs/error_dialog.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc(AuthProvider authProvider, BuildContext context)
+  AuthBloc(AuthProvider authProvider)
       : super(const AuthStateLoading()) {
     on<AuthEventShouldRegister>((event, emit) {
       emit(
@@ -48,10 +47,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           final user =
               await authProvider.logIn(email: email, password: password);
           if (user.isEmailVerified == false) {
-            showErrorDialog(
-                context: context,
-                title: 'Verification Email',
-                text: "Check gmail ${user.email} to verification your email");
+            emit(
+              AuthStateLoggedOut(
+                exception: AuthEmailNeedsVefiricationException(),
+                email: user.email,
+                isLoading: false,
+              ),
+            );
           } else {
             emit(
               const AuthStateLoggedOut(exception: null, isLoading: false),
@@ -79,6 +81,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           password: password,
         );
         await authProvider.sendEmailVerification();
+        final user = await authProvider.logIn(email: email, password: password);
+        if (user.isEmailVerified == false) {
+          emit(
+            AuthStateRegistering(
+              exception: AuthEmailNeedsVefiricationException(),
+              email: event.email,
+              isLoading: false,
+            ),
+          );
+        }
       } on Exception catch (e) {
         emit(AuthStateRegistering(
           exception: e,
