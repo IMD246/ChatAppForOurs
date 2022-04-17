@@ -4,34 +4,46 @@ import 'package:flutter/foundation.dart';
 
 @immutable
 abstract class AuthState {
-  const AuthState();
+  final bool isLoading;
+  final String? loadingText;
+  const AuthState({
+    required this.isLoading,
+    this.loadingText = 'Please wait a moment',
+  });
 }
 
 class AuthStateLoading extends AuthState {
-  const AuthStateLoading();
+  const AuthStateLoading({required bool isLoading})
+      : super(isLoading: isLoading);
 }
 
 class AuthStateLoggedIn extends AuthState {
   final AuthUser authUser;
 
-  const AuthStateLoggedIn(this.authUser);
+  const AuthStateLoggedIn({required bool isLoading, required this.authUser})
+      : super(isLoading: isLoading);
 }
 
 class AuthStateNeedsVerification extends AuthState {
-  const AuthStateNeedsVerification();
+  const AuthStateNeedsVerification({required bool isLoading})
+      : super(isLoading: isLoading);
 }
 
-class AuthStateLogginFailure extends AuthState {
-  final Exception exception;
+class AuthStateForgotPassWord extends AuthState {
+  final Exception? exception;
+  final bool hasSentEmail;
 
-  const AuthStateLogginFailure(this.exception);
+  const AuthStateForgotPassWord(
+      {required bool isLoading,required this.exception,required this.hasSentEmail})
+      : super(isLoading: isLoading);
 }
 
 class AuthStateLoggedOut extends AuthState with EquatableMixin {
   final Exception? exception;
-  final bool isLoading;
   final String? email;
-  const AuthStateLoggedOut({required this.exception, required this.isLoading,this.email});
+  const AuthStateLoggedOut(
+      {required this.exception, required bool isLoading, this.email})
+      : super(isLoading: isLoading);
 
   @override
   List<Object?> get props => [exception, isLoading];
@@ -39,16 +51,13 @@ class AuthStateLoggedOut extends AuthState with EquatableMixin {
 
 class AuthStateRegistering extends AuthState {
   final Exception? exception;
-  final bool isLoading;
   final String? email;
   const AuthStateRegistering(
-      {required this.exception, required this.isLoading, this.email});
-}
-
-class AuthStateLogoutFailure extends AuthState {
-  const AuthStateLogoutFailure();
+      {required this.exception, required bool isLoading, this.email})
+      : super(isLoading: isLoading);
 }
 
 class AuthStateSetting extends AuthState {
-  const AuthStateSetting();
+  const AuthStateSetting({required bool isLoading})
+      : super(isLoading: isLoading);
 }

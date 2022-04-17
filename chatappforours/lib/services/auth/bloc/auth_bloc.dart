@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(AuthProvider authProvider)
-      : super(const AuthStateLoading()) {
+      : super(const AuthStateLoading(isLoading: false)) {
     on<AuthEventShouldRegister>((event, emit) {
       emit(
         const AuthStateRegistering(
@@ -26,7 +26,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         } else {
           if (user.isEmailVerified == true) {
             emit(
-              AuthStateLoggedIn(user),
+              AuthStateLoggedIn(authUser: user, isLoading: true),
             );
           } else {
             emit(
@@ -59,7 +59,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               const AuthStateLoggedOut(exception: null, isLoading: false),
             );
             emit(
-              AuthStateLoggedIn(user),
+              AuthStateLoggedIn(authUser: user, isLoading: false),
             );
           }
         } on Exception catch (e) {
@@ -98,24 +98,73 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ));
       }
     });
-    on<AuthEventLogOut>((event, emit) async {
-      try {
-        await authProvider.logOut();
+    on<AuthEventLogOut>(
+      (event, emit) async {
+        try {
+          await authProvider.logOut();
+          emit(
+            const AuthStateLoggedOut(
+              exception: null,
+              isLoading: false,
+            ),
+          );
+        } on Exception catch (e) {
+          emit(
+            AuthStateLoggedOut(
+              exception: e,
+              isLoading: false,
+            ),
+          );
+        }
+      },
+    );
+    on<AuthEventForgetPassword>(
+      (event, emit) async {
         emit(
-          const AuthStateLoggedOut(
+          const AuthStateForgotPassWord(
             exception: null,
+            hasSentEmail: false,
             isLoading: false,
           ),
         );
-      } on Exception catch (e) {
+        // user wants to actually send a forgot-password email
         emit(
-          AuthStateLoggedOut(
-            exception: e,
+          const AuthStateForgotPassWord(
+            exception: null,
+            hasSentEmail: false,
+            isLoading: true,
+          ),
+        );
+        bool didSendEmail = false;
+        Exception? exception;
+        final email = event.email;
+        if (email == null) {
+          return;
+        } else {
+          try {
+            await authProvider.sendEmailResetPassWord(email: event.email!);
+            didSendEmail = true;
+            exception = null;
+          } on Exception catch (e) {
+            didSendEmail = false;
+            exception = e;
+          }
+        }
+        emit(
+          AuthStateForgotPassWord(
+            exception: exception,
+            hasSentEmail: didSendEmail,
             isLoading: false,
           ),
         );
-      }
-    });
-    on<AuthEventSetting>((event, emit) => {emit(const AuthStateSetting())});
+      },
+    );
+    on<AuthEventSetting>(
+      (event, emit) => {
+        emit(
+          const AuthStateSetting(isLoading: false),
+        ),
+      },
+    );
   }
 }

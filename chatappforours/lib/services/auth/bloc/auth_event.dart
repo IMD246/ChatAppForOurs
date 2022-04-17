@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 @immutable
 abstract class AuthEvent {
@@ -22,6 +22,11 @@ class AuthEventLogOut extends AuthEvent {
 
 class AuthEventSetting extends AuthEvent {
   const AuthEventSetting();
+}
+
+class AuthEventForgetPassword extends AuthEvent {
+  final String? email;
+  const AuthEventForgetPassword({required this.email});
 }
 
 class AuthEventRegister extends AuthEvent {

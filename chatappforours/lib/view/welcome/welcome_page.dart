@@ -2,6 +2,7 @@ import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
+import 'package:chatappforours/view/ForgotPassword/forgot_password.dart';
 import 'package:chatappforours/view/chat/chat_screen.dart';
 import 'package:chatappforours/view/chat/settings/setting_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
@@ -24,6 +25,8 @@ class WelcomePage extends StatelessWidget {
           return const SignUp();
         } else if (state is AuthStateSetting) {
           return const SettingScreen();
+        } else if (state is AuthStateForgotPassWord) {
+          return const ForgotPassword();
         } else {
           return Scaffold(
             backgroundColor: Colors.white,

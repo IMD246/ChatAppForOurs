@@ -39,7 +39,6 @@ class _BodySignInState extends State<BodySignIn> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -185,7 +184,11 @@ class _BodySignInState extends State<BodySignIn> {
               ],
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                context.read<AuthBloc>().add(
+                      const AuthEventForgetPassword(email: null),
+                    );
+              },
               child: const Text('Forgot Password'),
             )
           ],
