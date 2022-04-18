@@ -21,9 +21,10 @@ class _SignUpState extends State<SignUp> {
         if (state is AuthStateRegistering) {
           if (state.exception is EmailAlreadyInUseAuthException) {
             await showErrorDialog(
-                context: context,
-                title: 'Email Already In Use Error',
-                text: "Email Already In Use");
+              context: context,
+              title: 'Email Already In Use Error',
+              text: "Email Already In Use",
+            );
           } else if (state.exception is AuthEmailNeedsVefiricationException) {
             await showErrorDialog(
                 context: context,

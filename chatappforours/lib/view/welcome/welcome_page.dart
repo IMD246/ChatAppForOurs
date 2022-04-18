@@ -34,7 +34,7 @@ class WelcomePage extends StatelessWidget {
           return const SignIn();
         } else if (state is AuthStateRegistering) {
           return const SignUp();
-        } else if (state is AuthStateSetting) {
+        } else if (state is AuthStateSetting) { 
           return const SettingScreen();
         } else if (state is AuthStateForgotPassWord) {
           return const ForgotPassword();

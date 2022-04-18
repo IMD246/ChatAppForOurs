@@ -78,13 +78,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final email = event.email;
       final password = event.password;
       try {
-         emit(
-            const AuthStateRegistering(
-              exception: null,
-              email: null,
-              isLoading: true,
-            ),
-          );
+        emit(
+          const AuthStateRegistering(
+            exception: null,
+            email: null,
+            isLoading: true,
+          ),
+        );
         await authProvider.createUser(
           email: email,
           password: password,
@@ -115,12 +115,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           );
         }
         emit(
-            AuthStateRegistering(
-              exception: AuthEmailNeedsVefiricationException(),
-              email: event.email,
-              isLoading: false,
-            ),
-          );
+          AuthStateRegistering(
+            exception: AuthEmailNeedsVefiricationException(),
+            email: event.email,
+            isLoading: false,
+          ),
+        );
       } on Exception catch (e) {
         emit(AuthStateRegistering(
           exception: e,
@@ -157,14 +157,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             isLoading: false,
           ),
         );
-        // user wants to actually send a forgot-password email
-        emit(
-          const AuthStateForgotPassWord(
-            exception: null,
-            hasSentEmail: false,
-            isLoading: true,
-          ),
-        );
         bool didSendEmail = false;
         Exception? exception;
         final email = event.email;
@@ -175,6 +167,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             await authProvider.sendEmailResetPassWord(email: event.email!);
             didSendEmail = true;
             exception = null;
+            emit(
+              const AuthStateForgotPassWord(
+                exception: null,
+                hasSentEmail: false,
+                isLoading: true,
+              ),
+            );
           } on Exception catch (e) {
             didSendEmail = false;
             exception = e;
