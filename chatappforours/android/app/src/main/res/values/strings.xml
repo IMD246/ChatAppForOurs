@@ -1,0 +1,7 @@
+
+<resources>
+<string name="facebook_app_id">1126057557967552</string>
+<string name="app_name">Chat App Firebase Auth</string>
+<string name="fb_login_protocol_scheme">fb1126057557967552</string>
+<string name="facebook_client_token">2e48783e1609495562f78dca688a509b</string>
+</resources>
