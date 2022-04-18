@@ -2,6 +2,8 @@ import 'package:chatappforours/services/auth/auth_exception.dart';
 import 'package:chatappforours/services/auth/auth_provider.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/crud/user_profile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -76,12 +78,33 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final email = event.email;
       final password = event.password;
       try {
+         emit(
+            const AuthStateRegistering(
+              exception: null,
+              email: null,
+              isLoading: true,
+            ),
+          );
         await authProvider.createUser(
           email: email,
           password: password,
         );
+        final userProfileFirebase = FirebaseUserProfile();
         await authProvider.sendEmailVerification();
-        final user = await authProvider.logIn(email: email, password: password);
+        final user = await authProvider.logIn(
+          email: email,
+          password: password,
+        );
+        final userProfile = UserProfile(
+          email: user.email,
+          fullName: event.fullName,
+          urlImage: '',
+          isDarkMode: false,
+        );
+        await userProfileFirebase.createNewNote(
+          userID: user.id,
+          userProfile: userProfile,
+        );
         if (user.isEmailVerified == false) {
           emit(
             AuthStateRegistering(
@@ -91,6 +114,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             ),
           );
         }
+        emit(
+            AuthStateRegistering(
+              exception: AuthEmailNeedsVefiricationException(),
+              email: event.email,
+              isLoading: false,
+            ),
+          );
       } on Exception catch (e) {
         emit(AuthStateRegistering(
           exception: e,

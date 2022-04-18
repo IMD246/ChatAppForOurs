@@ -2,7 +2,6 @@ import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
-import 'package:chatappforours/utilities/dialogs/error_dialog.dart';
 import 'package:chatappforours/utilities/dialogs/password_reset_email_sent_dialog.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
 import 'package:chatappforours/utilities/validator/check_format_field.dart';
@@ -53,10 +52,13 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Center(
-                child: Image.asset(
-                  "chatappforours/assets/images/reset-password.png",
-                  height: 246,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: kDefaultPadding),
+                child: Center(
+                  child: Image.asset(
+                    "assets/images/reset-password.png",
+                    height: 246,
+                  ),
                 ),
               ),
               Column(

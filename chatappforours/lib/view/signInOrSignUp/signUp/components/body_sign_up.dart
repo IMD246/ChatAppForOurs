@@ -65,10 +65,14 @@ class _BodySignUpState extends State<BodySignUp> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Center(
-                  child: Image.asset(
-                    "assets/images/Register_Image.png",
-                    height: 200,
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+                  child: Center(
+                    child: Image.asset(
+                      "assets/images/Register_Image.png",
+                      height: 185,
+                    ),
                   ),
                 ),
                 Column(
@@ -252,7 +256,8 @@ class _BodySignUpState extends State<BodySignUp> {
                           errorStringLastName.isEmpty &&
                           errorStringPassWord.isEmpty) {
                         context.read<AuthBloc>().add(
-                              AuthEventRegister(email.text, password.text),
+                              AuthEventRegister(email.text, password.text,
+                                  "${firstName.text} ${lastName.text}"),
                             );
                       }
                     },
