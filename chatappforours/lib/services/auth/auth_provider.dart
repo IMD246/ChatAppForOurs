@@ -1,4 +1,3 @@
-
 import 'package:chatappforours/services/auth/auth_user.dart';
 
 abstract class AuthProvider {
@@ -9,6 +8,10 @@ abstract class AuthProvider {
     required String email,
     required String password,
   });
+  Future<void> createUserWithFacebook();
+  
+  Future<void> createUserWithGoogle();
+
   Future<void> sendEmailVerification();
   Future<void> logOut();
   Future<void> sendEmailResetPassWord({required String email});

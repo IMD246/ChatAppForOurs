@@ -23,7 +23,9 @@ class AuthEventLogOut extends AuthEvent {
 class AuthEventSetting extends AuthEvent {
   const AuthEventSetting();
 }
-
+class AuthEventSettingBack extends AuthEvent {
+  const AuthEventSettingBack();
+}
 class AuthEventForgetPassword extends AuthEvent {
   final String? email;
   const AuthEventForgetPassword({required this.email});
@@ -38,4 +40,12 @@ class AuthEventRegister extends AuthEvent {
 
 class AuthEventShouldRegister extends AuthEvent {
   const AuthEventShouldRegister();
+}
+
+class AuthEventRegisterWithFacebook extends AuthEvent {
+  const AuthEventRegisterWithFacebook();
+}
+
+class AuthEventRegisterWithGoogle extends AuthEvent {
+  const AuthEventRegisterWithGoogle();
 }

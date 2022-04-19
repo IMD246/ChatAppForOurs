@@ -1,3 +1,4 @@
+import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/auth_exception.dart';
 import 'package:chatappforours/services/auth/auth_provider.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
@@ -28,14 +29,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         } else {
           if (user.isEmailVerified == true) {
             emit(
-              AuthStateLoggedIn(authUser: user, isLoading: true),
+              AuthStateLoggedIn(authUser: user, isLoading: false),
             );
           } else {
             emit(
               const AuthStateLoggedOut(exception: null, isLoading: false),
             );
           }
+          const AuthStateLoggedOut(exception: null, isLoading: false);
         }
+        const AuthStateLoggedOut(exception: null, isLoading: false);
       },
     );
     on<AuthEventLogIn>(
@@ -46,8 +49,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final email = event.email;
         final password = event.password;
         try {
-          final user =
-              await authProvider.logIn(email: email, password: password);
+          final user = await authProvider.logIn(
+            email: email,
+            password: password,
+          );
           if (user.isEmailVerified == false) {
             emit(
               AuthStateLoggedOut(
@@ -89,20 +94,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           email: email,
           password: password,
         );
-        final userProfileFirebase = FirebaseUserProfile();
         await authProvider.sendEmailVerification();
+        final userProfileFirebase = FirebaseUserProfile();
         final user = await authProvider.logIn(
           email: email,
           password: password,
         );
         final userProfile = UserProfile(
-          email: user.email,
+          email: user.email!,
           fullName: event.fullName,
           urlImage: '',
           isDarkMode: false,
         );
         await userProfileFirebase.createNewNote(
-          userID: user.id,
+          userID: user.id!,
           userProfile: userProfile,
         );
         if (user.isEmailVerified == false) {
@@ -191,8 +196,77 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthEventSetting>(
       (event, emit) => {
         emit(
-          const AuthStateSetting(isLoading: false),
+          AuthStateSetting(isLoading: false, authUser: authProvider.currentUser!),
         ),
+      },
+    );
+    on<AuthEventSettingBack>(
+      (event, emit) => {
+        emit(
+          AuthStateLoggedIn(isLoading: false, authUser: authProvider.currentUser!),
+        ),
+      },
+    );
+    on<AuthEventRegisterWithFacebook>(
+      (event, emit) async {
+        emit(
+          const AuthStateRegiseringWithFacebook(
+            isLoading: true,
+            exception: null,
+          ),
+        );
+        Exception? exception;
+        try {
+          await authProvider.createUserWithFacebook();
+          exception = null;
+          emit(
+            const AuthStateRegiseringWithFacebook(
+              isLoading: false,
+              exception: null,
+            ),
+          );
+        } on Exception catch (e) {
+          exception = e;
+        }
+        emit(AuthStateRegiseringWithFacebook(
+          isLoading: false,
+          exception: exception,
+        ));
+      },
+    );
+    on<AuthEventRegisterWithGoogle>(
+      (event, emit) async {
+        emit(
+          const AuthStateRegiseringWithGoogle(
+            isLoading: true,
+            exception: null,
+          ),
+        );
+        Exception? exception;
+        try {
+          await authProvider.createUserWithGoogle();
+          exception = null;
+          emit(
+            const AuthStateRegiseringWithGoogle(
+              isLoading: false,
+              exception: null,
+            ),
+          );
+        } on Exception catch (e) {
+          exception = e;
+          emit(
+            AuthStateRegiseringWithGoogle(
+              isLoading: false,
+              exception: exception,
+            ),
+          );
+        }
+        emit(
+          AuthStateRegiseringWithGoogle(
+            isLoading: false,
+            exception: exception,
+          ),
+        );
       },
     );
   }

@@ -12,8 +12,19 @@ class FirebaseUserProfile {
       {
         fullNameField: userProfile.fullName,
         emailField: userProfile.email,
+        urlImageField : userProfile.urlImage,
         isDarkModeField: userProfile.isDarkMode
       },
     );
+  }
+
+  Future<UserProfile?> getUserProfile({
+    required String? userID,
+  }) async {
+    if (userID != null) {
+      final userProfileSnapshot = await userProfilePath.doc(userID).get();
+      return UserProfile.fromSnapshot(userProfileSnapshot);
+    }
+    return null;
   }
 }

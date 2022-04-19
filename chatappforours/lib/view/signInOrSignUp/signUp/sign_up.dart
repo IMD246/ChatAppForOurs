@@ -36,6 +36,35 @@ class _SignUpState extends State<SignUp> {
                 title: 'Generic error',
                 text: "Register failed");
           }
+        } else if (state is AuthStateRegiseringWithFacebook ) {
+          if (state.exception is EmailAlreadyInUseAuthException) {
+            await showErrorDialog(
+              context: context,
+              title: 'Email Already In Use Error',
+              text: "Email Already In Use",
+            );
+          } else if (state.exception is GenericAuthException) {
+            await showErrorDialog(
+              context: context,
+              title: 'Generic error',
+              text: "Register facebook failed",
+            );
+          }
+        }
+        else if (state is AuthStateRegiseringWithGoogle) {
+          if (state.exception is EmailAlreadyInUseAuthException) {
+            await showErrorDialog(
+              context: context,
+              title: 'Email Already In Use Error',
+              text: "Email Already In Use",
+            );
+          } else if (state.exception is GenericAuthException) {
+            await showErrorDialog(
+              context: context,
+              title: 'Generic error',
+              text: "Register google failed",
+            );
+          }
         }
       },
       child: const Scaffold(

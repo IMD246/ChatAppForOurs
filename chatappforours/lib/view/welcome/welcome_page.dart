@@ -18,7 +18,7 @@ class WelcomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-         if (state.isLoading) {
+        if (state.isLoading) {
           LoadingScreen().show(
             context: context,
             text: state.loadingText ?? 'Please wait a moment',
@@ -28,13 +28,16 @@ class WelcomePage extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        if (state is AuthStateLoggedIn) {
-          return const ChatScreen();
-        } else if (state is AuthStateLoggedOut) {
+        if (state is AuthStateLoggedOut) {
           return const SignIn();
-        } else if (state is AuthStateRegistering) {
+        }
+        else if (state is AuthStateLoggedIn) {
+          return const ChatScreen();
+        } else if (state is AuthStateRegistering ||
+            state is AuthStateRegiseringWithFacebook ||
+            state is AuthStateRegiseringWithGoogle) {
           return const SignUp();
-        } else if (state is AuthStateSetting) { 
+        } else if (state is AuthStateSetting) {
           return const SettingScreen();
         } else if (state is AuthStateForgotPassWord) {
           return const ForgotPassword();
@@ -62,9 +65,9 @@ class WelcomePage extends StatelessWidget {
                   FittedBox(
                     child: TextButton(
                       onPressed: () {
-                        context
-                            .read<AuthBloc>()
-                            .add(const AuthEventInitialize());
+                        context.read<AuthBloc>().add(
+                              const AuthEventInitialize(),
+                            );
                       },
                       child: Row(
                         children: [

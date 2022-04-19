@@ -3,6 +3,8 @@ import 'package:chatappforours/services/auth/auth_provider.dart';
 import 'package:chatappforours/services/auth/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_login_facebook/flutter_login_facebook.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
   @override
@@ -14,8 +16,10 @@ class FirebaseAuthProvider implements AuthProvider {
   Future<AuthUser> createUser(
       {required String email, required String password}) async {
     try {
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       final user = currentUser;
       if (user != null) {
         return user;
@@ -100,6 +104,55 @@ class FirebaseAuthProvider implements AuthProvider {
       await user.sendEmailVerification();
     } else {
       throw UserNotLoggedInAuthException();
+    }
+  }
+
+  @override
+  Future<void> createUserWithFacebook() async {
+    var facebookLogin = FacebookLogin();
+    var result = await facebookLogin.logIn(permissions: [
+      FacebookPermission.publicProfile,
+      FacebookPermission.email,
+    ]);
+    try {
+      final AuthCredential authCredential;
+      if (result.status == FacebookLoginStatus.success) {
+        authCredential =
+            FacebookAuthProvider.credential(result.accessToken!.token);
+        await FirebaseAuth.instance.signInWithCredential(authCredential);
+      } else {
+        throw UserNotLoggedInAuthException();
+      }
+    } catch (e) {
+      throw GenericAuthException();
+    }
+  }
+
+  @override
+  Future<void> createUserWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email'],
+        hostedDomain: "",
+        clientId: "",
+      );
+      final GoogleSignInAccount? googleSignInAccount =
+          await googleSignIn.signIn();
+      final GoogleSignInAuthentication? googleSignAuth =
+          await googleSignInAccount?.authentication;
+      final AuthCredential authCredential = GoogleAuthProvider.credential(
+        accessToken: googleSignAuth!.accessToken,
+        idToken: googleSignAuth.idToken,
+      );
+      await FirebaseAuth.instance.signInWithCredential(authCredential);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        throw EmailAlreadyInUseAuthException();
+      } else {
+        throw GenericAuthException();
+      }
+    } catch (_) {
+      rethrow;
     }
   }
 }

@@ -292,10 +292,24 @@ class _BodySignUpState extends State<BodySignUp> {
                 const OrDivider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    SocialIcon(urlImage: "assets/icons/facebook-white.svg"),
-                    SizedBox(width: kDefaultPadding),
-                    SocialIcon(urlImage: "assets/icons/google-light.svg"),
+                  children: [
+                    SocialIcon(
+                      urlImage: "assets/icons/facebook-white.svg",
+                      press: () {
+                        context.read<AuthBloc>().add(
+                               const AuthEventRegisterWithFacebook(),
+                            );
+                      },
+                    ),
+                    const SizedBox(width: kDefaultPadding),
+                    SocialIcon(
+                      urlImage: "assets/icons/google-light.svg",
+                      press: () async{
+                           context.read<AuthBloc>().add(
+                               const AuthEventRegisterWithGoogle(),
+                            );
+                      },
+                    ),
                   ],
                 ),
               ],

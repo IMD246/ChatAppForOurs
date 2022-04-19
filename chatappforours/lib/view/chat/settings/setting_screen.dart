@@ -1,5 +1,7 @@
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/services/auth/auth_user.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
+import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 
 import 'package:chatappforours/view/chat/settings/components/body_setting.dart';
@@ -18,20 +20,32 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        return Scaffold(
-          appBar: buildAppbar(themeMode: ThemeMode.light),
-          body: const BodySetting(),
-        );
+        if (state is AuthStateSetting) {
+          return Scaffold(
+            appBar: buildAppbar(themeMode: ThemeMode.light, context: context),
+            body: const BodySetting(),
+          );
+        } else {
+          return const Scaffold();
+        }
       },
     );
   }
 
-  AppBar buildAppbar({required ThemeMode themeMode}) {
+  AppBar buildAppbar(
+      {required ThemeMode themeMode,
+      required BuildContext context,
+      AuthUser? authUser}) {
     return AppBar(
       automaticallyImplyLeading: false,
       title: Row(
         children: [
           BackButton(
+            onPressed: () {
+              context.read<AuthBloc>().add(
+                    const AuthEventSettingBack(),
+                  );
+            },
             color: textColorMode(themeMode),
           ),
           Text(

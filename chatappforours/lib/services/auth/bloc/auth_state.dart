@@ -58,6 +58,17 @@ class AuthStateRegistering extends AuthState {
 }
 
 class AuthStateSetting extends AuthState {
-  const AuthStateSetting({required bool isLoading})
+  final AuthUser authUser;
+  const AuthStateSetting({required this.authUser,required bool isLoading})
+      : super(isLoading: isLoading);
+}
+class AuthStateRegiseringWithFacebook extends AuthState {
+  final Exception? exception;
+  const AuthStateRegiseringWithFacebook({required this.exception,required bool isLoading})
+      : super(isLoading: isLoading);
+}
+class AuthStateRegiseringWithGoogle extends AuthState {
+  final Exception? exception;
+  const AuthStateRegiseringWithGoogle({required this.exception,required bool isLoading})
       : super(isLoading: isLoading);
 }
