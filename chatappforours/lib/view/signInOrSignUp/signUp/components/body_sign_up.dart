@@ -81,6 +81,8 @@ class _BodySignUpState extends State<BodySignUp> {
                       child: Column(
                         children: [
                           TextField(
+                            style: TextStyle(
+                                color: textColorMode(ThemeMode.light)),
                             textInputAction: TextInputAction.next,
                             onTap: () {
                               setState(() {
@@ -118,6 +120,8 @@ class _BodySignUpState extends State<BodySignUp> {
                       child: Column(
                         children: [
                           TextField(
+                            style: TextStyle(
+                                color: textColorMode(ThemeMode.light)),
                             textInputAction: TextInputAction.next,
                             onTap: () {
                               setState(() {
@@ -157,6 +161,8 @@ class _BodySignUpState extends State<BodySignUp> {
                       child: Column(
                         children: [
                           TextField(
+                            style: TextStyle(
+                                color: textColorMode(ThemeMode.light)),
                             textInputAction: TextInputAction.next,
                             onTap: () {
                               setState(() {
@@ -193,6 +199,8 @@ class _BodySignUpState extends State<BodySignUp> {
                       child: Column(
                         children: [
                           TextField(
+                            style: TextStyle(
+                                color: textColorMode(ThemeMode.light)),
                             textInputAction: TextInputAction.done,
                             onTap: () {
                               setState(() {
@@ -297,16 +305,16 @@ class _BodySignUpState extends State<BodySignUp> {
                       urlImage: "assets/icons/facebook-white.svg",
                       press: () {
                         context.read<AuthBloc>().add(
-                               const AuthEventRegisterWithFacebook(),
+                              const AuthEventRegisterWithFacebook(),
                             );
                       },
                     ),
                     const SizedBox(width: kDefaultPadding),
                     SocialIcon(
                       urlImage: "assets/icons/google-light.svg",
-                      press: () async{
-                           context.read<AuthBloc>().add(
-                               const AuthEventRegisterWithGoogle(),
+                      press: () async {
+                        context.read<AuthBloc>().add(
+                              const AuthEventRegisterWithGoogle(),
                             );
                       },
                     ),

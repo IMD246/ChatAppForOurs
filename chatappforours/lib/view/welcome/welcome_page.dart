@@ -1,7 +1,10 @@
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/crud/user_profile.dart';
 import 'package:chatappforours/utilities/loading/loading_screen.dart';
 import 'package:chatappforours/view/ForgotPassword/forgot_password.dart';
 import 'package:chatappforours/view/chat/chat_screen.dart';
@@ -10,14 +13,23 @@ import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
+    final ThemeChanger themeChanger = Provider.of<ThemeChanger>(context);
     return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
+      listener: (context, state) async {
+        if (state is AuthStateLoggedIn) {
+          final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+          final userProfile = await firebaseUserProfile.getUserProfile(
+              userID: state.authUser.id);
+          themeChanger.setTheme(
+            userProfile!.isDarkMode,
+          );
+        }
         if (state.isLoading) {
           LoadingScreen().show(
             context: context,
@@ -30,8 +42,7 @@ class WelcomePage extends StatelessWidget {
       builder: (context, state) {
         if (state is AuthStateLoggedOut) {
           return const SignIn();
-        }
-        else if (state is AuthStateLoggedIn) {
+        } else if (state is AuthStateLoggedIn) {
           return const ChatScreen();
         } else if (state is AuthStateRegistering ||
             state is AuthStateRegiseringWithFacebook ||

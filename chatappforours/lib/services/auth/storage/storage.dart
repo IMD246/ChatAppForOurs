@@ -14,14 +14,20 @@ class Storage {
       await storage.ref('image/$fileName').putFile(file).then(
             (p0) => ScaffoldMessenger.of(context!).showSnackBar(
               const SnackBar(
-                content: Text('Upload Image Successful'),
+                content: Text(
+                  'Upload Image Successful',
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           );
     } on FirebaseException catch (_) {
       ScaffoldMessenger.of(context!).showSnackBar(
         const SnackBar(
-          content: Text('Upload Image Failed'),
+          content: Text(
+            'Upload Image Failed',
+            textAlign: TextAlign.center,
+          ),
         ),
       );
     }

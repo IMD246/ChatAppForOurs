@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -10,6 +12,7 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 class BodySetting extends StatefulWidget {
   const BodySetting({Key? key}) : super(key: key);
@@ -21,14 +24,17 @@ class BodySetting extends StatefulWidget {
 class _BodySettingState extends State<BodySetting> {
   bool isSelectedDarkMode = false;
   late final FirebaseUserProfile userProfile;
+  late final FirebaseUserProfile firebaseUserProfile;
   @override
   void initState() {
     userProfile = FirebaseUserProfile();
+    firebaseUserProfile = FirebaseUserProfile();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    ThemeChanger themeChanger = Provider.of<ThemeChanger>(context);
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state is AuthStateSetting) {
@@ -48,32 +54,111 @@ class _BodySettingState extends State<BodySetting> {
                           children: [
                             if (userProfile!.urlImage != null)
                               GestureDetector(
-                                onTap: () {
-                                  // context.read<AuthBloc>().add(
-                                  //       const AuthEventSetting(),
-                                  //     );
+                                onTap: () async {
+                                  final results =
+                                      await FilePicker.platform.pickFiles(
+                                    allowMultiple: false,
+                                    type: FileType.custom,
+                                    allowedExtensions: [
+                                      'jpg',
+                                      'png',
+                                      'PNG',
+                                    ],
+                                  );
+                                  if (results == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'No file selected',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    final path = results.files.single.path;
+                                    final fileName = userProfile.email;
+                                    context.read<AuthBloc>().add(
+                                          AuthEventUploadImage(
+                                            context: context,
+                                            path: path!,
+                                            fileName: fileName,
+                                          ),
+                                        );
+                                  }
                                 },
-                                child: CircleAvatar(
-                                  radius: 40,
-                                  child: ClipOval(
-                                    child: Image.network(
-                                      userProfile.urlImage!,
-                                      fit: BoxFit.cover,
+                                child: Stack(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 60,
+                                      child: ClipOval(
+                                        child: CachedNetworkImage(
+                                          imageUrl: userProfile.urlImage!,
+                                          placeholder: (context, url) =>
+                                              const CircularProgressIndicator(),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
+                                          colorBlendMode: BlendMode.softLight,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    Positioned(
+                                      bottom: -7,
+                                      right: -5,
+                                      child: Container(
+                                        child: IconButton(
+                                          onPressed: () async {
+                                            final results = await FilePicker
+                                                .platform
+                                                .pickFiles(
+                                              allowMultiple: false,
+                                              type: FileType.custom,
+                                              allowedExtensions: [
+                                                'jpg',
+                                                'png',
+                                                'PNG',
+                                              ],
+                                            );
+                                            if (results == null) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'No file selected',
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              final path =
+                                                  results.files.single.path;
+                                              final fileName =
+                                                  userProfile.email;
+                                              context.read<AuthBloc>().add(
+                                                    AuthEventUploadImage(
+                                                      context: context,
+                                                      path: path!,
+                                                      fileName: fileName,
+                                                    ),
+                                                  );
+                                            }
+                                          },
+                                          icon: const Icon(Icons.edit),
+                                        ),
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Color.fromARGB(
+                                              162, 189, 187, 187),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             if (userProfile.urlImage == null)
-                              GestureDetector(
-                                // onTap: () {
-                                //   context
-                                //       .read<AuthBloc>()
-                                //       .add(const AuthEventSetting());
-                                // },
-                                child: const CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: AssetImage(
-                                      "assets/images/defaultImage.png"),
+                              const CircleAvatar(
+                                radius: 40,
+                                backgroundImage: AssetImage(
+                                  "assets/images/defaultImage.png",
                                 ),
                               ),
                             const SizedBox(height: kDefaultPadding * 0.5),
@@ -83,54 +168,6 @@ class _BodySettingState extends State<BodySetting> {
                                 color: textColorMode(ThemeMode.light),
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: kDefaultPadding * 0.5),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: kDefaultPadding,
-                              ),
-                              child: PrimaryButton(
-                                width: 100,
-                                text: 'Upload Image',
-                                press: () async {
-                                  final results =
-                                      await FilePicker.platform.pickFiles(
-                                    allowMultiple: false,
-                                    type: FileType.custom,
-                                    allowedExtensions: [
-                                      'jpg',
-                                      'png',
-                                    ],
-                                  );
-                                  if (results == null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('No file selected'),
-                                      ),
-                                    );
-                                  } else {
-                                    final path = results.files.single.path;
-                                    final fileName = userProfile.email;
-                                    Storage storage = Storage();
-                                    await storage.uploadFile(
-                                      filePath: path!,
-                                      fileName: fileName,
-                                      context: context,
-                                    );
-                                    final urlProfile =
-                                        await storage.getDownloadURL(
-                                      fileName: fileName,
-                                    );
-                                    FirebaseUserProfile firebaseUserProfile =
-                                        FirebaseUserProfile();
-                                    await firebaseUserProfile.uploadUserImage(
-                                      userID: state.authUser.id,
-                                      urlImage: urlProfile,
-                                    );
-                                  }
-                                },
-                                context: context,
                               ),
                             ),
                           ],
@@ -160,18 +197,24 @@ class _BodySettingState extends State<BodySetting> {
                           ),
                           Switch(
                             inactiveTrackColor: kPrimaryColor.withOpacity(0.5),
-                            value: isSelectedDarkMode,
+                            value: themeChanger.getTheme(),
                             activeColor: kPrimaryColor,
                             onChanged: (val) {
                               setState(
-                                () {
-                                  isSelectedDarkMode = val;
+                                ()  {
+                                    context.read<AuthBloc>().add(
+                                      AuthEventUploadStateTheme(isDarkTheme: val)
+                                    );
+                                  themeChanger.setTheme(val);
                                 },
                               );
                             },
                           ),
                         ],
                       ),
+                    ),
+                    const SizedBox(
+                      height: kDefaultPadding,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(

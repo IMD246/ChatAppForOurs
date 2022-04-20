@@ -34,7 +34,9 @@ class AuthStateForgotPassWord extends AuthState {
   final bool hasSentEmail;
 
   const AuthStateForgotPassWord(
-      {required bool isLoading,required this.exception,required this.hasSentEmail})
+      {required bool isLoading,
+      required this.exception,
+      required this.hasSentEmail})
       : super(isLoading: isLoading);
 }
 
@@ -59,16 +61,26 @@ class AuthStateRegistering extends AuthState {
 
 class AuthStateSetting extends AuthState {
   final AuthUser authUser;
-  const AuthStateSetting({required this.authUser,required bool isLoading})
+  const AuthStateSetting({required this.authUser, required bool isLoading})
       : super(isLoading: isLoading);
+}
+
+class AuthStateUploadingImage extends AuthState {
+  const AuthStateUploadingImage({required bool isLoading}) : super(isLoading: isLoading);
+}
+class AuthStateUploadingTheme extends AuthState {
+  const AuthStateUploadingTheme({required bool isLoading}) : super(isLoading: isLoading);
 }
 class AuthStateRegiseringWithFacebook extends AuthState {
   final Exception? exception;
-  const AuthStateRegiseringWithFacebook({required this.exception,required bool isLoading})
+  const AuthStateRegiseringWithFacebook(
+      {required this.exception, required bool isLoading})
       : super(isLoading: isLoading);
 }
+
 class AuthStateRegiseringWithGoogle extends AuthState {
   final Exception? exception;
-  const AuthStateRegiseringWithGoogle({required this.exception,required bool isLoading})
+  const AuthStateRegiseringWithGoogle(
+      {required this.exception, required bool isLoading})
       : super(isLoading: isLoading);
 }

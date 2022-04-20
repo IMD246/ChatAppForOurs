@@ -5,6 +5,7 @@ import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/user_profile.dart';
+import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -196,15 +197,104 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthEventSetting>(
       (event, emit) => {
         emit(
-          AuthStateSetting(isLoading: false, authUser: authProvider.currentUser!),
+          AuthStateSetting(
+            isLoading: false,
+            authUser: authProvider.currentUser!,
+          ),
         ),
       },
     );
     on<AuthEventSettingBack>(
       (event, emit) => {
         emit(
-          AuthStateLoggedIn(isLoading: false, authUser: authProvider.currentUser!),
+          AuthStateLoggedIn(
+              isLoading: false, authUser: authProvider.currentUser!),
         ),
+      },
+    );
+    on<AuthEventUploadImage>(
+      (event, emit) async {
+        {
+          emit(
+            AuthStateSetting(
+              isLoading: true,
+              authUser: authProvider.currentUser!,
+            ),
+          );
+          Storage storage = Storage();
+          FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+          try {
+            await storage.uploadFile(
+              filePath: event.path,
+              fileName: event.fileName,
+              context: event.context,
+            );
+            final urlProfile = await storage.getDownloadURL(
+              fileName: event.fileName,
+            );
+            await firebaseUserProfile.uploadUserImage(
+              userID: authProvider.currentUser!.id,
+              urlImage: urlProfile,
+            );
+            emit(
+              AuthStateSetting(
+                isLoading: false,
+                authUser: authProvider.currentUser!,
+              ),
+            );
+          } on Exception catch (_) {
+            emit(
+              AuthStateSetting(
+                isLoading: false,
+                authUser: authProvider.currentUser!,
+              ),
+            );
+          }
+          emit(
+            AuthStateSetting(
+              isLoading: false,
+              authUser: authProvider.currentUser!,
+            ),
+          );
+        }
+      },
+    );
+    on<AuthEventUploadStateTheme>(
+      (event, emit) async {
+        {
+          emit(
+            AuthStateSetting(
+              isLoading: true,
+              authUser: authProvider.currentUser!,
+            ),
+          );
+          FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+          try {
+            await firebaseUserProfile.uploadDarkTheme(
+              userID: authProvider.currentUser!.id,
+              isDarkTheme: event.isDarkTheme,
+            );
+            emit(
+              AuthStateSetting(
+                isLoading: false,
+                authUser: authProvider.currentUser!,
+              ),
+            );
+          } on Exception catch (_) {
+            emit(
+              AuthStateSetting(
+                isLoading: false,
+                authUser: authProvider.currentUser!,
+              ),
+            );
+          }
+          emit(
+            AuthStateSetting(
+              isLoading: false,
+              authUser: authProvider.currentUser!,
+            ),
+          );
+        }
       },
     );
     on<AuthEventRegisterWithFacebook>(

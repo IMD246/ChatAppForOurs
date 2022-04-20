@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
@@ -104,8 +105,15 @@ class _ChatScreenState extends State<ChatScreen> {
                 context.read<AuthBloc>().add(const AuthEventSetting());
               },
               child: CircleAvatar(
-                child:
-                    ClipOval(child: Image.network(urlImage, fit: BoxFit.cover)),
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: urlImage,
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
+                ),
               ),
             ),
           if (urlImage == null)

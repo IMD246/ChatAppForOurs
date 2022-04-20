@@ -38,4 +38,15 @@ class FirebaseUserProfile {
       await userProfilePath.doc(userID).update(mapUser);
     }
   }
+
+  Future<void> uploadDarkTheme({
+    required String? userID,
+    required bool isDarkTheme,
+  }) async {
+    if (userID != null) {
+      Map<String, dynamic> mapUser = <String, dynamic>{};
+      mapUser.addAll({isDarkModeField: isDarkTheme});
+      await userProfilePath.doc(userID).update(mapUser);
+    }
+  }
 }

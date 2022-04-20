@@ -56,6 +56,7 @@ class _BodySignInState extends State<BodySignIn> {
                     children: [
                       TextField(
                         textInputAction: TextInputAction.next,
+                        style: TextStyle(color: textColorMode(ThemeMode.light)),
                         onTap: () {
                           setState(() {
                             errorStringEmail = checkFormatEmail(email.text);
@@ -92,6 +93,7 @@ class _BodySignInState extends State<BodySignIn> {
                     children: [
                       TextField(
                         textInputAction: TextInputAction.done,
+                        style: TextStyle(color: textColorMode(ThemeMode.light)),
                         onTap: () {
                           setState(() {
                             errorStringPassWord = checkPassword(password.text);

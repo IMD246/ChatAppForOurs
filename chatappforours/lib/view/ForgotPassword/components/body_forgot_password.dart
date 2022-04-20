@@ -67,6 +67,8 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                     child: Column(
                       children: [
                         TextField(
+                          style:
+                              TextStyle(color: textColorMode(ThemeMode.light)),
                           textInputAction: TextInputAction.next,
                           onTap: () {
                             setState(() {
