@@ -6,7 +6,6 @@ import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/user_profile.dart';
-import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:file_picker/file_picker.dart';
 

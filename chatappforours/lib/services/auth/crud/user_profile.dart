@@ -7,11 +7,13 @@ class UserProfile {
   final String email;
   final String fullName;
   final String? urlImage;
+  final bool isOnline;
   final bool isDarkMode;
   const UserProfile({
     required this.email,
     required this.fullName,
     required this.urlImage,
+    required this.isOnline,
     required this.isDarkMode,
   });
   factory UserProfile.fromSnapshot(
@@ -22,6 +24,6 @@ class UserProfile {
         urlImage: snapshot.get(urlImageField).toString().isEmpty
             ? null
             : snapshot.get(urlImageField),
-        isDarkMode: snapshot.get(isDarkModeField),
+        isDarkMode: snapshot.get(isDarkModeField), isOnline: snapshot.get(isOnlineField),
       );
 }

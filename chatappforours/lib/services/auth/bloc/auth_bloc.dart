@@ -1,4 +1,3 @@
-import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/auth_exception.dart';
 import 'package:chatappforours/services/auth/auth_provider.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
@@ -21,6 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
     on<AuthEventInitialize>(
       (event, emit) async {
+        emit(const AuthStateLoggedOut(exception: null, isLoading: true));
         await authProvider.intialize();
         final user = authProvider.currentUser;
         if (user == null) {
@@ -29,6 +29,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           );
         } else {
           if (user.isEmailVerified == true) {
+            FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+            await firebaseUserProfile.uploadIsOnline(
+              userID: user.id,
+              isOnline: true,
+            );
             emit(
               AuthStateLoggedIn(authUser: user, isLoading: false),
             );
@@ -106,6 +111,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           fullName: event.fullName,
           urlImage: '',
           isDarkMode: false,
+          isOnline: false,
         );
         await userProfileFirebase.createNewNote(
           userID: user.id!,
@@ -136,7 +142,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
     on<AuthEventLogOut>(
       (event, emit) async {
+        emit(
+          const AuthStateLoggedOut(
+            exception: null,
+            isLoading: true,
+          ),
+        );
         try {
+          FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+          await firebaseUserProfile.uploadIsOnline(
+            userID: authProvider.currentUser!.id,
+            isOnline: false,
+          );
           await authProvider.logOut();
           emit(
             const AuthStateLoggedOut(
@@ -152,6 +169,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             ),
           );
         }
+        emit(
+          const AuthStateLoggedOut(
+            exception: null,
+            isLoading: false,
+          ),
+        );
       },
     );
     on<AuthEventForgetPassword>(

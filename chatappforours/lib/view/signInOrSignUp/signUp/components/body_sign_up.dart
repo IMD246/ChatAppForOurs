@@ -252,7 +252,7 @@ class _BodySignUpState extends State<BodySignUp> {
                     ),
                   ],
                 ),
-                SizedBox(height: size.height * 0.03),
+                SizedBox(height: size.height * 0.01),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: kDefaultPadding),
