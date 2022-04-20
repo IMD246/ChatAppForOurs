@@ -12,7 +12,7 @@ class FirebaseUserProfile {
       {
         fullNameField: userProfile.fullName,
         emailField: userProfile.email,
-        urlImageField : userProfile.urlImage,
+        urlImageField: userProfile.urlImage,
         isDarkModeField: userProfile.isDarkMode
       },
     );
@@ -26,5 +26,16 @@ class FirebaseUserProfile {
       return UserProfile.fromSnapshot(userProfileSnapshot);
     }
     return null;
+  }
+
+  Future<void> uploadUserImage({
+    required String? userID,
+    required String? urlImage,
+  }) async {
+    if (userID != null) {
+      Map<String, dynamic> mapUser = <String, dynamic>{};
+      mapUser.addAll({urlImageField: urlImage});
+      await userProfilePath.doc(userID).update(mapUser);
+    }
   }
 }

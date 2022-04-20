@@ -35,8 +35,7 @@ class _ChatScreenState extends State<ChatScreen> {
               : userProfile.getUserProfile(userID: null),
           builder: (context, snapshot) {
             final userProfile = snapshot.data;
-            if (snapshot.connectionState == ConnectionState.done &&
-                snapshot.hasData) {
+            if (snapshot.hasData) {
               return Scaffold(
                 appBar: buildAppbar(
                   currentIndex,

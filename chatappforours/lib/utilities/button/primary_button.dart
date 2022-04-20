@@ -8,6 +8,7 @@ class PrimaryButton extends StatelessWidget {
     required this.press,
     required this.context,
     this.color = kPrimaryColor,
+    this.width = double.infinity,
     this.padding = const EdgeInsets.all(kDefaultPadding * 0.75),
   }) : super(key: key);
   final BuildContext context;
@@ -15,6 +16,7 @@ class PrimaryButton extends StatelessWidget {
   final VoidCallback press;
   final Color color;
   final EdgeInsets padding;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class PrimaryButton extends StatelessWidget {
       ),
       padding: padding,
       color: color,
-      minWidth: double.infinity,
+      minWidth: width,
       onPressed: press,
       child: Text(
         text,
