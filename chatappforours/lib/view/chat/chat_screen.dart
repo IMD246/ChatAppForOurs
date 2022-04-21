@@ -5,8 +5,11 @@ import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/user_profile.dart';
+import 'package:chatappforours/utilities/dialogs/error_dialog.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,11 +22,16 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   int currentIndex = 0;
-  late final FirebaseUserProfile userProfile;
+  late final FirebaseUserProfile firebaseUserProfile;
   @override
   void initState() {
-    userProfile = FirebaseUserProfile();
+    firebaseUserProfile = FirebaseUserProfile();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -32,8 +40,8 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (context, state) {
         return FutureBuilder<UserProfile?>(
           future: (state is AuthStateLoggedIn)
-              ? userProfile.getUserProfile(userID: state.authUser.id!)
-              : userProfile.getUserProfile(userID: null),
+              ? firebaseUserProfile.getUserProfile(userID: state.authUser.id!)
+              : firebaseUserProfile.getUserProfile(userID: null),
           builder: (context, snapshot) {
             final userProfile = snapshot.data;
             if (snapshot.hasData) {
@@ -48,7 +56,22 @@ class _ChatScreenState extends State<ChatScreen> {
                     ? const BodyChatScreen()
                     : const BodyContactScreen(),
                 floatingActionButton: FloatingActionButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final DatabaseReference userPresenceDatabaseReference =
+                        FirebaseDatabase.instance.ref('userPresence');
+                    final uid = FirebaseAuth.instance.currentUser!.uid;
+                    userPresenceDatabaseReference
+                        .child("$uid/presence")
+                        .onValue
+                        .listen((event) {
+                      bool isOnline = event.snapshot.value as bool;
+                      showErrorDialog(
+                        context: context,
+                        text: "check: $isOnline",
+                        title: "check",
+                      );
+                    });
+                  },
                   child: const Icon(
                     Icons.person_add_alt_1,
                     color: Colors.white,

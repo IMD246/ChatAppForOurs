@@ -18,35 +18,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ),
       );
     });
-    on<AuthEventInitialize>(
-      (event, emit) async {
-        emit(const AuthStateLoggedOut(exception: null, isLoading: true));
-        await authProvider.intialize();
-        final user = authProvider.currentUser;
-        if (user == null) {
+    on<AuthEventInitialize>((event, emit) async {
+      emit(const AuthStateLoggedOut(exception: null, isLoading: true));
+      final user = authProvider.currentUser;
+      if (user == null) {
+        emit(
+          const AuthStateLoggedOut(exception: null, isLoading: false),
+        );
+      } else {
+        if (user.isEmailVerified == true) {
+          FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+          await firebaseUserProfile.updateUserPresenceDisconnect(uid: user.id!);
+          emit(
+            AuthStateLoggedIn(authUser: user, isLoading: false),
+          );
+        } else {
           emit(
             const AuthStateLoggedOut(exception: null, isLoading: false),
           );
-        } else {
-          if (user.isEmailVerified == true) {
-            FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-            await firebaseUserProfile.uploadIsOnline(
-              userID: user.id,
-              isOnline: true,
-            );
-            emit(
-              AuthStateLoggedIn(authUser: user, isLoading: false),
-            );
-          } else {
-            emit(
-              const AuthStateLoggedOut(exception: null, isLoading: false),
-            );
-          }
-          const AuthStateLoggedOut(exception: null, isLoading: false);
         }
-        const AuthStateLoggedOut(exception: null, isLoading: false);
-      },
-    );
+      }
+    });
     on<AuthEventLogIn>(
       (event, emit) async {
         emit(
@@ -68,8 +60,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               ),
             );
           } else {
-            emit(
-              const AuthStateLoggedOut(exception: null, isLoading: false),
+            FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+            await firebaseUserProfile.updateUserPresenceDisconnect(
+              uid: user.id!,
             );
             emit(
               AuthStateLoggedIn(authUser: user, isLoading: false),
@@ -111,9 +104,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           fullName: event.fullName,
           urlImage: '',
           isDarkMode: false,
-          isOnline: false,
         );
-        await userProfileFirebase.createNewNote(
+        await userProfileFirebase.createUserProfile(
           userID: user.id!,
           userProfile: userProfile,
         );
@@ -142,6 +134,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
     on<AuthEventLogOut>(
       (event, emit) async {
+        FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
         emit(
           const AuthStateLoggedOut(
             exception: null,
@@ -149,10 +142,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           ),
         );
         try {
-          FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-          await firebaseUserProfile.uploadIsOnline(
-            userID: authProvider.currentUser!.id,
-            isOnline: false,
+          await firebaseUserProfile.updateUserPresence(
+            bool: false,
+            uid: authProvider.currentUser!.id!,
           );
           await authProvider.logOut();
           emit(
