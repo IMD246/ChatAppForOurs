@@ -28,12 +28,10 @@ class _ChatScreenState extends State<ChatScreen> {
     firebaseUserProfile = FirebaseUserProfile();
     super.initState();
   }
-
   @override
   void dispose() {
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(

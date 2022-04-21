@@ -1,4 +1,5 @@
 import 'package:chatappforours/constants/user_profile_constant_field.dart';
+import 'package:chatappforours/services/auth/auth_exception.dart';
 import 'package:chatappforours/services/auth/crud/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -23,13 +24,19 @@ class FirebaseUserProfile {
 
   Future<UserProfile?> getUserProfile({
     required String? userID,
-    bool isOnline = false,
   }) async {
-    if (userID != null) {
-      final userProfileSnapshot = await userProfilePath.doc(userID).get();
-      return UserProfile.fromSnapshot(userProfileSnapshot);
+    try {
+      final userProfile = await userProfilePath.doc(userID).get();
+      return UserProfile.fromSnapshot(userProfile);
+    } on FirebaseException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw UserNotFoundAuthException();
+      } else {
+        throw GenericAuthException();
+      }
+    } catch (_) {
+      return null;
     }
-    return null;
   }
 
   Future<void> uploadUserImage({
@@ -64,16 +71,29 @@ class FirebaseUserProfile {
     Map<String, dynamic> presenceStatusFalse = {
       'presence': false,
     };
-    await userPresenceDatabaseReference.child(uid).onDisconnect().update(
-          presenceStatusFalse,
-        );
+    await userPresenceDatabaseReference
+        .child(uid)
+        .onDisconnect()
+        .update(presenceStatusFalse);
   }
 
   Future<void> updateUserPresence(
-      {required String uid, required bool bool}) async {
+      {required String? uid, required bool bool}) async {
     Map<String, dynamic> presenceStatusFalse = {
       'presence': bool,
     };
-    await userPresenceDatabaseReference.child(uid).update(presenceStatusFalse);
+    try {
+      await userPresenceDatabaseReference
+          .child(uid!)
+          .update(presenceStatusFalse);
+    } on FirebaseException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw UserNotFoundAuthException();
+      } else {
+        throw GenericAuthException();
+      }
+    } catch (_) {
+      throw GenericAuthException();
+    }
   }
 }

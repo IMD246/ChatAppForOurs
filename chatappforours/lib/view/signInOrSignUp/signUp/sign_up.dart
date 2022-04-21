@@ -34,7 +34,7 @@ class _SignUpState extends State<SignUp> {
             await showErrorDialog(
                 context: context,
                 title: 'Generic error',
-                text: "Register failed");
+                text: "Auth Error");
           }
         } else if (state is AuthStateRegiseringWithFacebook ) {
           if (state.exception is EmailAlreadyInUseAuthException) {

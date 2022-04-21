@@ -18,27 +18,47 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ),
       );
     });
-    on<AuthEventInitialize>((event, emit) async {
-      emit(const AuthStateLoggedOut(exception: null, isLoading: true));
-      final user = authProvider.currentUser;
-      if (user == null) {
-        emit(
-          const AuthStateLoggedOut(exception: null, isLoading: false),
-        );
-      } else {
-        if (user.isEmailVerified == true) {
-          FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-          await firebaseUserProfile.updateUserPresenceDisconnect(uid: user.id!);
+    on<AuthEventInitialize>(
+      (event, emit) async {
+        emit(const AuthStateLoggedOut(exception: null, isLoading: true));
+        FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+        final user = authProvider.currentUser;
+        try {
+          final userProfile =
+              await firebaseUserProfile.getUserProfile(userID: user?.id);
+          if (userProfile == null) {
+            emit(
+              const AuthStateLoggedOut(exception: null, isLoading: false),
+            );
+          } else {
+            if (user != null) {
+              if (user.isEmailVerified == true) {
+                await firebaseUserProfile.updateUserPresenceDisconnect(
+                    uid: user.id!);
+                emit(
+                  AuthStateLoggedIn(authUser: user, isLoading: false),
+                );
+              } else {
+                emit(
+                  const AuthStateLoggedOut(exception: null, isLoading: false),
+                );
+              }
+            } else {
+              emit(
+                const AuthStateLoggedOut(exception: null, isLoading: false),
+              );
+            }
+          }
+        } on Exception catch (e) {
           emit(
-            AuthStateLoggedIn(authUser: user, isLoading: false),
-          );
-        } else {
-          emit(
-            const AuthStateLoggedOut(exception: null, isLoading: false),
+            AuthStateLoggedOut(
+              exception: e,
+              isLoading: false,
+            ),
           );
         }
-      }
-    });
+      },
+    );
     on<AuthEventLogIn>(
       (event, emit) async {
         emit(
@@ -144,9 +164,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         try {
           await firebaseUserProfile.updateUserPresence(
             bool: false,
-            uid: authProvider.currentUser!.id!,
+            uid: authProvider.currentUser?.id,
           );
-          await authProvider.logOut();
+          final userProfile = await firebaseUserProfile.getUserProfile(
+              userID: authProvider.currentUser?.id);
+          if (userProfile != null) {
+            await authProvider.logOut();
+          }
           emit(
             const AuthStateLoggedOut(
               exception: null,
