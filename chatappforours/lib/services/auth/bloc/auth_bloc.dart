@@ -1,9 +1,11 @@
+import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/auth_exception.dart';
 import 'package:chatappforours/services/auth/auth_provider.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
-import 'package:chatappforours/services/auth/crud/user_profile.dart';
+import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -101,6 +103,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthEventRegister>((event, emit) async {
       final email = event.email;
       final password = event.password;
+      final FirebaseUsersJoinChat firebaseUsersJoinChat =
+          FirebaseUsersJoinChat();
       try {
         emit(
           const AuthStateRegistering(
@@ -113,8 +117,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           email: email,
           password: password,
         );
-        await authProvider.sendEmailVerification();
-        final userProfileFirebase = FirebaseUserProfile();
         final user = await authProvider.logIn(
           email: email,
           password: password,
@@ -125,6 +127,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           urlImage: '',
           isDarkMode: false,
         );
+        await firebaseUsersJoinChat.createUsersJoinChat(
+          userID: user.id!,
+          ruleChat: RuleChat.member,
+          fullName: event.fullName,
+        );
+        await authProvider.sendEmailVerification();
+        final userProfileFirebase = FirebaseUserProfile();
         await userProfileFirebase.createUserProfile(
           userID: user.id!,
           userProfile: userProfile,

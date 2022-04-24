@@ -9,7 +9,9 @@ String checkFormatEmail(String val) {
 }
 
 String checkPassword(String val) {
-  return val.isEmpty ? "Enter Your Password" : '';
+  return val.isEmpty
+      ? "Enter Your Password"
+      : (val.length < 6 ? "Weak Password" : "");
 }
 
 String checkFirstName(String val) {
@@ -17,6 +19,7 @@ String checkFirstName(String val) {
       ? "Enter Your First Name"
       : (val.length < 3 ? "Your First Name Length Need To > 3" : '');
 }
+
 String checkLastName(String val) {
   return val.isEmpty
       ? "Enter Your Last Name"
