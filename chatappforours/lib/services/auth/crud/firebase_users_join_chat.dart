@@ -1,4 +1,3 @@
-import 'package:chatappforours/constants/chat_constant_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/constants/user_profile_constant_field.dart';
 import 'package:chatappforours/enum/enum.dart';
@@ -16,17 +15,20 @@ class FirebaseUsersJoinChat {
     Map<String, dynamic> map = <String, dynamic>{
       userIDField: userID,
       ruleChatField: ruleChat.toString(),
+      stampTimeField: DateTime.now(),
     };
+    await firebaseUsersJoinChat.doc().set(map);
     final firebaseChat = FirebaseChat();
-    await firebaseUsersJoinChat.doc().set(map).whenComplete(() {
-       firebaseChat.createChat(
-        stampTime: "asd",
-        lastText: 'Let make some chat',
-        nameChat: fullName,
-        typeChat: TypeChat.normal,
-        chatID: firebaseUsersJoinChat.doc().path,
-      );
-    });
+    Query query = firebaseUsersJoinChat
+        .orderBy(stampTimeField, descending: true)
+        .limit(1);
+    final id = await query.get().then((value) => value.docs.first.id);
+    await firebaseChat.createChat(
+      lastText: 'Let make some chat',
+      nameChat: fullName,
+      typeChat: TypeChat.normal,
+      chatID: id,
+    );
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getUsersJoinChatByID({

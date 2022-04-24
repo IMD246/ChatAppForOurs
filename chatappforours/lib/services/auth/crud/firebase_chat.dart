@@ -7,13 +7,12 @@ class FirebaseChat {
   final firebaseChat = FirebaseFirestore.instance.collection('chat');
   Future<void> createChat({
     required String chatID,
-    required String stampTime,
     required String lastText,
     required String nameChat,
     required TypeChat typeChat,
   }) async {
     Map<String, dynamic> map = <String, dynamic>{
-      timeLastChatField: stampTime,
+      timeLastChatField: DateTime.now(),
       lastTextField: lastText,
       nameChatField: nameChat,
       typeChatField: typeChat.toString(),
