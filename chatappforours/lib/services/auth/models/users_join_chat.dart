@@ -14,12 +14,17 @@ class UsersJoinChat {
     required this.userID,
   });
   factory UsersJoinChat.fromSnapshot({
-    required DocumentSnapshot<Map<String, dynamic>> docs,
+    required QueryDocumentSnapshot<Map<String, dynamic>> docs,
   }) {
-   return UsersJoinChat(
-      ruleChat: docs.get(ruleChatField).compareTo(RuleChat.admin.toString()) ? RuleChat.admin : RuleChat.member,
-      chatID: docs.get(chatIDField),
-      userID: docs.get(userIDField),
-    );
+    return UsersJoinChat(
+        ruleChat: docs
+                    .data()[ruleChatField]
+                    .toString()
+                    .compareTo(RuleChat.admin.toString()) ==
+                0
+            ? RuleChat.admin
+            : RuleChat.member,
+        chatID: docs.id,
+        userID: docs.data()[userIDField]);
   }
 }

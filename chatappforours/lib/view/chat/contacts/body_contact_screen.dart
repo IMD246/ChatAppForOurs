@@ -1,5 +1,5 @@
 import 'package:chatappforours/constants/constants.dart';
-import 'package:chatappforours/models/chat.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/view/chat/contacts/components/contact_card.dart';
 import 'package:flutter/material.dart';
@@ -12,25 +12,25 @@ class BodyContactScreen extends StatefulWidget {
 }
 
 class _BodyContactScreenState extends State<BodyContactScreen> {
-  List<dynamic> listChatData = [];
+  List<Chat> listChatData = [];
   bool isFilledRecent = true;
   bool isFilledActive = false;
-  void getAllData() {
-    listChatData.clear();
-    listChatData.addAll(chatsData);
-  }
+  // void getAllData() {
+  //   listChatData.clear();
+  //   listChatData.addAll(chatsData);
+  // }
 
-  Future<void> getData() async {
-    listChatData.clear();
-    for (var i = 0; i < chatsData.length; i++) {
-      await chatsData[i].isActive ? listChatData.add(chatsData[i]) : null;
-    }
-  }
+  // Future<void> getData() async {
+  //   listChatData.clear();
+  //   for (var i = 0; i < chatsData.length; i++) {
+  //     await chatsData[i].isActive ? listChatData.add(chatsData[i]) : null;
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
-    getAllData();
+    // getAllData();
   }
 
   @override
@@ -60,7 +60,6 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                     () {
                       isFilledRecent = true;
                       isFilledActive = false;
-                      getAllData();
                     },
                   );
                 },
@@ -72,7 +71,6 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                   setState(() {
                     isFilledRecent = false;
                     isFilledActive = true;
-                    getData();
                   });
                 },
                 text: "Active",
@@ -81,16 +79,15 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
             ],
           ),
         ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: listChatData.length,
-            itemBuilder: (context, index) {
-              return ContactCard(
-                chat: listChatData[index],
-              );
-            },
-          ),
-        ),
+        // Expanded(
+        //   child: ListView.builder(
+        //     itemBuilder: (context, index) {
+        //       return ContactCard(
+        //         chat: listChatData[index],
+        //       );
+        //     },
+        //   ),
+        // ),
       ],
     );
   }

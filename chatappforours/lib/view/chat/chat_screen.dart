@@ -28,10 +28,12 @@ class _ChatScreenState extends State<ChatScreen> {
     firebaseUserProfile = FirebaseUserProfile();
     super.initState();
   }
+
   @override
   void dispose() {
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
@@ -54,22 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ? const BodyChatScreen()
                     : const BodyContactScreen(),
                 floatingActionButton: FloatingActionButton(
-                  onPressed: () async {
-                    final DatabaseReference userPresenceDatabaseReference =
-                        FirebaseDatabase.instance.ref('userPresence');
-                    final uid = FirebaseAuth.instance.currentUser!.uid;
-                    userPresenceDatabaseReference
-                        .child("$uid/presence")
-                        .onValue
-                        .listen((event) {
-                      bool isOnline = event.snapshot.value as bool;
-                      showErrorDialog(
-                        context: context,
-                        text: "check: $isOnline",
-                        title: "check",
-                      );
-                    });
-                  },
+                  onPressed: () {},
                   child: const Icon(
                     Icons.person_add_alt_1,
                     color: Colors.white,
@@ -102,8 +89,8 @@ class _ChatScreenState extends State<ChatScreen> {
               return const Scaffold(
                 body: Center(
                   child: SizedBox(
-                    height: 100,
-                    width: 100,
+                    height: 200,
+                    width: 200,
                     child: CircularProgressIndicator(),
                   ),
                 ),

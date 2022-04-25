@@ -1,6 +1,5 @@
-
 import 'package:chatappforours/constants/constants.dart';
-import 'package:chatappforours/models/chat.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -32,32 +31,32 @@ class ContactCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundImage: AssetImage(chat.image),
+                  // backgroundImage: AssetImage(chat.image),
                 ),
-                if (chat.isActive)
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: kPrimaryColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          width: 3,
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                        ),
-                      ),
-                    ),
-                  )
+                // if (chat.isActive)
+                //   Positioned(
+                //     bottom: 0,
+                //     right: 0,
+                //     child: Container(
+                //       width: 16,
+                //       height: 16,
+                //       decoration: BoxDecoration(
+                //         color: kPrimaryColor,
+                //         shape: BoxShape.circle,
+                //         border: Border.all(
+                //           width: 3,
+                //           color: Theme.of(context).scaffoldBackgroundColor,
+                //         ),
+                //       ),
+                //     ),
+                //   )
               ],
             ),
             const SizedBox(width: kDefaultPadding / 2),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
               child: Text(
-                chat.name,
+                chat.nameChat,
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 16,
@@ -67,9 +66,8 @@ class ContactCard extends StatelessWidget {
             const Spacer(),
             Opacity(
               opacity: 0.64,
-              child: Text(
-                chat.time,
-              ),
+              child: Text("asd"),
+              //  chat.time,
             ),
           ],
         ),

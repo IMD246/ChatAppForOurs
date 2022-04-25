@@ -23,8 +23,13 @@ class FirebaseChat {
   Future<Chat> getChatByID({
     required String idChat,
     required RuleChat ruleChat,
+    required String userIDChatScreen,
   }) async {
     final chat = await firebaseChat.doc(idChat).get();
-    return Chat.fromSnapshot(docs: chat, rule: ruleChat);
+    return Chat.fromSnapshot(
+      docs: chat,
+      rule: ruleChat,
+      userIDChatScreen: userIDChatScreen,
+    );
   }
 }

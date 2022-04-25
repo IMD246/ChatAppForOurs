@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../constants/constants.dart';
-import '../../../../models/chat.dart';
 
 class ChatCard extends StatelessWidget {
   const ChatCard({
@@ -13,6 +16,7 @@ class ChatCard extends StatelessWidget {
   final VoidCallback press;
   @override
   Widget build(BuildContext context) {
+    final firebaseUserProfile = FirebaseUserProfile();
     return GestureDetector(
       onTap: press,
       child: Padding(
@@ -22,30 +26,67 @@ class ChatCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: AssetImage(chat.image),
-                ),
-                if (chat.isActive)
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      height: 16,
-                      width: 16,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: kPrimaryColor,
-                        border: Border.all(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          width: 3,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+            FutureBuilder<UserProfile?>(
+              future: firebaseUserProfile.getUserProfile(userID: chat.userID),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.done:
+                    if (snapshot.hasData) {
+                      final userProfile = snapshot.data;
+                      return Stack(
+                        children: [
+                          if (userProfile!.urlImage != null)
+                            CircleAvatar(
+                              child: ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: userProfile.urlImage!,
+                                  placeholder: (context, url) =>
+                                      const CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                ),
+                              ),
+                            ),
+                          if (userProfile.urlImage == null)
+                            const CircleAvatar(
+                              backgroundImage:
+                                  AssetImage("assets/images/defaultImage.png"),
+                            ),
+                          if (chat.presence == true)
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                height: 16,
+                                width: 16,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: kPrimaryColor,
+                                  border: Border.all(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    width: 3,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    } else {
+                      return const Text(
+                        "Waiting...",
+                      );
+                    }
+                  case ConnectionState.waiting:
+                    return const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(),
+                    );
+                  default:
+                    return const Text("Waiting...");
+                }
+              },
             ),
             const SizedBox(width: kDefaultPadding / 2),
             Expanded(
@@ -56,7 +97,7 @@ class ChatCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      chat.name,
+                      chat.nameChat,
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 16,
@@ -66,7 +107,7 @@ class ChatCard extends StatelessWidget {
                     Opacity(
                       opacity: 0.64,
                       child: Text(
-                        chat.lastMessage,
+                        chat.lastText,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -76,7 +117,7 @@ class ChatCard extends StatelessWidget {
             ),
             Opacity(
               opacity: 0.64,
-              child: Text(chat.time),
+              child: Text(chat.stampTime),
             ),
           ],
         ),

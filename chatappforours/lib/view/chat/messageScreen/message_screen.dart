@@ -1,4 +1,4 @@
-import 'package:chatappforours/models/chat.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/body_mesasge.dart';
 import 'package:flutter/material.dart';
 
@@ -26,11 +26,11 @@ class MesssageScreen extends StatelessWidget {
           const BackButton(),
           Stack(
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: AssetImage(chat.image),
-              ),
-              if (chat.isActive)
+              // CircleAvatar(
+              //   radius: 20,
+              //   backgroundImage: AssetImage(chat.image),
+              // ),
+              if (chat.presence == true)
                 Positioned(
                   bottom: 0,
                   right: 0,
@@ -54,13 +54,13 @@ class MesssageScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                chat.name,
+                chat.nameChat,
                 style: TextStyle(
                     color: textColorMode(themeMode).withOpacity(0.8),
                     fontSize: 16),
               ),
               Text(
-                chat.isActive ? 'Online' : 'Online ${chat.time}',
+                chat.presence! ? 'Online' : 'Online ${chat.stampTime}',
                 style: TextStyle(
                   color: Colors.black.withOpacity(
                     themeMode == ThemeMode.light ? 0.4 : 0.6,

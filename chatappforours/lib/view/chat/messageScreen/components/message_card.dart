@@ -1,5 +1,5 @@
 import 'package:chatappforours/models/ChatMessage.dart';
-import 'package:chatappforours/models/chat.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/audio_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/image_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/text_message.dart';
@@ -45,10 +45,10 @@ class MessageCard extends StatelessWidget {
             : MainAxisAlignment.start,
         children: [
           if (!chatMessage.isSender)
-            CircleAvatar(
-              backgroundImage: AssetImage(chat.image),
-              radius: 20,
-            ),
+            // CircleAvatar(
+            //   backgroundImage: AssetImage(chat.image),
+            //   radius: 20,
+            // ),
           const SizedBox(width: kDefaultPadding * 0.5),
           messageContaint(chatMessage),
           if (chatMessage.messageStatus != MessageStatus.viewed)
