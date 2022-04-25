@@ -1,4 +1,4 @@
-import 'package:chatappforours/services/auth/auth_exception.dart';
+import 'package:chatappforours/services/auth/models/auth_exception.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/utilities/dialogs/error_dialog.dart';

@@ -57,24 +57,26 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
               FillOutlineButton(
                 isFilled: isFilledRecent,
                 press: () {
-                  setState(
-                    () {
-                      isFilledRecent = true;
-                      isFilledActive = false;
-                      // getAllData();
-                    },
-                  );
+                  if (isFilledRecent == false) {
+                    setState(
+                      () {
+                        isFilledRecent = true;
+                        isFilledActive = false;
+                      },
+                    );
+                  }
                 },
                 text: "Recent Message",
               ),
               const SizedBox(width: kDefaultPadding),
               FillOutlineButton(
                 press: () {
-                  setState(() {
-                    isFilledRecent = false;
-                    isFilledActive = true;
-                    // getData();
-                  });
+                  if (isFilledActive == false) {
+                    setState(() {
+                      isFilledRecent = false;
+                      isFilledActive = true;
+                    });
+                  }
                 },
                 text: "Active",
                 isFilled: isFilledActive,
@@ -135,7 +137,7 @@ class _ChatListViewState extends State<ChatListView> {
   late final FirebaseChat firebaseChat;
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
-  getData({required Iterable<UsersJoinChat> list}) async {
+  getAllDataChat({required Iterable<UsersJoinChat> list}) async {
     listChatData.clear();
     for (var i = 0; i < list.length; i++) {
       final chat = await firebaseChat.getChatByID(
@@ -155,12 +157,44 @@ class _ChatListViewState extends State<ChatListView> {
     }
   }
 
+  getAllDataChatOnline({required Iterable<UsersJoinChat> list}) async {
+    listChatData.clear();
+    for (var i = 0; i < list.length; i++) {
+      final chat = await firebaseChat.getChatByID(
+        idChat: list.elementAt(i).chatID,
+        ruleChat: list.elementAt(i).ruleChat,
+        userIDChatScreen: list.elementAt(i).userID,
+      );
+      userPresenceDatabaseReference
+          .child("${chat.userID}/presence")
+          .onValue
+          .listen((event) {
+        bool isOnline = event.snapshot.value as bool;
+        chat.presence = isOnline;
+        if (chat.presence == true) {
+          listChatData.add(chat);
+          _streamController.sink.add(listChatData);
+        }
+      });
+    }
+  }
+
   @override
   void initState() {
     firebaseChat = FirebaseChat();
     listChatData = <Chat>[];
-    getData(list: widget.listUserJoinChat);
+    if (widget.isFilledActive == true) {
+      getAllDataChat(list: widget.listUserJoinChat);
+    } else {
+      getAllDataChatOnline(list: widget.listUserJoinChat);
+    }
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    listChatData.clear();
+    super.dispose();
   }
 
   @override

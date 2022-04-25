@@ -1,6 +1,6 @@
 import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
-import 'package:chatappforours/services/auth/firebase_auth_provider.dart';
+import 'package:chatappforours/services/auth/crud/firebase_auth_provider.dart';
 import 'package:chatappforours/utilities/theme/theme_data.dart';
 import 'package:chatappforours/view/welcome/welcome_page.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,4 @@
-import 'package:chatappforours/services/auth/auth_user.dart';
+import 'package:chatappforours/services/auth/models/auth_user.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 

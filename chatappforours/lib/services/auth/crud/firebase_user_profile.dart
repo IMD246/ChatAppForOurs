@@ -1,5 +1,5 @@
 import 'package:chatappforours/constants/user_profile_constant_field.dart';
-import 'package:chatappforours/services/auth/auth_exception.dart';
+import 'package:chatappforours/services/auth/models/auth_exception.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

@@ -1,6 +1,6 @@
 import 'package:chatappforours/enum/enum.dart';
-import 'package:chatappforours/services/auth/auth_exception.dart';
-import 'package:chatappforours/services/auth/auth_provider.dart';
+import 'package:chatappforours/services/auth/models/auth_exception.dart';
+import 'package:chatappforours/services/auth/models/auth_provider.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
