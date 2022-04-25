@@ -31,7 +31,6 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
   @override
   void initState() {
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
-
     super.initState();
   }
 
@@ -57,7 +56,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
               FillOutlineButton(
                 isFilled: isFilledRecent,
                 press: () {
-                  if (isFilledRecent == false) {
+                  if (isFilledActive == true) {
                     setState(
                       () {
                         isFilledRecent = true;

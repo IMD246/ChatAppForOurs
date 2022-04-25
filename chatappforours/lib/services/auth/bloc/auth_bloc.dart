@@ -5,6 +5,7 @@ import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
+import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,6 +36,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           } else {
             if (user != null) {
               if (user.isEmailVerified == true) {
+                await firebaseUserProfile.uploadStampTime(userID: user.id!);
                 await firebaseUserProfile.updateUserPresenceDisconnect(
                     uid: user.id!);
                 emit(
@@ -83,6 +85,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             );
           } else {
             FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+            await firebaseUserProfile.uploadStampTime(userID: user.id!);
             await firebaseUserProfile.updateUserPresenceDisconnect(
               uid: user.id!,
             );
@@ -100,45 +103,60 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
       },
     );
-    on<AuthEventRegister>((event, emit) async {
-      final email = event.email;
-      final password = event.password;
-      final FirebaseUsersJoinChat firebaseUsersJoinChat =
-          FirebaseUsersJoinChat();
-      try {
-        emit(
-          const AuthStateRegistering(
-            exception: null,
-            email: null,
-            isLoading: true,
-          ),
-        );
-        await authProvider.createUser(
-          email: email,
-          password: password,
-        );
-        final user = await authProvider.logIn(
-          email: email,
-          password: password,
-        );
-        final userProfile = UserProfile(
-          email: user.email!,
-          fullName: event.fullName,
-          urlImage: '',
-          isDarkMode: false,
-        );
-        await firebaseUsersJoinChat.createUsersJoinChat(
-          userID: user.id!,
-          ruleChat: RuleChat.member,
-          fullName: event.fullName,
-        );
-        await authProvider.sendEmailVerification();
-        final userProfileFirebase = FirebaseUserProfile();
-        await userProfileFirebase.createUserProfile(
-          userID: user.id!,
-          userProfile: userProfile,
-        );
-        if (user.isEmailVerified == false) {
+    on<AuthEventRegister>(
+      (event, emit) async {
+        final email = event.email;
+        final password = event.password;
+        final FirebaseUsersJoinChat firebaseUsersJoinChat =
+            FirebaseUsersJoinChat();
+        final FirebaseFriendList friendListFirebase = FirebaseFriendList();
+        try {
+          emit(
+            const AuthStateRegistering(
+              exception: null,
+              email: null,
+              isLoading: true,
+            ),
+          );
+          await authProvider.createUser(
+            email: email,
+            password: password,
+          );
+          final user = await authProvider.logIn(
+            email: email,
+            password: password,
+          );
+          final userProfile = UserProfile(
+            email: user.email!,
+            fullName: event.fullName,
+            urlImage: '',
+            isDarkMode: false,
+          );
+          await friendListFirebase.createNewFriend(
+            userID: user.id!,
+            ownerUserID: user.id!,
+            isRequest: true,
+          );
+          await firebaseUsersJoinChat.createUsersJoinChat(
+            userID: user.id!,
+            ruleChat: RuleChat.member,
+            fullName: event.fullName,
+          );
+          await authProvider.sendEmailVerification();
+          final userProfileFirebase = FirebaseUserProfile();
+          await userProfileFirebase.createUserProfile(
+            userID: user.id!,
+            userProfile: userProfile,
+          );
+          if (user.isEmailVerified == false) {
+            emit(
+              AuthStateRegistering(
+                exception: AuthEmailNeedsVefiricationException(),
+                email: event.email,
+                isLoading: false,
+              ),
+            );
+          }
           emit(
             AuthStateRegistering(
               exception: AuthEmailNeedsVefiricationException(),
@@ -146,21 +164,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               isLoading: false,
             ),
           );
-        }
-        emit(
-          AuthStateRegistering(
-            exception: AuthEmailNeedsVefiricationException(),
-            email: event.email,
+        } on Exception catch (e) {
+          emit(AuthStateRegistering(
+            exception: e,
             isLoading: false,
-          ),
-        );
-      } on Exception catch (e) {
-        emit(AuthStateRegistering(
-          exception: e,
-          isLoading: false,
-        ));
-      }
-    });
+          ));
+        }
+      },
+    );
     on<AuthEventLogOut>(
       (event, emit) async {
         FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();

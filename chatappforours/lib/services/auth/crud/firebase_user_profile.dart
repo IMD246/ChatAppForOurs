@@ -1,6 +1,6 @@
+import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/constants/user_profile_constant_field.dart';
 import 'package:chatappforours/services/auth/models/auth_exception.dart';
-import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -18,7 +18,8 @@ class FirebaseUserProfile {
         fullNameField: userProfile.fullName,
         emailField: userProfile.email,
         urlImageField: userProfile.urlImage,
-        isDarkModeField: userProfile.isDarkMode
+        isDarkModeField: userProfile.isDarkMode,
+        stampTimeField: DateTime.now(),
       },
     );
   }
@@ -51,6 +52,16 @@ class FirebaseUserProfile {
     }
   }
 
+  Future<void> uploadStampTime({
+    required String? userID,
+  }) async {
+    if (userID != null) {
+      Map<String, dynamic> mapUser = <String, dynamic>{};
+      mapUser.addAll({stampTimeField: DateTime.now()});
+      await userProfilePath.doc(userID).update(mapUser);
+    }
+  }
+
   Future<void> uploadDarkTheme({
     required String? userID,
     required bool isDarkTheme,
@@ -61,6 +72,7 @@ class FirebaseUserProfile {
       await userProfilePath.doc(userID).update(mapUser);
     }
   }
+
   Future<void> updateUserPresenceDisconnect({required String uid}) async {
     Map<String, dynamic> presenceStatusTrue = {
       'presence': true,
