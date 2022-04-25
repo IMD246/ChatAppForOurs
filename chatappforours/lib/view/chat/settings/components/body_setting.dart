@@ -51,42 +51,49 @@ class _BodySettingState extends State<BodySetting> {
                             vertical: kDefaultPadding),
                         child: Column(
                           children: [
-                            if (userProfile!.urlImage != null)
-                              GestureDetector(
-                                onTap: () async {
-                                  final results =
-                                      await FilePicker.platform.pickFiles(
-                                    allowMultiple: false,
-                                    type: FileType.custom,
-                                    allowedExtensions: [
-                                      'jpg',
-                                      'png',
-                                      'PNG',
-                                    ],
-                                  );
-                                  if (results == null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'No file selected',
-                                          textAlign: TextAlign.center,
-                                        ),
+                            GestureDetector(
+                              onTap: () async {
+                                final results =
+                                    await FilePicker.platform.pickFiles(
+                                  allowMultiple: false,
+                                  type: FileType.custom,
+                                  allowedExtensions: [
+                                    'jpg',
+                                    'png',
+                                    'PNG',
+                                  ],
+                                );
+                                if (results == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'No file selected',
+                                        textAlign: TextAlign.center,
                                       ),
-                                    );
-                                  } else {
-                                    final path = results.files.single.path;
-                                    final fileName = userProfile.email;
-                                    context.read<AuthBloc>().add(
-                                          AuthEventUploadImage(
-                                            context: context,
-                                            path: path!,
-                                            fileName: fileName,
-                                          ),
-                                        );
-                                  }
-                                },
-                                child: Stack(
-                                  children: [
+                                    ),
+                                  );
+                                } else {
+                                  final path = results.files.single.path;
+                                  final fileName = userProfile!.email;
+                                  context.read<AuthBloc>().add(
+                                        AuthEventUploadImage(
+                                          context: context,
+                                          path: path!,
+                                          fileName: fileName,
+                                        ),
+                                      );
+                                }
+                              },
+                              child: Stack(
+                                children: [
+                                  if (userProfile?.urlImage == null)
+                                    const CircleAvatar(
+                                      radius: 60,
+                                      backgroundImage: AssetImage(
+                                        "assets/images/defaultImage.png",
+                                      ),
+                                    ),
+                                  if (userProfile!.urlImage != null)
                                     CircleAvatar(
                                       radius: 60,
                                       child: ClipOval(
@@ -100,66 +107,58 @@ class _BodySettingState extends State<BodySetting> {
                                         ),
                                       ),
                                     ),
-                                    Positioned(
-                                      bottom: -7,
-                                      right: -5,
-                                      child: Container(
-                                        child: IconButton(
-                                          onPressed: () async {
-                                            final results = await FilePicker
-                                                .platform
-                                                .pickFiles(
-                                              allowMultiple: false,
-                                              type: FileType.custom,
-                                              allowedExtensions: [
-                                                'jpg',
-                                                'png',
-                                                'PNG',
-                                              ],
-                                            );
-                                            if (results == null) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'No file selected',
-                                                    textAlign: TextAlign.center,
-                                                  ),
+                                  Positioned(
+                                    bottom: -7,
+                                    right: -5,
+                                    child: Container(
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          final results = await FilePicker
+                                              .platform
+                                              .pickFiles(
+                                            allowMultiple: false,
+                                            type: FileType.custom,
+                                            allowedExtensions: [
+                                              'jpg',
+                                              'png',
+                                              'PNG',
+                                            ],
+                                          );
+                                          if (results == null) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'No file selected',
+                                                  textAlign: TextAlign.center,
                                                 ),
-                                              );
-                                            } else {
-                                              final path =
-                                                  results.files.single.path;
-                                              final fileName =
-                                                  userProfile.email;
-                                              context.read<AuthBloc>().add(
-                                                    AuthEventUploadImage(
-                                                      context: context,
-                                                      path: path!,
-                                                      fileName: fileName,
-                                                    ),
-                                                  );
-                                            }
-                                          },
-                                          icon: const Icon(Icons.edit),
-                                        ),
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Color.fromARGB(
-                                              162, 189, 187, 187),
-                                        ),
+                                              ),
+                                            );
+                                          } else {
+                                            final path =
+                                                results.files.single.path;
+                                            final fileName = userProfile.email;
+                                            context.read<AuthBloc>().add(
+                                                  AuthEventUploadImage(
+                                                    context: context,
+                                                    path: path!,
+                                                    fileName: fileName,
+                                                  ),
+                                                );
+                                          }
+                                        },
+                                        icon: const Icon(Icons.edit),
+                                      ),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color:
+                                            Color.fromARGB(162, 189, 187, 187),
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            if (userProfile.urlImage == null)
-                              const CircleAvatar(
-                                radius: 40,
-                                backgroundImage: AssetImage(
-                                  "assets/images/defaultImage.png",
-                                ),
-                              ),
+                            ),
                             const SizedBox(height: kDefaultPadding * 0.5),
                             Text(
                               userProfile.fullName,
@@ -200,10 +199,10 @@ class _BodySettingState extends State<BodySetting> {
                             activeColor: kPrimaryColor,
                             onChanged: (val) {
                               setState(
-                                ()  {
-                                    context.read<AuthBloc>().add(
-                                      AuthEventUploadStateTheme(isDarkTheme: val)
-                                    );
+                                () {
+                                  context.read<AuthBloc>().add(
+                                      AuthEventUploadStateTheme(
+                                          isDarkTheme: val));
                                   themeChanger.setTheme(val);
                                 },
                               );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../constants/constants.dart';
+
 class FillOutlineButton extends StatelessWidget {
   const FillOutlineButton({
     Key? key,
@@ -16,6 +17,7 @@ class FillOutlineButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
+      minWidth: 5,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(30),
         side: const BorderSide(color: Colors.white),

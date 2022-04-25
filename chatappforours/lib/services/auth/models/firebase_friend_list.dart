@@ -25,10 +25,16 @@ class FirebaseFriendList {
     Map<String, dynamic> map = <String, dynamic>{
       isRequestField: true,
     };
-    await friendListDocumentDefault.doc('$ownerUserID/userID').update(map);
+    await friendListDocumentDefault
+        .doc('$ownerUserID/friend/$userID')
+        .update(map);
   }
 
-  Stream<Iterable<FriendList>> getAllFriendIsOnlined({required ownerUserID}) {
+  Future<void> deleteFriend(
+      {required String ownerUserID, required String userID}) async {
+    await friendListDocumentDefault.doc('$ownerUserID/friend/$userID').delete();
+  }
+  Stream<Iterable<FriendList>> getAllFriendIsAccepted({required ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
         .doc(ownerUserID)
@@ -41,7 +47,21 @@ class FirebaseFriendList {
             (e) => FriendList.fromSnapshot(snapshot: e),
           ),
         );
-
+    return friendList;
+  }
+  Stream<Iterable<FriendList>> getAllFriendIsRequested({required ownerUserID}) {
+    final friendList = friendListDocument
+        .collection('friendList')
+        .doc(ownerUserID)
+        .collection('friend')
+        .where(isRequestField, isEqualTo: false)
+        .orderBy(stampTimeField, descending: true)
+        .snapshots()
+        .map(
+          (event) => event.docs.map(
+            (e) => FriendList.fromSnapshot(snapshot: e),
+          ),
+        );
     return friendList;
   }
 }

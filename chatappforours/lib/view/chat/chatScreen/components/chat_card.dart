@@ -74,7 +74,7 @@ class ChatCard extends StatelessWidget {
                       );
                     } else {
                       return const Text(
-                        "Waiting...",
+                        "Let make some friend and chat",
                       );
                     }
                   case ConnectionState.waiting:
@@ -84,7 +84,11 @@ class ChatCard extends StatelessWidget {
                       child: CircularProgressIndicator(),
                     );
                   default:
-                    return const Text("Waiting...");
+                    return const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(),
+                    );
                 }
               },
             ),

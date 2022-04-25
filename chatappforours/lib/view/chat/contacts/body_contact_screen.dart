@@ -1,5 +1,4 @@
 import 'package:chatappforours/constants/constants.dart';
-import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/friend_list.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
@@ -15,31 +14,19 @@ class BodyContactScreen extends StatefulWidget {
 }
 
 class _BodyContactScreenState extends State<BodyContactScreen> {
-  List<Chat> listChatData = [];
   bool isFilledRecent = true;
-  bool isFilledActive = false;
-  // void getAllData() {
-  //   listChatData.clear();
-  //   listChatData.addAll(chatsData);
-  // }
-
-  // Future<void> getData() async {
-  //   listChatData.clear();
-  //   for (var i = 0; i < chatsData.length; i++) {
-  //     await chatsData[i].isActive ? listChatData.add(chatsData[i]) : null;
-  //   }
-  // }
-
+  bool isFilledRequestFriend = false;
+  late final FirebaseFriendList firebaseFriendList;
+  String id = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
+    firebaseFriendList = FirebaseFriendList();
     super.initState();
-    // getAllData();
   }
 
   @override
   void dispose() {
     super.dispose();
-    listChatData.clear();
   }
 
   @override
@@ -59,34 +46,49 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
               FillOutlineButton(
                 isFilled: isFilledRecent,
                 press: () {
-                  if (isFilledActive == true) {
+                  if (isFilledRequestFriend == true) {
                     setState(
                       () {
                         isFilledRecent = true;
-                        isFilledActive = false;
+                        isFilledRequestFriend = false;
                       },
                     );
                   }
                 },
-                text: "Recent Contact",
+                text: "Recent Friend",
               ),
               const SizedBox(width: kDefaultPadding * 0.7),
-              FillOutlineButton(
-                press: () {
-                  if (isFilledActive == false) {
-                    setState(() {
-                      isFilledRecent = false;
-                      isFilledActive = true;
-                    });
+              StreamBuilder(
+                stream:
+                    firebaseFriendList.getAllFriendIsRequested(ownerUserID: id),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final friendList = snapshot.data as Iterable<FriendList>;
+                    String? lengthText =
+                        friendList.isEmpty ? '' : "(${friendList.length})";
+                    return FillOutlineButton(
+                      press: () {
+                        if (isFilledRequestFriend == false) {
+                          setState(() {
+                            isFilledRecent = false;
+                            isFilledRequestFriend = true;
+                          });
+                        }
+                      },
+                      text: "Request Friend $lengthText",
+                      isFilled: isFilledRequestFriend,
+                    );
+                  } else {
+                    return const Text(
+                      'Let find some friend',
+                    );
                   }
                 },
-                text: "Active",
-                isFilled: isFilledActive,
               ),
             ],
           ),
         ),
-        const ContactListView(),
+        ContactListView(filledRequestFriend: isFilledRequestFriend),
       ],
     );
   }
@@ -95,8 +97,9 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
 class ContactListView extends StatefulWidget {
   const ContactListView({
     Key? key,
+    required this.filledRequestFriend,
   }) : super(key: key);
-
+  final bool filledRequestFriend;
   @override
   State<ContactListView> createState() => _ContactListViewState();
 }
@@ -108,7 +111,9 @@ class _ContactListViewState extends State<ContactListView> {
   Widget build(BuildContext context) {
     return Expanded(
       child: StreamBuilder(
-        stream: firebaseFriendList.getAllFriendIsOnlined(ownerUserID: id),
+        stream: widget.filledRequestFriend
+            ? firebaseFriendList.getAllFriendIsRequested(ownerUserID: id)
+            : firebaseFriendList.getAllFriendIsAccepted(ownerUserID: id),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.active:
@@ -119,6 +124,7 @@ class _ContactListViewState extends State<ContactListView> {
                   itemBuilder: (context, index) {
                     return ContactCard(
                       friend: listFriend.elementAt(index),
+                      requestFriend: widget.filledRequestFriend,
                     );
                   },
                 );
@@ -127,14 +133,14 @@ class _ContactListViewState extends State<ContactListView> {
               }
             case ConnectionState.waiting:
               return const SizedBox(
-                height: 24,
-                width: 24,
+                height: 200,
+                width: 200,
                 child: CircularProgressIndicator(),
               );
             default:
               return const SizedBox(
-                height: 50,
-                width: 50,
+                height: 200,
+                width: 200,
                 child: CircularProgressIndicator(),
               );
           }

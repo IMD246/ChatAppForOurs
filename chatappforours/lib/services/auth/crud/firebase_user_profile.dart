@@ -29,6 +29,7 @@ class FirebaseUserProfile {
   }) async {
     try {
       final userProfile = await userProfilePath.doc(userID).get();
+      await uploadStampTime(userID: userID);
       return UserProfile.fromSnapshot(userProfile);
     } on FirebaseException catch (e) {
       if (e.code == 'user-not-found') {

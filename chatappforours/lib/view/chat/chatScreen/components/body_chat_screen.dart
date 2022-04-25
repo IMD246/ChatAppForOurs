@@ -57,7 +57,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
               FillOutlineButton(
                 isFilled: isFilledRecent,
                 press: () {
-                  if (isFilledActive == false) {
+                  if (isFilledActive == true) {
                     setState(
                       () {
                         isFilledRecent = true;
@@ -71,7 +71,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
               const SizedBox(width: kDefaultPadding),
               FillOutlineButton(
                 press: () {
-                  if (isFilledActive == true) {
+                  if (isFilledActive == false) {
                     setState(() {
                       isFilledRecent = false;
                       isFilledActive = true;
@@ -99,15 +99,15 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                     );
                   } else {
                     return const SizedBox(
-                      height: 50,
-                      width: 50,
+                      height: 200,
+                      width: 200,
                       child: CircularProgressIndicator(),
                     );
                   }
                 default:
                   return const SizedBox(
-                    height: 50,
-                    width: 50,
+                    height: 200,
+                    width: 200,
                     child: CircularProgressIndicator(),
                   );
               }
