@@ -38,7 +38,7 @@ class FirebaseUsersJoinChat {
 
   Stream<Iterable<UsersJoinChat>> getUsersJoinChatByID({
     required String userID,
-  }) {
+  }){
     final usersJoinChat = firebaseUsersJoinChat
         .where(userIDField, isEqualTo: userID)
         .orderBy(stampTimeField, descending: true)

@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FriendList {
   final String userID;
-  final bool isRequest;
+  final bool? isRequest;
   FriendList({
     required this.userID,
     required this.isRequest,
@@ -12,8 +12,8 @@ class FriendList {
   factory FriendList.fromSnapshot(
       {required QueryDocumentSnapshot<Map<String, dynamic>> snapshot}) {
     return FriendList(
-      userID: snapshot.get(userIDField),
-      isRequest: snapshot.get(isRequestField),
+      userID: snapshot.data()[userIDField],
+      isRequest: snapshot.data()[isRequestField],
     );
   }
 }

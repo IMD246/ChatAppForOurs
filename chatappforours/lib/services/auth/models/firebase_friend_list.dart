@@ -28,28 +28,20 @@ class FirebaseFriendList {
     await friendListDocumentDefault.doc('$ownerUserID/userID').update(map);
   }
 
-  Stream<Iterable<FriendList?>?> getAllFriendIsOnlined({required ownerUserID}) {
-    return friendListDocument
-        .collection('friendList/$ownerUserID/friend')
+  Stream<Iterable<FriendList>> getAllFriendIsOnlined({required ownerUserID}) {
+    final friendList = friendListDocument
+        .collection('friendList')
+        .doc(ownerUserID)
+        .collection('friend')
         .where(isRequestField, isEqualTo: true)
         .orderBy(stampTimeField, descending: true)
         .snapshots()
         .map(
-      (event) {
-        if (event.docs.isNotEmpty) {
-          return event.docs.map(
-            (docs) {
-              if (docs.exists) {
-                return FriendList.fromSnapshot(snapshot: docs);
-              } else {
-                return null;
-              }
-            },
-          );
-        } else {
-          return null;
-        }
-      },
-    );
+          (event) => event.docs.map(
+            (e) => FriendList.fromSnapshot(snapshot: e),
+          ),
+        );
+
+    return friendList;
   }
 }
