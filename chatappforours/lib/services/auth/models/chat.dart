@@ -10,6 +10,7 @@ class Chat {
   final TypeChat typeChat;
   final RuleChat? rule;
   final String? userID;
+  String? time;
   bool? presence = false;
   Chat(
       {required this.stampTime,
@@ -18,11 +19,12 @@ class Chat {
       required this.typeChat,
       this.rule,
       this.userID,
-      this.presence});
+      this.presence,this.time});
   factory Chat.fromSnapshot({
     required DocumentSnapshot<Map<String, dynamic>> docs,
     required RuleChat rule,
-    required String userIDChatScreen, bool? presence,
+    required String userIDChatScreen,
+    bool? presence,
   }) =>
       Chat(
         stampTime: differenceInCalendarDays(

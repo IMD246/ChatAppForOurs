@@ -36,9 +36,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           } else {
             if (user != null) {
               if (user.isEmailVerified == true) {
-                await firebaseUserProfile.uploadStampTime(userID: user.id!);
                 await firebaseUserProfile.updateUserPresenceDisconnect(
-                    uid: user.id!);
+                    uid: user.id!,);
                 emit(
                   AuthStateLoggedIn(authUser: user, isLoading: false),
                 );
@@ -85,7 +84,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             );
           } else {
             FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-            await firebaseUserProfile.uploadStampTime(userID: user.id!);
             await firebaseUserProfile.updateUserPresenceDisconnect(
               uid: user.id!,
             );

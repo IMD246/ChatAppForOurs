@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/users_join_chat.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
+import 'package:chatappforours/utilities/time_handle/handle_time.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/chat_card.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -145,15 +147,15 @@ class _ChatListViewState extends State<ChatListView> {
         ruleChat: list.elementAt(i).ruleChat,
         userIDChatScreen: list.elementAt(i).userID,
       );
-      userPresenceDatabaseReference
-          .child("${chat.userID}/presence")
-          .onValue
-          .listen((event) {
-        bool isOnline = event.snapshot.value as bool;
-        chat.presence = isOnline;
-        listChatData.add(chat);
-        _streamController.sink.add(listChatData);
-      });
+      userPresenceDatabaseReference.child("${chat.userID}").once().then(
+        (event) {
+          final data = Map<String, dynamic>.from(event.snapshot.value as Map);
+          final isOnline = data['presence'];
+          chat.presence = isOnline;
+          listChatData.add(chat);
+          _streamController.sink.add(listChatData);
+        },
+      );
     }
   }
 
@@ -165,17 +167,17 @@ class _ChatListViewState extends State<ChatListView> {
         ruleChat: list.elementAt(i).ruleChat,
         userIDChatScreen: list.elementAt(i).userID,
       );
-      userPresenceDatabaseReference
-          .child("${chat.userID}/presence")
-          .onValue
-          .listen((event) {
-        bool isOnline = event.snapshot.value as bool;
-        chat.presence = isOnline;
-        if (chat.presence == true) {
-          listChatData.add(chat);
-          _streamController.sink.add(listChatData);
-        }
-      });
+      userPresenceDatabaseReference.child("${chat.userID}").once().then(
+        (event) {
+          final data = Map<String, dynamic>.from(event.snapshot.value as Map);
+          final isOnline = data['presence'];
+          chat.presence = isOnline;
+          if (chat.presence == true) {
+            listChatData.add(chat);
+            _streamController.sink.add(listChatData);
+          }
+        },
+      );
     }
   }
 
@@ -183,7 +185,7 @@ class _ChatListViewState extends State<ChatListView> {
   void initState() {
     firebaseChat = FirebaseChat();
     listChatData = <Chat>[];
-    if (widget.isFilledActive == true) {
+    if (widget.isFilledActive == false) {
       getAllDataChat(list: widget.listUserJoinChat);
     } else {
       getAllDataChatOnline(list: widget.listUserJoinChat);
@@ -228,11 +230,25 @@ class _ChatListViewState extends State<ChatListView> {
             } else {
               return Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
+                child: const Center(
+                  child: SizedBox(
+                    height: 200,
+                    width: 200,
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
               );
             }
           default:
             return Container(
               color: Theme.of(context).scaffoldBackgroundColor,
+              child: const Center(
+                child: SizedBox(
+                  height: 200,
+                  width: 200,
+                  child: CircularProgressIndicator(),
+                ),
+              ),
             );
         }
       },

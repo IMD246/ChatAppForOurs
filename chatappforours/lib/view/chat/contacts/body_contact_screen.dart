@@ -132,16 +132,26 @@ class _ContactListViewState extends State<ContactListView> {
                 return const Text("Let add some friend");
               }
             case ConnectionState.waiting:
-              return const SizedBox(
-                height: 200,
-                width: 200,
-                child: CircularProgressIndicator(),
+              return Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: const Center(
+                  child: SizedBox(
+                    height: 200,
+                    width: 200,
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
               );
             default:
-              return const SizedBox(
-                height: 200,
-                width: 200,
-                child: CircularProgressIndicator(),
+              return Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: const Center(
+                  child: SizedBox(
+                    height: 200,
+                    width: 200,
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
               );
           }
         },

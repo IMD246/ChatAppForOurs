@@ -1,14 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
-import 'package:chatappforours/constants/list_friend_constant_field.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
-import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
-import 'package:chatappforours/utilities/button/primary_button.dart';
-import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -31,17 +27,17 @@ class _ContactCardState extends State<ContactCard> {
   final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
   late final FirebaseFriendList firebaseFriendList;
   String id = FirebaseAuth.instance.currentUser!.uid;
-  late bool isActive;
+  bool isActive = false;
   @override
   void initState() {
     firebaseFriendList = FirebaseFriendList();
-    userPresenceDatabaseReference
-        .child("${widget.friend.userID}/presence")
-        .onValue
-        .listen((event) {
-      bool isOnline = event.snapshot.value as bool;
-      isActive = isOnline;
-    });
+    userPresenceDatabaseReference.child(widget.friend.userID).once().then(
+      (event) {
+        final data = event.snapshot.value as Map;
+        bool isOnline = data['presence'];
+        isActive = isOnline;
+      },
+    );
     super.initState();
   }
 
@@ -156,16 +152,20 @@ class _ContactCardState extends State<ContactCard> {
                   return const Text('No Data Available');
                 }
               case ConnectionState.waiting:
-                return const SizedBox(
-                  height: 24,
-                  width: 24,
-                  child: CircularProgressIndicator(),
+                return const Center(
+                  child: SizedBox(
+                    height: 25,
+                    width: 20,
+                    child: CircularProgressIndicator(),
+                  ),
                 );
               default:
-                return const SizedBox(
-                  height: 24,
-                  width: 24,
-                  child: CircularProgressIndicator(),
+                return const Center(
+                  child: SizedBox(
+                    height: 25,
+                    width: 20,
+                    child: CircularProgressIndicator(),
+                  ),
                 );
             }
           },
