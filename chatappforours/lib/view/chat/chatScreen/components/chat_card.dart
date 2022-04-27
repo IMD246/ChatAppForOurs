@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../constants/constants.dart';
 
-class ChatCard extends StatelessWidget {
+class ChatCard extends StatefulWidget {
   const ChatCard({
     Key? key,
     required this.chat,
@@ -14,11 +14,21 @@ class ChatCard extends StatelessWidget {
   }) : super(key: key);
   final Chat chat;
   final VoidCallback press;
+
+  @override
+  State<ChatCard> createState() => _ChatCardState();
+}
+
+class _ChatCardState extends State<ChatCard> {
+  @override
+  void initState() {
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     final firebaseUserProfile = FirebaseUserProfile();
     return GestureDetector(
-      onTap: press,
+      onTap: widget.press,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: kDefaultPadding,
@@ -27,7 +37,7 @@ class ChatCard extends StatelessWidget {
         child: Row(
           children: [
             FutureBuilder<UserProfile?>(
-              future: firebaseUserProfile.getUserProfile(userID: chat.userID),
+              future: firebaseUserProfile.getUserProfile(userID: widget.chat.userID),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.done:
@@ -52,7 +62,7 @@ class ChatCard extends StatelessWidget {
                               backgroundImage:
                                   AssetImage("assets/images/defaultImage.png"),
                             ),
-                          if (chat.presence == true)
+                          if (widget.chat.presence == true)
                             Positioned(
                               bottom: 0,
                               right: 0,
@@ -105,7 +115,7 @@ class ChatCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      chat.nameChat,
+                      widget.chat.nameChat,
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 16,
@@ -115,7 +125,7 @@ class ChatCard extends StatelessWidget {
                     Opacity(
                       opacity: 0.64,
                       child: Text(
-                        chat.lastText,
+                        widget.chat.lastText,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -125,7 +135,7 @@ class ChatCard extends StatelessWidget {
             ),
             Opacity(
               opacity: 0.64,
-              child: Text(chat.stampTime),
+              child: Text(widget.chat.stampTime),
             ),
           ],
         ),

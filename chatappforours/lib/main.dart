@@ -28,7 +28,6 @@ class _StartAppState extends State<StartApp> {
     );
   }
 }
-
 class Material extends StatelessWidget {
   const Material({
     Key? key,

@@ -1,12 +1,8 @@
 import 'dart:async';
 
 import 'package:chatappforours/constants/constants.dart';
-import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
-
-import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
-import 'package:chatappforours/services/auth/models/users_join_chat.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/time_handle/handle_time.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/chat_card.dart';
@@ -24,7 +20,7 @@ class BodyChatScreen extends StatefulWidget {
 
 class _BodyChatScreenState extends State<BodyChatScreen> {
   List<Chat> listChatData = [];
-  late final FirebaseUsersJoinChat firebaseUsersJoinChat;
+  late final FirebaseChat firebaseChat;
   final String userID = FirebaseAuth.instance.currentUser!.uid;
   late final DatabaseReference userPresenceDatabaseReference;
   bool isFilledRecent = true;
@@ -32,7 +28,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
   late final bool isActive;
   @override
   void initState() {
-    firebaseUsersJoinChat = FirebaseUsersJoinChat();
+    firebaseChat = FirebaseChat();
 
     super.initState();
   }
@@ -88,29 +84,34 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
         ),
         Expanded(
           child: StreamBuilder(
-            stream: firebaseUsersJoinChat.getUsersJoinChatByID(userID: userID),
+            stream: firebaseChat.getAllChat(userID: userID),
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.active:
                   if (snapshot.hasData) {
-                    final listUserJoinChat =
-                        snapshot.data as Iterable<UsersJoinChat>;
+                    final allChat = snapshot.data as Iterable<Chat>;
                     return ChatListView(
-                      listUserJoinChat: listUserJoinChat,
+                      allChat: allChat,
                       isFilledActive: isFilledActive,
                     );
                   } else {
-                    return const SizedBox(
+                    return Container();
+                  }
+                case ConnectionState.waiting:
+                  return const Center(
+                    child: SizedBox(
                       height: 200,
                       width: 200,
                       child: CircularProgressIndicator(),
-                    );
-                  }
+                    ),
+                  );
                 default:
-                  return const SizedBox(
-                    height: 200,
-                    width: 200,
-                    child: CircularProgressIndicator(),
+                  return const Center(
+                    child: SizedBox(
+                      height: 200,
+                      width: 200,
+                      child: CircularProgressIndicator(),
+                    ),
                   );
               }
             },
@@ -124,33 +125,32 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
 class ChatListView extends StatefulWidget {
   const ChatListView({
     Key? key,
-    required this.listUserJoinChat,
+    required this.allChat,
     required this.isFilledActive,
   }) : super(key: key);
-  final Iterable<UsersJoinChat> listUserJoinChat;
+  final Iterable<Chat> allChat;
   final bool isFilledActive;
   @override
   State<ChatListView> createState() => _ChatListViewState();
 }
 
 class _ChatListViewState extends State<ChatListView> {
-  late final List<Chat> listChatData;
+  final List<Chat> listChatData = [];
   final StreamController _streamController = StreamController();
   late final FirebaseChat firebaseChat;
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
-  getAllDataChat({required Iterable<UsersJoinChat> list}) async {
+  getAllDataChat({required Iterable<Chat> list}) async {
     listChatData.clear();
     for (var i = 0; i < list.length; i++) {
-      final chat = await firebaseChat.getChatByID(
-        idChat: list.elementAt(i).chatID,
-        ruleChat: list.elementAt(i).ruleChat,
-        userIDChatScreen: list.elementAt(i).userID,
-      );
-      userPresenceDatabaseReference.child("${chat.userID}").once().then(
+      final chat = list.elementAt(i);
+      userPresenceDatabaseReference.child(list.elementAt(i).userID).once().then(
         (event) {
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           final isOnline = data['presence'];
+          final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
+          final date = differenceInCalendarDays(stampTimeUser);
+          chat.stampTimeUser = date;
           chat.presence = isOnline;
           listChatData.add(chat);
           _streamController.sink.add(listChatData);
@@ -159,20 +159,19 @@ class _ChatListViewState extends State<ChatListView> {
     }
   }
 
-  getAllDataChatOnline({required Iterable<UsersJoinChat> list}) async {
+  getAllDataChatOnline({required Iterable<Chat> list}) async {
     listChatData.clear();
     for (var i = 0; i < list.length; i++) {
-      final chat = await firebaseChat.getChatByID(
-        idChat: list.elementAt(i).chatID,
-        ruleChat: list.elementAt(i).ruleChat,
-        userIDChatScreen: list.elementAt(i).userID,
-      );
-      userPresenceDatabaseReference.child("${chat.userID}").once().then(
+      final chat = list.elementAt(i);
+      userPresenceDatabaseReference.child(list.elementAt(i).userID).once().then(
         (event) {
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           final isOnline = data['presence'];
+          final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
+          final date = differenceInCalendarDays(stampTimeUser);
+          chat.stampTimeUser = date;
           chat.presence = isOnline;
-          if (chat.presence == true) {
+          if (chat.presence!) {
             listChatData.add(chat);
             _streamController.sink.add(listChatData);
           }
@@ -184,11 +183,10 @@ class _ChatListViewState extends State<ChatListView> {
   @override
   void initState() {
     firebaseChat = FirebaseChat();
-    listChatData = <Chat>[];
     if (widget.isFilledActive == false) {
-      getAllDataChat(list: widget.listUserJoinChat);
+      getAllDataChat(list: widget.allChat);
     } else {
-      getAllDataChatOnline(list: widget.listUserJoinChat);
+      getAllDataChatOnline(list: widget.allChat);
     }
     super.initState();
   }
@@ -204,52 +202,31 @@ class _ChatListViewState extends State<ChatListView> {
     return StreamBuilder(
       stream: _streamController.stream,
       builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.active:
-            if (snapshot.hasData) {
-              final allChatCard = snapshot.data as Iterable<Chat>;
-              return ListView.builder(
-                itemCount: allChatCard.length,
-                itemBuilder: (context, index) {
-                  return ChatCard(
-                    chat: allChatCard.elementAt(index),
-                    press: () {
-                      final chatData = listChatData[index];
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return MesssageScreen(chat: chatData);
-                          },
-                        ),
-                      );
-                    },
+        if (snapshot.hasData) {
+          final allChatCard = snapshot.data as Iterable<Chat>;
+          return ListView.builder(
+            itemCount: allChatCard.length,
+            itemBuilder: (context, index) {
+              return ChatCard(
+                chat: allChatCard.elementAt(index),
+                press: () {
+                  final chatData = listChatData[index];
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MesssageScreen(chat: chatData);
+                      },
+                    ),
                   );
                 },
               );
-            } else {
-              return Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: const Center(
-                  child: SizedBox(
-                    height: 200,
-                    width: 200,
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-              );
-            }
-          default:
-            return Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: const Center(
-                child: SizedBox(
-                  height: 200,
-                  width: 200,
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            );
+            },
+          );
+        } else {
+          return Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+          );
         }
       },
     );

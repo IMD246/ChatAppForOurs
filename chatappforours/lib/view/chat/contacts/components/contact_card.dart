@@ -1,10 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
+import 'package:chatappforours/utilities/time_handle/handle_time.dart';
+import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -24,18 +28,25 @@ class ContactCard extends StatefulWidget {
 class _ContactCardState extends State<ContactCard> {
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
-  final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+  late final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+  late final FirebaseChat firebaseChat;
   late final FirebaseFriendList firebaseFriendList;
   String id = FirebaseAuth.instance.currentUser!.uid;
-  bool isActive = false;
+
   @override
   void initState() {
     firebaseFriendList = FirebaseFriendList();
+    firebaseChat = FirebaseChat();
     userPresenceDatabaseReference.child(widget.friend.userID).once().then(
       (event) {
-        final data = event.snapshot.value as Map;
+        final data = Map<String, dynamic>.from(event.snapshot.value as Map);
         bool isOnline = data['presence'];
-        isActive = isOnline;
+        final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
+        final date = differenceInCalendarDays(stampTimeUser);
+        setState(() {
+          widget.friend.presence = isOnline;
+          widget.friend.stampTimeUser = date;
+        });
       },
     );
     super.initState();
@@ -44,17 +55,31 @@ class _ContactCardState extends State<ContactCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => MesssageScreen(chat: chat),
-        //   ),
-        // );
+      onTap: () async {
+        final userProfile =
+            await firebaseUserProfile.getUserProfile(userID: id);
+        await firebaseChat.createChat(
+          idFriendDocument: widget.friend.idFriendList,
+          ownerUserID: id,
+          userIDFriend: widget.friend.userID,
+          nameChat: userProfile!.fullName,
+          typeChat: TypeChat.normal,
+        );
+        final chat = await firebaseChat.getChatByID(
+          idChat: widget.friend.idFriendList,
+        );
+        chat.presence = widget.friend.presence;
+        chat.stampTimeUser = widget.friend.stampTimeUser;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MesssageScreen(chat: chat),
+          ),
+        );
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: kDefaultPadding * 0.5,
+          horizontal: kDefaultPadding,
           vertical: kDefaultPadding * 0.75,
         ),
         child: FutureBuilder<UserProfile?>(
@@ -86,7 +111,7 @@ class _ContactCardState extends State<ContactCard> {
                               backgroundImage:
                                   AssetImage("assets/images/defaultImage.png"),
                             ),
-                          if (isActive)
+                          if (widget.friend.presence)
                             Positioned(
                               bottom: 0,
                               right: 0,
@@ -106,7 +131,6 @@ class _ContactCardState extends State<ContactCard> {
                             )
                         ],
                       ),
-                      const SizedBox(width: kDefaultPadding * 0.25),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: kDefaultPadding),

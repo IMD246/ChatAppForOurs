@@ -65,7 +65,7 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                   if (snapshot.hasData) {
                     final friendList = snapshot.data as Iterable<FriendList>;
                     String? lengthText =
-                        friendList.isEmpty ? '' : "(${friendList.length})";
+                        friendList.isEmpty ? '' : '($friendList.length)';
                     return FillOutlineButton(
                       press: () {
                         if (isFilledRequestFriend == false) {
@@ -79,8 +79,17 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                       isFilled: isFilledRequestFriend,
                     );
                   } else {
-                    return const Text(
-                      'Let find some friend',
+                    return FillOutlineButton(
+                      press: () {
+                        if (isFilledRequestFriend == false) {
+                          setState(() {
+                            isFilledRecent = false;
+                            isFilledRequestFriend = true;
+                          });
+                        }
+                      },
+                      text: "Request Friend",
+                      isFilled: isFilledRequestFriend,
                     );
                   }
                 },

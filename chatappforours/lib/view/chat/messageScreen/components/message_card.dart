@@ -33,7 +33,6 @@ class MessageCard extends StatelessWidget {
           return const SizedBox();
       }
     }
-
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: kDefaultPadding,

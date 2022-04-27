@@ -18,6 +18,7 @@ class _SignInState extends State<SignIn> {
   void initState() {
     super.initState();
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -45,7 +46,7 @@ class _SignInState extends State<SignIn> {
                 text: "Check your gmail ${[state.email]} to verification");
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(
-                context: context, title: 'Generic error', text: "Login failed");
+                context: context, title: 'Generic error', text: "Login failed",);
           }
         }
       },

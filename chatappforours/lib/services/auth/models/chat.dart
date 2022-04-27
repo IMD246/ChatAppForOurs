@@ -1,32 +1,36 @@
 import 'package:chatappforours/constants/chat_constant_field.dart';
+import 'package:chatappforours/constants/user_profile_constant_field.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/utilities/time_handle/handle_time.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Chat {
+  final String userID;
   final String stampTime;
   final String lastText;
   final String nameChat;
   final TypeChat typeChat;
-  final RuleChat? rule;
-  final String? userID;
+  RuleChat? rule;
   String? time;
   bool? presence = false;
+  String? stampTimeUser;
   Chat(
-      {required this.stampTime,
+      {
+      required this.userID,
+      required this.stampTime,
       required this.lastText,
       required this.nameChat,
       required this.typeChat,
       this.rule,
-      this.userID,
-      this.presence,this.time});
+      this.presence,
+      this.time,
+      this.stampTimeUser});
   factory Chat.fromSnapshot({
     required DocumentSnapshot<Map<String, dynamic>> docs,
-    required RuleChat rule,
-    required String userIDChatScreen,
     bool? presence,
   }) =>
       Chat(
+        userID: docs.get(userIDField),
         stampTime: differenceInCalendarDays(
           docs.get(timeLastChatField).toDate(),
         ),
@@ -34,12 +38,9 @@ class Chat {
         nameChat: docs.get(nameChatField),
         typeChat: docs
                     .get(typeChatField)
-                    .toString()
                     .compareTo(TypeChat.normal.toString()) ==
                 0
             ? TypeChat.normal
             : TypeChat.group,
-        rule: rule,
-        userID: userIDChatScreen,
       );
 }

@@ -32,11 +32,9 @@ class _SignUpState extends State<SignUp> {
                 text: "Check gmail ${[state.email]} to verification");
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(
-                context: context,
-                title: 'Generic error',
-                text: "Auth Error");
+                context: context, title: 'Generic error', text: "Auth Error");
           }
-        } else if (state is AuthStateRegiseringWithFacebook ) {
+        } else if (state is AuthStateRegiseringWithFacebook) {
           if (state.exception is EmailAlreadyInUseAuthException) {
             await showErrorDialog(
               context: context,
@@ -50,8 +48,7 @@ class _SignUpState extends State<SignUp> {
               text: "Register facebook failed",
             );
           }
-        }
-        else if (state is AuthStateRegiseringWithGoogle) {
+        } else if (state is AuthStateRegiseringWithGoogle) {
           if (state.exception is EmailAlreadyInUseAuthException) {
             await showErrorDialog(
               context: context,

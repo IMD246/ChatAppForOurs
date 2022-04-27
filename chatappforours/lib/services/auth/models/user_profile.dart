@@ -8,13 +8,11 @@ class UserProfile {
   final String fullName;
   final String? urlImage;
   final bool isDarkMode;
-  final String? stampTime;
   const UserProfile({
     required this.email,
     required this.fullName,
     required this.urlImage,
     required this.isDarkMode,
-    this.stampTime,
   });
   factory UserProfile.fromSnapshot(
           DocumentSnapshot<Map<String, dynamic>> snapshot) =>

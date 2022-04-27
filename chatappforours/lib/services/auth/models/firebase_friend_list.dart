@@ -10,14 +10,31 @@ class FirebaseFriendList {
   final friendListDocument = FirebaseFirestore.instance;
   Future<void> createNewFriend(
       {required String ownerUserID,
-      required String userID,
+      required String userIDFriend,
       bool? isRequest}) async {
     Map<String, dynamic> map = <String, dynamic>{
-      userIDField: userID,
+      userIDField: userIDFriend,
       isRequestField: isRequest ?? false,
       stampTimeField: DateTime.now(),
     };
-    await friendListDocumentDefault.doc("$ownerUserID/friend/$userID").set(map);
+    await friendListDocumentDefault
+        .doc(ownerUserID)
+        .collection('friend')
+        .doc()
+        .set(map);
+  }
+
+  Future<String> getIDFriendListDocument(
+      {required String ownerUserID,
+      required String userID,
+      bool? isRequest}) async {
+    final id = await friendListDocumentDefault
+        .doc(ownerUserID)
+        .collection('friend')
+        .where(userIDField, isEqualTo: userID)
+        .get()
+        .then((value) => value.docs.first.id);
+    return id;
   }
 
   Future<void> updateRequestFriend(
@@ -34,6 +51,7 @@ class FirebaseFriendList {
       {required String ownerUserID, required String userID}) async {
     await friendListDocumentDefault.doc('$ownerUserID/friend/$userID').delete();
   }
+
   Stream<Iterable<FriendList>> getAllFriendIsAccepted({required ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
@@ -49,7 +67,8 @@ class FirebaseFriendList {
         );
     return friendList;
   }
-  Stream<Iterable<FriendList>> getAllFriendIsRequested({required ownerUserID}) {
+
+  Stream<Iterable<FriendList>> getAllFriendIsRequested({required String ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
         .doc(ownerUserID)
