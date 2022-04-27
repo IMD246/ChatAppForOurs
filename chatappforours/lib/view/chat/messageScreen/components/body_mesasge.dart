@@ -6,6 +6,7 @@ import 'package:chatappforours/view/chat/messageScreen/components/chat_input_fie
 import 'package:chatappforours/view/chat/messageScreen/components/message_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class BodyMessage extends StatefulWidget {
   const BodyMessage({Key? key, required this.chat}) : super(key: key);
@@ -24,8 +25,9 @@ class _BodyMessageState extends State<BodyMessage> {
           return Column(
             children: [
               Expanded(
-                child: ListView.builder(
-                  controller: state.scrollController,
+                child: ScrollablePositionedList.builder(
+                  initialScrollIndex: demeChatMessages.length,
+                  itemScrollController: state.scrollController,
                   itemCount: demeChatMessages.length,
                   itemBuilder: (context, index) {
                     return MessageCard(

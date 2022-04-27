@@ -65,7 +65,7 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                   if (snapshot.hasData) {
                     final friendList = snapshot.data as Iterable<FriendList>;
                     String? lengthText =
-                        friendList.isEmpty ? '' : '($friendList.length)';
+                        friendList.isEmpty ? '' : "(${friendList.length})";
                     return FillOutlineButton(
                       press: () {
                         if (isFilledRequestFriend == false) {

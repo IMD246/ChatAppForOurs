@@ -24,7 +24,7 @@ class MesssageScreen extends StatelessWidget {
   AppBar buildAppbar(Chat chat, ThemeMode themeMode, BuildContext context) {
     final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
     return AppBar(
-      automaticallyImplyLeading: true,
+      automaticallyImplyLeading: false,
       title: FutureBuilder<UserProfile?>(
         future: firebaseUserProfile.getUserProfile(userID: chat.userID),
         builder: (context, snapshot) {

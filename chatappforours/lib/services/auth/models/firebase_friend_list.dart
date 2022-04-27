@@ -42,14 +42,28 @@ class FirebaseFriendList {
     Map<String, dynamic> map = <String, dynamic>{
       isRequestField: true,
     };
+    String id = await getIDFriendListDocument(
+      ownerUserID: ownerUserID,
+      userID: userID,
+    );
     await friendListDocumentDefault
-        .doc('$ownerUserID/friend/$userID')
+        .doc(ownerUserID)
+        .collection('friend')
+        .doc(id)
         .update(map);
   }
 
   Future<void> deleteFriend(
       {required String ownerUserID, required String userID}) async {
-    await friendListDocumentDefault.doc('$ownerUserID/friend/$userID').delete();
+    String id = await getIDFriendListDocument(
+      ownerUserID: ownerUserID,
+      userID: userID,
+    );
+    await friendListDocumentDefault
+        .doc(ownerUserID)
+        .collection('friend')
+        .doc(id)
+        .delete();
   }
 
   Stream<Iterable<FriendList>> getAllFriendIsAccepted({required ownerUserID}) {
@@ -68,7 +82,8 @@ class FirebaseFriendList {
     return friendList;
   }
 
-  Stream<Iterable<FriendList>> getAllFriendIsRequested({required String ownerUserID}) {
+  Stream<Iterable<FriendList>> getAllFriendIsRequested(
+      {required String ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
         .doc(ownerUserID)

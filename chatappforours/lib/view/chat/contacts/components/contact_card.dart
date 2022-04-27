@@ -56,30 +56,32 @@ class _ContactCardState extends State<ContactCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        final userProfile =
-            await firebaseUserProfile.getUserProfile(userID: id);
-        await firebaseChat.createChat(
-          idFriendDocument: widget.friend.idFriendList,
-          ownerUserID: id,
-          userIDFriend: widget.friend.userID,
-          nameChat: userProfile!.fullName,
-          typeChat: TypeChat.normal,
-        );
-        final chat = await firebaseChat.getChatByID(
-          idChat: widget.friend.idFriendList,
-        );
-        chat.presence = widget.friend.presence;
-        chat.stampTimeUser = widget.friend.stampTimeUser;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MesssageScreen(chat: chat),
-          ),
-        );
+        if (!widget.requestFriend) {
+          final userProfile =
+              await firebaseUserProfile.getUserProfile(userID: id);
+          await firebaseChat.createChat(
+            idFriendDocument: widget.friend.idFriendList,
+            ownerUserID: id,
+            userIDFriend: widget.friend.userID,
+            nameChat: userProfile!.fullName,
+            typeChat: TypeChat.normal,
+          );
+          final chat = await firebaseChat.getChatByID(
+            idChat: widget.friend.idFriendList,
+          );
+          chat.presence = widget.friend.presence;
+          chat.stampTimeUser = widget.friend.stampTimeUser;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MesssageScreen(chat: chat),
+            ),
+          );
+        }
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: kDefaultPadding,
+          horizontal: kDefaultPadding * 0.5,
           vertical: kDefaultPadding * 0.75,
         ),
         child: FutureBuilder<UserProfile?>(

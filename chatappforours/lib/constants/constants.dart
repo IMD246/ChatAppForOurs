@@ -9,6 +9,7 @@ const kErrorColor = Color(0xFFF03738);
 const kColorDarkMode = Color.fromARGB(18, 18, 18, 1);
 const kDefaultPadding = 20.0;
 const defaultValue = 'default';
+const int intMaxValue = 9223372036854775807;
 Color textColorMode(ThemeMode themeMode) {
   return themeMode == ThemeMode.light ? Colors.black : Colors.white;
 }
