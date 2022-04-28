@@ -34,7 +34,7 @@ class _BodyMessageState extends State<BodyMessage> {
   Widget build(BuildContext context) {
     return StreamBuilder(
       stream: firebaseChatMessage.getAllMessage(
-        chatID: widget.chat.idChat!,
+        chatID: widget.chat.idChat,
         ownerUserID: id,
       ),
       builder: (context, snapshot) {
@@ -57,7 +57,7 @@ class _BodyMessageState extends State<BodyMessage> {
                     ),
                   ),
                   ChatInputFieldMessage(
-                    idChat: widget.chat.idChat!,
+                    idChat: widget.chat.idChat,
                     scroll: scrollController,
                   ),
                 ],

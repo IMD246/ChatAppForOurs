@@ -3,6 +3,7 @@ import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
@@ -31,12 +32,14 @@ class _ContactCardState extends State<ContactCard> {
   late final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
   late final FirebaseChat firebaseChat;
   late final FirebaseFriendList firebaseFriendList;
+  late final FirebaseUsersJoinChat firebaseUsersJoinChat;
   String id = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
     firebaseFriendList = FirebaseFriendList();
     firebaseChat = FirebaseChat();
+    firebaseUsersJoinChat = FirebaseUsersJoinChat();
     userPresenceDatabaseReference.child(widget.friend.userID).once().then(
       (event) {
         final data = Map<String, dynamic>.from(event.snapshot.value as Map);
@@ -60,17 +63,21 @@ class _ContactCardState extends State<ContactCard> {
           final userProfile = await firebaseUserProfile.getUserProfile(
               userID: widget.friend.userID);
           await firebaseChat.createChat(
-            idFriendDocument: widget.friend.idFriendList,
             ownerUserID: id,
             userIDFriend: widget.friend.userID,
             nameChat: userProfile!.fullName,
             typeChat: TypeChat.normal,
           );
+          final userJoinChat =
+              await firebaseUsersJoinChat.getChatNormalByIDUser(
+            userIDFriend: widget.friend.userID,
+          );
           final chat = await firebaseChat.getChatByID(
-            idChat: widget.friend.idFriendList,
+            idChat: userJoinChat!.chatID,
           );
           chat.presence = widget.friend.presence;
           chat.stampTimeUser = widget.friend.stampTimeUser;
+          chat.userID = widget.friend.userID;
           Navigator.push(
             context,
             MaterialPageRoute(

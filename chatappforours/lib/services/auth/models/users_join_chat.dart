@@ -17,13 +17,13 @@ class UsersJoinChat {
   }) {
     return UsersJoinChat(
         ruleChat: docs
-                    .data()[ruleChatField]
+                    .get(ruleChatField)
                     .toString()
                     .compareTo(RuleChat.admin.toString()) ==
                 0
             ? RuleChat.admin
             : RuleChat.member,
-        chatID: docs.id,
-        userID: docs.data()[userIDField]);
+        chatID: docs.reference.parent.parent!.id,
+        userID: docs.get(userIDField));
   }
 }

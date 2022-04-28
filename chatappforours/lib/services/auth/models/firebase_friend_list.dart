@@ -23,7 +23,6 @@ class FirebaseFriendList {
         .doc()
         .set(map);
   }
-
   Future<String> getIDFriendListDocument(
       {required String ownerUserID,
       required String userID,

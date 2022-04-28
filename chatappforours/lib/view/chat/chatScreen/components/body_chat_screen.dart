@@ -4,6 +4,7 @@ import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
+import 'package:chatappforours/services/auth/models/users_join_chat.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/time_handle/handle_time.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/chat_card.dart';
@@ -91,9 +92,16 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
               switch (snapshot.connectionState) {
                 case ConnectionState.active:
                   if (snapshot.hasData) {
-                    final allIDChat = snapshot.data as Iterable<String>;
+                    final allUersJoinChat =
+                        snapshot.data as Iterable<UsersJoinChat>;
+                    final List<UsersJoinChat> allUsers = [];
+                    allUsers.addAll(allUersJoinChat);
                     return ChatListView(
-                      allChat: allIDChat,
+                      allChat: allUersJoinChat.elementAt(0).userID == userID
+                          ? allUsers
+                          : allUersJoinChat
+                              .where((element) => element.userID != userID)
+                              .toList(),
                       isFilledActive: isFilledActive,
                     );
                   } else {
@@ -130,7 +138,7 @@ class ChatListView extends StatefulWidget {
     required this.allChat,
     required this.isFilledActive,
   }) : super(key: key);
-  final Iterable<String> allChat;
+  final List<UsersJoinChat> allChat;
   final bool isFilledActive;
   @override
   State<ChatListView> createState() => _ChatListViewState();
@@ -142,11 +150,15 @@ class _ChatListViewState extends State<ChatListView> {
   late final FirebaseChat firebaseChat;
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
-  getAllDataChat({required Iterable<String> list}) async {
+
+  getAllDataChat({required List<UsersJoinChat> list}) async {
     listChatData.clear();
     for (var i = 0; i < list.length; i++) {
-      final chat = await firebaseChat.getChatByID(idChat: list.elementAt(i));
-      userPresenceDatabaseReference.child(chat.userID).once().then(
+      final chat =
+          await firebaseChat.getChatByID(idChat: list.elementAt(i).chatID);
+      chat.userID = list.elementAt(i).userID;
+      chat.rule = list.elementAt(i).ruleChat;
+      userPresenceDatabaseReference.child(chat.userID!).once().then(
         (event) {
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           final isOnline = data['presence'];
@@ -168,11 +180,14 @@ class _ChatListViewState extends State<ChatListView> {
     }
   }
 
-  getAllDataChatOnline({required Iterable<String> list}) async {
+  getAllDataChatOnline({required List<UsersJoinChat> list}) async {
     listChatData.clear();
     for (var i = 0; i < list.length; i++) {
-      final chat = await firebaseChat.getChatByID(idChat: list.elementAt(i));
-      userPresenceDatabaseReference.child(chat.userID).once().then(
+      final chat =
+          await firebaseChat.getChatByID(idChat: list.elementAt(i).chatID);
+      chat.userID = list.elementAt(i).userID;
+      chat.rule = list.elementAt(i).ruleChat;
+      userPresenceDatabaseReference.child(chat.userID!).once().then(
         (event) {
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           final isOnline = data['presence'];
