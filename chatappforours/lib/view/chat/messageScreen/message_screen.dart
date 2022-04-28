@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
-import 'package:chatappforours/view/chat/messageScreen/components/body_mesasge.dart';
+import 'package:chatappforours/view/chat/messageScreen/components/body_message.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../constants/constants.dart';
 
@@ -13,8 +15,10 @@ class MesssageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = Provider.of<ThemeChanger>(context).getTheme();
     return Scaffold(
-      appBar: buildAppbar(chat, ThemeMode.light, context),
+      appBar: buildAppbar(
+          chat, isDarkTheme ? ThemeMode.dark : ThemeMode.light, context),
       body: BodyMessage(
         chat: chat,
       ),
@@ -24,7 +28,7 @@ class MesssageScreen extends StatelessWidget {
   AppBar buildAppbar(Chat chat, ThemeMode themeMode, BuildContext context) {
     final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
     return AppBar(
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: true,
       title: FutureBuilder<UserProfile?>(
         future: firebaseUserProfile.getUserProfile(userID: chat.userID),
         builder: (context, snapshot) {
@@ -112,16 +116,6 @@ class MesssageScreen extends StatelessWidget {
           }
         },
       ),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.call),
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.videocam),
-        ),
-      ],
     );
   }
 }
