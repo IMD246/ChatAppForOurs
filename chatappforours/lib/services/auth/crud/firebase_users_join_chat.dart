@@ -7,6 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirebaseUsersJoinChat {
   final firebaseUsersJoinChat =
       FirebaseFirestore.instance.collection('userJoinChat');
+  final firebaseUsersJoinChatGroup =
+      FirebaseFirestore.instance.collectionGroup('usersJoinedChat');
   Future<void> createUsersJoinChat({
     required String chatID,
     required List<String> listUserID,
@@ -27,6 +29,22 @@ class FirebaseUsersJoinChat {
           .doc('$chatID/usersJoinedChat/${listUserID.elementAt(i)}')
           .set(map);
     }
+  }
+
+  Stream<Iterable<String>> getAllIDChatUserJoined({
+    required String ownerUserID,
+  }) {
+    final allIDChatUserJoined = firebaseUsersJoinChatGroup
+        .where(userIDField, isEqualTo: ownerUserID)
+        .snapshots()
+        .map(
+          (event) => event.docs.map(
+            (docs) {
+              return docs.reference.parent.parent!.id;
+            },
+          ),
+        );
+    return allIDChatUserJoined;
   }
 
   Stream<Iterable<UsersJoinChat>> getUsersJoinChatByID({

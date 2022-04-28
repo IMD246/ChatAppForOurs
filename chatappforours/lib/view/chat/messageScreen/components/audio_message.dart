@@ -1,5 +1,5 @@
 import 'package:chatappforours/constants/constants.dart';
-import 'package:chatappforours/models/ChatMessage.dart';
+import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:flutter/material.dart';
 
 class AudioMessasge extends StatefulWidget {

@@ -58,7 +58,7 @@ class _ContactCardState extends State<ContactCard> {
       onTap: () async {
         if (!widget.requestFriend) {
           final userProfile =
-              await firebaseUserProfile.getUserProfile(userID: id);
+              await firebaseUserProfile.getUserProfile(userID: widget.friend.userID);
           await firebaseChat.createChat(
             idFriendDocument: widget.friend.idFriendList,
             ownerUserID: id,

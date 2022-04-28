@@ -1,4 +1,4 @@
-import 'package:chatappforours/models/ChatMessage.dart';
+import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/bloc/message/message_bloc.dart';
 import 'package:chatappforours/services/bloc/message/message_state.dart';

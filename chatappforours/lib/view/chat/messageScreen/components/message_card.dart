@@ -1,4 +1,5 @@
-import 'package:chatappforours/models/ChatMessage.dart';
+import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/audio_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/image_message.dart';
@@ -19,13 +20,13 @@ class MessageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget messageContaint(ChatMessage chatMessage) {
       switch (chatMessage.messageType) {
-        case ChatMessageType.text:
+        case TypeMessage.text:
           return TextMessage(chatMessage: chatMessage);
-        case ChatMessageType.audio:
+        case TypeMessage.audio:
           return AudioMessasge(
             chatMessage: chatMessage,
           );
-        case ChatMessageType.image:
+        case TypeMessage.image:
           return const ImageMesage(
             urlImage: "assets/images/Video Place Here.png",
           );
@@ -72,7 +73,7 @@ class MessageStatusDot extends StatelessWidget {
       height: 12,
       decoration: BoxDecoration(
         color: (messageStatus == MessageStatus.sent ||
-                messageStatus == MessageStatus.not_view ||
+                messageStatus == MessageStatus.notViewed ||
                 messageStatus == MessageStatus.viewed)
             ? kPrimaryColor
             : Colors.black.withOpacity(0.1),
@@ -80,7 +81,7 @@ class MessageStatusDot extends StatelessWidget {
       ),
       child: Icon(
         (messageStatus == MessageStatus.sent ||
-                messageStatus == MessageStatus.not_view ||
+                messageStatus == MessageStatus.notViewed ||
                 messageStatus == MessageStatus.viewed)
             ? Icons.done
             : null,

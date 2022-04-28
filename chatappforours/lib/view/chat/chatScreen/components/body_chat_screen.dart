@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
+import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/time_handle/handle_time.dart';
@@ -21,15 +22,15 @@ class BodyChatScreen extends StatefulWidget {
 class _BodyChatScreenState extends State<BodyChatScreen> {
   List<Chat> listChatData = [];
   late final FirebaseChat firebaseChat;
+  late final FirebaseUsersJoinChat firebaseUsersJoinChat;
   final String userID = FirebaseAuth.instance.currentUser!.uid;
-  late final DatabaseReference userPresenceDatabaseReference;
   bool isFilledRecent = true;
   bool isFilledActive = false;
   late final bool isActive;
   @override
   void initState() {
     firebaseChat = FirebaseChat();
-
+    firebaseUsersJoinChat = FirebaseUsersJoinChat();
     super.initState();
   }
 
@@ -84,14 +85,15 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
         ),
         Expanded(
           child: StreamBuilder(
-            stream: firebaseChat.getAllChat(userID: userID),
+            stream: firebaseUsersJoinChat.getAllIDChatUserJoined(
+                ownerUserID: userID),
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.active:
                   if (snapshot.hasData) {
-                    final allChat = snapshot.data as Iterable<Chat>;
+                    final allIDChat = snapshot.data as Iterable<String>;
                     return ChatListView(
-                      allChat: allChat,
+                      allChat: allIDChat,
                       isFilledActive: isFilledActive,
                     );
                   } else {
@@ -128,7 +130,7 @@ class ChatListView extends StatefulWidget {
     required this.allChat,
     required this.isFilledActive,
   }) : super(key: key);
-  final Iterable<Chat> allChat;
+  final Iterable<String> allChat;
   final bool isFilledActive;
   @override
   State<ChatListView> createState() => _ChatListViewState();
@@ -140,11 +142,11 @@ class _ChatListViewState extends State<ChatListView> {
   late final FirebaseChat firebaseChat;
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
-  getAllDataChat({required Iterable<Chat> list}) async {
+  getAllDataChat({required Iterable<String> list}) async {
     listChatData.clear();
     for (var i = 0; i < list.length; i++) {
-      final chat = list.elementAt(i);
-      userPresenceDatabaseReference.child(list.elementAt(i).userID).once().then(
+      final chat = await firebaseChat.getChatByID(idChat: list.elementAt(i));
+      userPresenceDatabaseReference.child(chat.userID).once().then(
         (event) {
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           final isOnline = data['presence'];
@@ -153,17 +155,24 @@ class _ChatListViewState extends State<ChatListView> {
           chat.stampTimeUser = date;
           chat.presence = isOnline;
           listChatData.add(chat);
+          if (listChatData.length == list.length) {
+            listChatData.sort(
+              (a, b) {
+                return b.stampTime.compareTo(a.stampTime);
+              },
+            );
+          }
           _streamController.sink.add(listChatData);
         },
       );
     }
   }
 
-  getAllDataChatOnline({required Iterable<Chat> list}) async {
+  getAllDataChatOnline({required Iterable<String> list}) async {
     listChatData.clear();
     for (var i = 0; i < list.length; i++) {
-      final chat = list.elementAt(i);
-      userPresenceDatabaseReference.child(list.elementAt(i).userID).once().then(
+      final chat = await firebaseChat.getChatByID(idChat: list.elementAt(i));
+      userPresenceDatabaseReference.child(chat.userID).once().then(
         (event) {
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           final isOnline = data['presence'];
@@ -173,8 +182,15 @@ class _ChatListViewState extends State<ChatListView> {
           chat.presence = isOnline;
           if (chat.presence!) {
             listChatData.add(chat);
-            _streamController.sink.add(listChatData);
+            if (listChatData.length == list.length) {
+              listChatData.sort(
+                (a, b) {
+                  return b.stampTime.compareTo(a.stampTime);
+                },
+              );
+            }
           }
+          _streamController.sink.add(listChatData);
         },
       );
     }
