@@ -25,7 +25,7 @@ class TextMessage extends StatelessWidget {
         chatMessage.value,
         style: TextStyle(
             color: textColorMode(ThemeMode.light)
-                .withOpacity(chatMessage.isSender ? 0.7 : 1)),
+                .withOpacity(chatMessage.isSender ? 0.7 : 1),),
       ),
     );
   }

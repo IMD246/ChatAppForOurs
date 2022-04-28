@@ -87,17 +87,20 @@ class _BodySettingState extends State<BodySetting> {
                               child: Stack(
                                 children: [
                                   if (userProfile?.urlImage == null)
-                                    const CircleAvatar(
+                                    CircleAvatar(
+                                      backgroundColor: Colors.cyan[100],
                                       radius: 60,
-                                      backgroundImage: AssetImage(
+                                      backgroundImage: const AssetImage(
                                         "assets/images/defaultImage.png",
                                       ),
                                     ),
                                   if (userProfile!.urlImage != null)
                                     CircleAvatar(
+                                      backgroundColor: Colors.cyan[100],
                                       radius: 60,
                                       child: ClipOval(
                                         child: CachedNetworkImage(
+                                          fit: BoxFit.fill,
                                           imageUrl: userProfile.urlImage!,
                                           placeholder: (context, url) =>
                                               const CircularProgressIndicator(),

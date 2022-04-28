@@ -1,6 +1,8 @@
+import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/bloc/message/message_bloc.dart';
 import 'package:chatappforours/services/bloc/message/message_event.dart';
 import 'package:chatappforours/services/bloc/message/message_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,17 +11,21 @@ import '../../../../constants/constants.dart';
 class ChatInputFieldMessage extends StatefulWidget {
   const ChatInputFieldMessage({
     Key? key,
+    required this.idChat,
   }) : super(key: key);
-
+  final String idChat;
   @override
   State<ChatInputFieldMessage> createState() => _ChatInputFieldMessageState();
 }
 
 class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   late final TextEditingController textController;
+  late final FirebaseChatMessage firebaseChatMessage;
+  String id = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
     textController = TextEditingController();
+    firebaseChatMessage = FirebaseChatMessage();
     super.initState();
   }
 
@@ -70,10 +76,23 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                         Expanded(
                           child: TextField(
                             controller: textController,
+                            onTap: () async => {
+                              await firebaseChatMessage
+                                  .createTextMessageNotSent(
+                                userID: id,
+                                chatID: widget.idChat,
+                              )
+                            },
                             minLines: 1,
                             maxLines: 5,
                             keyboardType: TextInputType.multiline,
-                            onChanged: (value) {
+                            onChanged: (value) async {
+                              if (value.isEmpty) {
+                                await firebaseChatMessage.deleteMessageNotSent(
+                                  ownerUserID: id,
+                                  chatID: widget.idChat,
+                                );
+                              }
                               context.read<MessageBloc>().add(
                                     SendedEventMessage(value, false),
                                   );

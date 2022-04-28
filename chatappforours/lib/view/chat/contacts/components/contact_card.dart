@@ -57,8 +57,8 @@ class _ContactCardState extends State<ContactCard> {
     return GestureDetector(
       onTap: () async {
         if (!widget.requestFriend) {
-          final userProfile =
-              await firebaseUserProfile.getUserProfile(userID: widget.friend.userID);
+          final userProfile = await firebaseUserProfile.getUserProfile(
+              userID: widget.friend.userID);
           await firebaseChat.createChat(
             idFriendDocument: widget.friend.idFriendList,
             ownerUserID: id,
@@ -98,8 +98,10 @@ class _ContactCardState extends State<ContactCard> {
                         children: [
                           if (userProfile!.urlImage != null)
                             CircleAvatar(
+                              backgroundColor: Colors.cyan[100],
                               child: ClipOval(
                                 child: CachedNetworkImage(
+                                  fit: BoxFit.fill,
                                   imageUrl: userProfile.urlImage!,
                                   placeholder: (context, url) =>
                                       const CircularProgressIndicator(),
@@ -109,9 +111,10 @@ class _ContactCardState extends State<ContactCard> {
                               ),
                             ),
                           if (userProfile.urlImage == null)
-                            const CircleAvatar(
-                              backgroundImage:
-                                  AssetImage("assets/images/defaultImage.png"),
+                            CircleAvatar(
+                              backgroundColor: Colors.cyan[100],
+                              backgroundImage: const AssetImage(
+                                  "assets/images/defaultImage.png"),
                             ),
                           if (widget.friend.presence)
                             Positioned(

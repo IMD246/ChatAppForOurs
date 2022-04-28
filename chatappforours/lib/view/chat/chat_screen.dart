@@ -110,8 +110,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 context.read<AuthBloc>().add(const AuthEventSetting());
               },
               child: CircleAvatar(
+                backgroundColor: Colors.cyan[100],
                 child: ClipOval(
                   child: CachedNetworkImage(
+                    fit: BoxFit.fill,
                     imageUrl: urlImage,
                     placeholder: (context, url) =>
                         const CircularProgressIndicator(),

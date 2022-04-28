@@ -1,6 +1,9 @@
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
-import 'package:chatappforours/services/auth/models/chat.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/audio_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/image_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/text_message.dart';
@@ -8,14 +11,25 @@ import 'package:flutter/material.dart';
 
 import '../../../../constants/constants.dart';
 
-class MessageCard extends StatelessWidget {
+class MessageCard extends StatefulWidget {
   const MessageCard({
     Key? key,
     required this.chatMessage,
-    required this.chat,
   }) : super(key: key);
   final ChatMessage chatMessage;
-  final Chat chat;
+
+  @override
+  State<MessageCard> createState() => _MessageCardState();
+}
+
+class _MessageCardState extends State<MessageCard> {
+  late final FirebaseUserProfile firebaseUserProfile;
+  @override
+  void initState() {
+    firebaseUserProfile = FirebaseUserProfile();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget messageContaint(ChatMessage chatMessage) {
@@ -34,26 +48,55 @@ class MessageCard extends StatelessWidget {
           return const SizedBox();
       }
     }
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: kDefaultPadding,
         horizontal: kDefaultPadding * 0.75,
       ),
       child: Row(
-        mainAxisAlignment: chatMessage.isSender
+        mainAxisAlignment: widget.chatMessage.isSender
             ? MainAxisAlignment.end
             : MainAxisAlignment.start,
         children: [
-          if (!chatMessage.isSender)
-            // CircleAvatar(
-            //   backgroundImage: AssetImage(chat.image),
-            //   radius: 20,
-            // ),
+          if (!widget.chatMessage.isSender)
+            FutureBuilder<UserProfile?>(
+              future: firebaseUserProfile.getUserProfile(
+                  userID: widget.chatMessage.userID),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final userProfile = snapshot.data;
+                  if (userProfile!.urlImage == null) {
+                    return const CircleAvatar(
+                      backgroundImage:
+                          AssetImage("assets/images/defaultImage.png",),
+                      radius: 20,
+                    );
+                  } else {
+                    return CircleAvatar(
+                      radius: 20,
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          fit: BoxFit.fill,
+                          imageUrl: userProfile.urlImage!,
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        ),
+                      ),
+                    );
+                  }
+                } else {
+                  return const Text('');
+                }
+              },
+            ),
           const SizedBox(width: kDefaultPadding * 0.5),
-          messageContaint(chatMessage),
-          if (chatMessage.messageStatus != MessageStatus.viewed)
+          messageContaint(widget.chatMessage),
+          if (widget.chatMessage.messageStatus != MessageStatus.viewed)
             MessageStatusDot(
-              messageStatus: chatMessage.messageStatus,
+              messageStatus: widget.chatMessage.messageStatus,
             ),
         ],
       ),

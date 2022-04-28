@@ -42,9 +42,11 @@ class MesssageScreen extends StatelessWidget {
                       children: [
                         if (userProfile!.urlImage != null)
                           CircleAvatar(
+                            backgroundColor: Colors.cyan[100],
                             child: ClipOval(
                               child: CachedNetworkImage(
                                 imageUrl: userProfile.urlImage!,
+                                fit: BoxFit.fill,
                                 placeholder: (context, url) =>
                                     const CircularProgressIndicator(),
                                 errorWidget: (context, url, error) =>
@@ -54,8 +56,9 @@ class MesssageScreen extends StatelessWidget {
                           ),
                         if (userProfile.urlImage == null)
                           const CircleAvatar(
-                            backgroundImage:
-                                AssetImage("assets/images/defaultImage.png"),
+                            backgroundImage: AssetImage(
+                              "assets/images/defaultImage.png",
+                            ),
                           ),
                         if (chat.presence == true)
                           Positioned(

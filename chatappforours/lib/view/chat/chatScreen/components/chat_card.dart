@@ -24,6 +24,7 @@ class _ChatCardState extends State<ChatCard> {
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     final firebaseUserProfile = FirebaseUserProfile();
@@ -37,7 +38,8 @@ class _ChatCardState extends State<ChatCard> {
         child: Row(
           children: [
             FutureBuilder<UserProfile?>(
-              future: firebaseUserProfile.getUserProfile(userID: widget.chat.userID),
+              future: firebaseUserProfile.getUserProfile(
+                  userID: widget.chat.userID),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.done:
@@ -47,8 +49,10 @@ class _ChatCardState extends State<ChatCard> {
                         children: [
                           if (userProfile!.urlImage != null)
                             CircleAvatar(
+                              backgroundColor: Colors.cyan[100],
                               child: ClipOval(
                                 child: CachedNetworkImage(
+                                  fit: BoxFit.fill,
                                   imageUrl: userProfile.urlImage!,
                                   placeholder: (context, url) =>
                                       const CircularProgressIndicator(),
@@ -58,9 +62,11 @@ class _ChatCardState extends State<ChatCard> {
                               ),
                             ),
                           if (userProfile.urlImage == null)
-                            const CircleAvatar(
-                              backgroundImage:
-                                  AssetImage("assets/images/defaultImage.png"),
+                            CircleAvatar(
+                              backgroundColor: Colors.cyan[100],
+                              backgroundImage: const AssetImage(
+                                "assets/images/defaultImage.png",
+                              ),
                             ),
                           if (widget.chat.presence == true)
                             Positioned(
