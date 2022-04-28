@@ -33,18 +33,33 @@ class FirebaseChatMessage {
     await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
-        .where(idSenderField, isEqualTo: ownerUserID)
-        .where(messageStatusField, isEqualTo: MessageStatus.notSent.toString())
-        .orderBy(stampTimeField, descending: true)
-        .limit(1)
         .get()
         .then(
-          (value) => firebaseChatMessageDocument
+      (value) async {
+        if (value.docs.isNotEmpty) {
+          await firebaseChatMessageDocument
               .doc(chatID)
               .collection('message')
-              .doc(value.docs.first.id)
-              .delete(),
-        );
+              .where(idSenderField, isEqualTo: ownerUserID)
+              .where(
+                messageStatusField,
+                isEqualTo: MessageStatus.notSent.toString(),
+              )
+              .get()
+              .then(
+            (value) async {
+              if (value.docs.isNotEmpty) {
+                await firebaseChatMessageDocument
+                    .doc(chatID)
+                    .collection('message')
+                    .doc(value.docs.first.id)
+                    .delete();
+              }
+            },
+          );
+        }
+      },
+    );
   }
 
   Future<void> updateTextMessageSent({
@@ -52,21 +67,54 @@ class FirebaseChatMessage {
     required chatID,
     required text,
   }) async {
-    Map<String, dynamic> map = {
+    Map<String, dynamic> mapUpdate = {
       messageField: text,
       messageStatusField: MessageStatus.sent.toString(),
       stampTimeField: DateTime.now(),
     };
     final firebaseChat = FirebaseChat();
-    await firebaseChat.updateChat(
-      text: text,
-      chatID: chatID,
-    );
+
+    Map<String, dynamic> mapCreate = {
+      idSenderField: userID,
+      messageField: text,
+      typeMessageField: TypeMessage.text.toString(),
+      messageStatusField: MessageStatus.sent.toString(),
+      stampTimeField: DateTime.now(),
+    };
     await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
-        .doc(userID)
-        .update(map);
+        .where(idSenderField, isEqualTo: userID)
+        .where(
+          messageStatusField,
+          isEqualTo: MessageStatus.notSent.toString(),
+        )
+        .get()
+        .then(
+      (value) async {
+        if (value.docs.isNotEmpty) {
+          await firebaseChatMessageDocument
+              .doc(chatID)
+              .collection('message')
+              .doc(value.docs.first.id)
+              .update(mapUpdate);
+          await firebaseChat.updateChat(
+            text: text,
+            chatID: chatID,
+          );
+        } else {
+          await firebaseChatMessageDocument
+              .doc(chatID)
+              .collection('message')
+              .doc()
+              .set(mapCreate);
+          await firebaseChat.updateChat(
+            text: text,
+            chatID: chatID,
+          );
+        }
+      },
+    );
   }
 
   Stream<Iterable<ChatMessage>> getAllMessage(
@@ -81,8 +129,10 @@ class FirebaseChatMessage {
         .snapshots()
         .map(
           (event) => event.docs.map(
-            (docs) =>
-                ChatMessage.fromSnapshot(docs: docs, ownerUserID: ownerUserID),
+            (docs) => ChatMessage.fromSnapshot(
+              docs: docs,
+              ownerUserID: ownerUserID,
+            ),
           ),
         );
     return allMessage;

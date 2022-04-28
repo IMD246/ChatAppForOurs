@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
@@ -51,7 +50,7 @@ class _MessageCardState extends State<MessageCard> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-        vertical: kDefaultPadding,
+        vertical: kDefaultPadding * 0.25,
         horizontal: kDefaultPadding * 0.75,
       ),
       child: Row(
@@ -67,17 +66,22 @@ class _MessageCardState extends State<MessageCard> {
                 if (snapshot.hasData) {
                   final userProfile = snapshot.data;
                   if (userProfile!.urlImage == null) {
-                    return const CircleAvatar(
-                      backgroundImage:
-                          AssetImage("assets/images/defaultImage.png",),
-                      radius: 20,
+                    return FittedBox(
+                      fit: BoxFit.fill,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.cyan[100],
+                        backgroundImage: const AssetImage(
+                          "assets/images/defaultImage.png",
+                        ),
+                        radius: 20,
+                      ),
                     );
                   } else {
                     return CircleAvatar(
+                      backgroundColor: Colors.cyan[100],
                       radius: 20,
                       child: ClipOval(
                         child: CachedNetworkImage(
-                          fit: BoxFit.fill,
                           imageUrl: userProfile.urlImage!,
                           placeholder: (context, url) =>
                               const CircularProgressIndicator(),
@@ -94,7 +98,8 @@ class _MessageCardState extends State<MessageCard> {
             ),
           const SizedBox(width: kDefaultPadding * 0.5),
           messageContaint(widget.chatMessage),
-          if (widget.chatMessage.messageStatus != MessageStatus.viewed)
+          if (widget.chatMessage.messageStatus == MessageStatus.viewed ||
+              widget.chatMessage.messageStatus == MessageStatus.sent)
             MessageStatusDot(
               messageStatus: widget.chatMessage.messageStatus,
             ),
@@ -115,19 +120,13 @@ class MessageStatusDot extends StatelessWidget {
       width: 12,
       height: 12,
       decoration: BoxDecoration(
-        color: (messageStatus == MessageStatus.sent ||
-                messageStatus == MessageStatus.notViewed ||
-                messageStatus == MessageStatus.viewed)
+        color: (messageStatus == MessageStatus.viewed)
             ? kPrimaryColor
-            : Colors.black.withOpacity(0.1),
+            : Colors.black.withOpacity(0.3),
         shape: BoxShape.circle,
       ),
       child: Icon(
-        (messageStatus == MessageStatus.sent ||
-                messageStatus == MessageStatus.notViewed ||
-                messageStatus == MessageStatus.viewed)
-            ? Icons.done
-            : null,
+        Icons.done,
         size: 8,
         color: Theme.of(context).scaffoldBackgroundColor,
       ),

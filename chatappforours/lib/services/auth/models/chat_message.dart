@@ -37,9 +37,6 @@ MessageStatus getMessageStatus({required String value}) {
     return MessageStatus.notSent;
   } else if (value.toString().compareTo(MessageStatus.sent.toString()) == 0) {
     return MessageStatus.sent;
-  } else if (value.toString().compareTo(MessageStatus.notViewed.toString()) ==
-      0) {
-    return MessageStatus.notViewed;
   } else {
     return MessageStatus.viewed;
   }

@@ -42,17 +42,18 @@ class FirebaseChat {
       );
     }
   }
+
   Future<void> updateChat({
     required String text,
     required String chatID,
   }) async {
-      Map<String, dynamic> map = <String, dynamic>{
-        lastTextField: text,
-        timeLastChatField: DateTime.now(),
-      };
-      await firebaseChat.doc(chatID).update(map);
-    }
-  
+    Map<String, dynamic> map = <String, dynamic>{
+      lastTextField: text,
+      timeLastChatField: DateTime.now(),
+    };
+    await firebaseChat.doc(chatID).update(map);
+  }
+
   Stream<Iterable<Chat>> getAllChat({
     required String userID,
   }) {
