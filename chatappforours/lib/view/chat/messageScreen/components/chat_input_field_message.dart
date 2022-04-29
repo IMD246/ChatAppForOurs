@@ -1,6 +1,7 @@
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../../constants/constants.dart';
@@ -22,11 +23,23 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   late final FirebaseChatMessage firebaseChatMessage;
   String id = FirebaseAuth.instance.currentUser!.uid;
   bool isSelected = false;
+  bool isTaped = false;
   @override
   void initState() {
+    super.initState();
     textController = TextEditingController();
     firebaseChatMessage = FirebaseChatMessage();
-    super.initState();
+    KeyboardVisibilityController().onChange.listen(
+      (isVisible) {
+        if (isVisible) {
+        } else {
+          firebaseChatMessage.deleteMessageNotSent(
+            ownerUserID: id,
+            chatID: widget.idChat,
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -37,6 +50,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
 
   @override
   Widget build(BuildContext context) {
+    final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -75,24 +89,31 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                       child: TextField(
                         controller: textController,
                         onTap: () async => {
-                          if (textController.text.isEmpty)
-                            {
-                              await firebaseChatMessage
-                                  .createTextMessageNotSent(
-                                userID: id,
-                                chatID: widget.idChat,
-                              )
-                            }
+                          await firebaseChatMessage.createTextMessageNotSent(
+                            userID: id,
+                            chatID: widget.idChat,
+                          ),
+                          setState(() {
+                            !isKeyboard
+                                ? widget.scroll.scrollTo(
+                                    index: intMaxValue,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeIn)
+                                : null;
+                            isTaped = true;
+                          }),
                         },
                         onChanged: (value) {
                           setState(() {
-                            if (value.isEmpty) {
-                              firebaseChatMessage.deleteMessageNotSent(
-                                ownerUserID: id,
-                                chatID: widget.idChat,
-                              );
-                            }
+                            textController.text = value;
                           });
+                          // ? await firebaseChatMessage.deleteMessageNotSent(
+                          //     ownerUserID: id, chatID: widget.idChat)
+                          // : await firebaseChatMessage
+                          //     .createTextMessageNotSent(
+                          //     userID: id,
+                          //     chatID: widget.idChat,
+                          //   );
                         },
                         minLines: 1,
                         maxLines: 5,

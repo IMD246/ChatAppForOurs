@@ -1,5 +1,6 @@
 import 'package:chatappforours/constants/chat_constant_field.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,17 +23,26 @@ class FirebaseChat {
         typeChatField: typeChat.toString(),
         timeLastChatField: DateTime.now(),
       };
-      await firebaseChat.doc().set(map);
-      final userJoinChat = await firebaseUserJoinChat.getChatNormalByIDUser(
-          userIDFriend: userIDFriend);
       List<String> listUser = <String>[];
-      listUser.add(ownerUserID);
-      listUser.add(userIDFriend);
+      if (ownerUserID.compareTo(userIDFriend) == 0) {
+        listUser.add(ownerUserID);
+        map.update(nameChatField, (value) => 'Only You');
+      } else {
+        listUser.add(ownerUserID);
+        listUser.add(userIDFriend);
+      }
       await firebaseUserJoinChat.createUsersJoinChat(
-        chatID: userJoinChat!.chatID,
         listUserID: listUser,
         typeChat: typeChat,
       );
+      final userJoinChat = await firebaseUserJoinChat.getChatNormalByIDUser(
+          userIDFriend: userIDFriend);
+      final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
+      firebaseChatMessage.createFirstTextMessage(
+        userID: ownerUserID,
+        chatID: userJoinChat!.chatID,
+      );
+      await firebaseChat.doc(userJoinChat.chatID).set(map);
     }
   }
 

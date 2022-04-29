@@ -11,7 +11,6 @@ class FirebaseUsersJoinChat {
   final firebaseUsersJoinChatGroup =
       FirebaseFirestore.instance.collectionGroup('usersJoinedChat');
   Future<void> createUsersJoinChat({
-    required String chatID,
     required List<String> listUserID,
     required TypeChat typeChat,
   }) async {
@@ -27,8 +26,7 @@ class FirebaseUsersJoinChat {
         typeChatField: typeChat.toString(),
         stampTimeField: DateTime.now(),
       };
-      await firebaseUsersJoinChat
-          .doc('$chatID/usersJoinedChat/${listUserID.elementAt(i)}')
+      await firebaseUsersJoinChat.doc().collection('usersJoinedChat').doc(listUserID.elementAt(i))
           .set(map);
     }
   }

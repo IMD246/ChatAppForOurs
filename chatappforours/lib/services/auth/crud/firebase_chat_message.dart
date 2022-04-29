@@ -8,6 +8,55 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirebaseChatMessage {
   final firebaseChatMessageDocument =
       FirebaseFirestore.instance.collection('chatMessage');
+
+  Future<void> createFirstTextMessage({
+    required userID,
+    required chatID,
+  }) async {
+    Map<String, dynamic> map = {
+      idSenderField: userID,
+      messageField: "Let make some chat",
+      typeMessageField: TypeMessage.text.toString(),
+      messageStatusField: MessageStatus.sent.toString(),
+      stampTimeField: DateTime.now(),
+    };
+    await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .get()
+        .then(
+      (value) {
+        if (value.docs.isNotEmpty) {
+          firebaseChatMessageDocument
+              .doc(chatID)
+              .collection('message')
+              .where(idSenderField, isEqualTo: userID)
+              .where(
+                messageStatusField,
+                isEqualTo: MessageStatus.notSent.toString(),
+              )
+              .get()
+              .then(
+            (value) {
+              if (value.docs.isNotEmpty) {
+                firebaseChatMessageDocument
+                    .doc(chatID)
+                    .collection('message')
+                    .doc(value.docs.first.id)
+                    .set(map);
+              }
+            },
+          );
+        } else {
+          firebaseChatMessageDocument
+              .doc(chatID)
+              .collection('message')
+              .doc()
+              .set(map);
+        }
+      },
+    );
+  }
   Future<void> createTextMessageNotSent({
     required userID,
     required chatID,
@@ -36,7 +85,7 @@ class FirebaseChatMessage {
         .get()
         .then(
       (value) async {
-        if (value.docs.isNotEmpty) {
+        if (value.size > 0) {
           await firebaseChatMessageDocument
               .doc(chatID)
               .collection('message')
@@ -45,10 +94,11 @@ class FirebaseChatMessage {
                 messageStatusField,
                 isEqualTo: MessageStatus.notSent.toString(),
               )
+              .limit(1)
               .get()
               .then(
             (value) async {
-              if (value.docs.isNotEmpty) {
+              if (value.size > 0) {
                 await firebaseChatMessageDocument
                     .doc(chatID)
                     .collection('message')

@@ -58,6 +58,7 @@ dependencies:
   flutter_lifecycle_state: ^1.0.0
   firebase_database: ^9.0.11
   scrollable_positioned_list: ^0.2.3
+  flutter_keyboard_visibility: ^5.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

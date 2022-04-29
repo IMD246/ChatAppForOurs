@@ -21,30 +21,24 @@ class _BodyMessageState extends State<BodyMessage> {
   @override
   void initState() {
     firebaseChatMessage = FirebaseChatMessage();
-    setState(() {
-      firebaseChatMessage.deleteMessageNotSent(
-        ownerUserID: id,
-        chatID: widget.chat.idChat,
-      );
-    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: firebaseChatMessage.getAllMessage(
-        chatID: widget.chat.idChat,
-        ownerUserID: id,
-      ),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.active:
-            if (snapshot.hasData) {
-              final allChat = snapshot.data as Iterable<ChatMessage>;
-              return Column(
-                children: [
-                  Expanded(
+    return Column(
+      children: [
+        StreamBuilder(
+          stream: firebaseChatMessage.getAllMessage(
+            chatID: widget.chat.idChat,
+            ownerUserID: id,
+          ),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.active:
+                if (snapshot.hasData) {
+                  final allChat = snapshot.data as Iterable<ChatMessage>;
+                  return Expanded(
                     child: ScrollablePositionedList.builder(
                       initialScrollIndex: allChat.length,
                       itemScrollController: scrollController,
@@ -55,36 +49,36 @@ class _BodyMessageState extends State<BodyMessage> {
                         );
                       },
                     ),
+                  );
+                } else {
+                  return Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  );
+                }
+              case ConnectionState.waiting:
+                return const Center(
+                  child: SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(),
                   ),
-                  ChatInputFieldMessage(
-                    idChat: widget.chat.idChat,
-                    scroll: scrollController,
+                );
+              default:
+                return const Center(
+                  child: SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(),
                   ),
-                ],
-              );
-            } else {
-              return Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-              );
+                );
             }
-          case ConnectionState.waiting:
-            return const Center(
-              child: SizedBox(
-                height: 100,
-                width: 100,
-                child: CircularProgressIndicator(),
-              ),
-            );
-          default:
-            return const Center(
-              child: SizedBox(
-                height: 100,
-                width: 100,
-                child: CircularProgressIndicator(),
-              ),
-            );
-        }
-      },
+          },
+        ),
+        ChatInputFieldMessage(
+          idChat: widget.chat.idChat,
+          scroll: scrollController,
+        ),
+      ],
     );
   }
 }

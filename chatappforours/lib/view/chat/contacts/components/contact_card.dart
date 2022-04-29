@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
@@ -29,7 +30,7 @@ class ContactCard extends StatefulWidget {
 class _ContactCardState extends State<ContactCard> {
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
-  late final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+  late final FirebaseUserProfile firebaseUserProfile;
   late final FirebaseChat firebaseChat;
   late final FirebaseFriendList firebaseFriendList;
   late final FirebaseUsersJoinChat firebaseUsersJoinChat;
@@ -38,6 +39,7 @@ class _ContactCardState extends State<ContactCard> {
   @override
   void initState() {
     firebaseFriendList = FirebaseFriendList();
+    firebaseUserProfile = FirebaseUserProfile();
     firebaseChat = FirebaseChat();
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
     userPresenceDatabaseReference.child(widget.friend.userID).once().then(
