@@ -57,6 +57,7 @@ class FirebaseChatMessage {
       },
     );
   }
+
   Future<void> createTextMessageNotSent({
     required userID,
     required chatID,
@@ -68,48 +69,62 @@ class FirebaseChatMessage {
       messageStatusField: MessageStatus.notSent.toString(),
       stampTimeField: DateTime.now(),
     };
-    await firebaseChatMessageDocument
+    final bool check = await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
-        .doc()
-        .set(map);
+        .where(idSenderField, isEqualTo: userID)
+        .where(messageStatusField, isEqualTo: MessageStatus.notSent.toString())
+        .orderBy(stampTimeField, descending: true)
+        .limit(1)
+        .get()
+        .then(
+      (value) {
+        if (value.docs.isNotEmpty && value.docs.first.exists) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    );
+    if (check == false) {
+      await firebaseChatMessageDocument
+          .doc(chatID)
+          .collection('message')
+          .doc()
+          .set(map);
+    }
   }
 
   Future<void> deleteMessageNotSent({
     required ownerUserID,
     required chatID,
   }) async {
-    await firebaseChatMessageDocument
+    String? id;
+    final bool isCheck = await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
+        .where(idSenderField, isEqualTo: ownerUserID)
+        .where(messageStatusField, isEqualTo: MessageStatus.notSent.toString())
+        .orderBy(stampTimeField, descending: true)
+        .limit(1)
         .get()
         .then(
-      (value) async {
-        if (value.size > 0) {
-          await firebaseChatMessageDocument
-              .doc(chatID)
-              .collection('message')
-              .where(idSenderField, isEqualTo: ownerUserID)
-              .where(
-                messageStatusField,
-                isEqualTo: MessageStatus.notSent.toString(),
-              )
-              .limit(1)
-              .get()
-              .then(
-            (value) async {
-              if (value.size > 0) {
-                await firebaseChatMessageDocument
-                    .doc(chatID)
-                    .collection('message')
-                    .doc(value.docs.first.id)
-                    .delete();
-              }
-            },
-          );
+      (value) {
+        if (value.size > 0 && value.docs.first.exists) {
+          id = value.docs.first.id;
+          return true;
+        } else {
+          return false;
         }
       },
     );
+    if (isCheck == true) {
+      await firebaseChatMessageDocument
+          .doc(chatID)
+          .collection('message')
+          .doc(id)
+          .delete();
+    }
   }
 
   Future<void> updateTextMessageSent({
