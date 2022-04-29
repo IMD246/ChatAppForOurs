@@ -3,6 +3,7 @@ import 'package:chatappforours/enum/enum.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatMessage {
+  final String idMessage;
   final String value;
   final TypeMessage messageType;
   final MessageStatus messageStatus;
@@ -10,6 +11,7 @@ class ChatMessage {
   final bool? isSender;
   final bool hasSender;
   ChatMessage({
+    required this.idMessage, 
     this.value = '',
     required this.messageType,
     required this.messageStatus,
@@ -21,6 +23,7 @@ class ChatMessage {
       {required QueryDocumentSnapshot<Map<String, dynamic>> docs,
       required String ownerUserID}) {
     return ChatMessage(
+      idMessage: docs.id,
       value: docs.get(messageField).toString(),
       messageType: getTypeMessage(value: docs.get(typeMessageField).toString()),
       messageStatus:
@@ -30,7 +33,7 @@ class ChatMessage {
               ? true
               : false
           : null,
-      userID: docs.get(idSenderField).toString(), hasSender: docs.get(hasSenderField),
+      userID: docs.get(idSenderField).toString(), hasSender: docs.get(hasSenderField), 
     );
   }
 }

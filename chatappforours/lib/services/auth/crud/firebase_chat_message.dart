@@ -2,7 +2,9 @@ import 'package:chatappforours/constants/message_chat_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseChatMessage {
@@ -109,19 +111,35 @@ class FirebaseChatMessage {
     }
   }
 
-  Future<void> updateTextMessageSent({
-    required userID,
+  Future<void> updateTextMessageFriendToViewed({
     required chatID,
-    required text,
+    required messageID,
+  }) async {
+    Map<String, dynamic> mapUpdate = {
+      messageStatusField: MessageStatus.viewed.toString(),
+    };
+    await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .doc(messageID)
+        .update(mapUpdate);
+  }
+
+  Future<void> updateTextMessageSent({
+    required String ownerUserID,
+    required String userIDFriend,
+    required String chatID,
+    required String text,
   }) async {
     final firebaseChat = FirebaseChat();
-
     Map<String, dynamic> mapCreate = {
-      idSenderField: userID,
+      idSenderField: ownerUserID,
       hasSenderField: true,
       messageField: text,
       typeMessageField: TypeMessage.text.toString(),
-      messageStatusField: MessageStatus.sent.toString(),
+      messageStatusField: userIDFriend.compareTo(ownerUserID) == 0
+          ? MessageStatus.viewed.toString()
+          : MessageStatus.sent.toString(),
       stampTimeField: DateTime.now(),
     };
     await firebaseChatMessageDocument
@@ -133,6 +151,37 @@ class FirebaseChatMessage {
       text: text,
       chatID: chatID,
     );
+  }
+
+  Future<UserProfile?> checkLastMessageOfChatRoom(
+      {required String chatID,
+      required String idMessage,
+      required String userIDFriend}) async {
+    final FirebaseUserProfile userProfile = FirebaseUserProfile();
+    final bool lastMessage = await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .where(messageStatusField, isEqualTo: MessageStatus.viewed.toString())
+        .orderBy(
+          stampTimeField,
+          descending: true,
+        )
+        .limit(1)
+        .get()
+        .then(
+      (value) {
+        if (value.docs.first.id.isNotEmpty) {
+          return value.docs.first.id == idMessage ? true : false;
+        } else {
+          return false;
+        }
+      },
+    );
+    if (lastMessage) {
+      return userProfile.getUserProfile(userID: userIDFriend);
+    } else {
+      return null;
+    }
   }
 
   Stream<Iterable<ChatMessage>> getAllMessage(

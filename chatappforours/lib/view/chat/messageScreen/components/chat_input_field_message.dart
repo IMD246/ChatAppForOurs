@@ -9,9 +9,10 @@ class ChatInputFieldMessage extends StatefulWidget {
   const ChatInputFieldMessage({
     Key? key,
     required this.idChat,
-    required this.scroll,
+    required this.scroll,required this.userIDFriend,
   }) : super(key: key);
   final String idChat;
+  final String userIDFriend;
   final ItemScrollController scroll;
   @override
   State<ChatInputFieldMessage> createState() => _ChatInputFieldMessageState();
@@ -145,9 +146,10 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                         chatID: widget.idChat,
                       );
                       firebaseChatMessage.updateTextMessageSent(
-                        userID: id,
                         chatID: widget.idChat,
                         text: textController.text,
+                        ownerUserID: id,
+                        userIDFriend: widget.userIDFriend,
                       );
                       textController.clear();
                       widget.scroll.scrollTo(

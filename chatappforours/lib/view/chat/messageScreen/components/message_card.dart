@@ -1,11 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/audio_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/image_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/text_message.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../constants/constants.dart';
@@ -14,8 +17,10 @@ class MessageCard extends StatefulWidget {
   const MessageCard({
     Key? key,
     required this.chatMessage,
+    required this.chat,
   }) : super(key: key);
   final ChatMessage chatMessage;
+  final Chat chat;
 
   @override
   State<MessageCard> createState() => _MessageCardState();
@@ -23,9 +28,22 @@ class MessageCard extends StatefulWidget {
 
 class _MessageCardState extends State<MessageCard> {
   late final FirebaseUserProfile firebaseUserProfile;
+  late final FirebaseChatMessage firebaseChatMessage;
+  String idUser = FirebaseAuth.instance.currentUser!.uid;
+  String? urlStringImage;
   @override
   void initState() {
     firebaseUserProfile = FirebaseUserProfile();
+    firebaseChatMessage = FirebaseChatMessage();
+    setState(() {
+      if (widget.chatMessage.isSender == false &&
+          widget.chatMessage.messageStatus == MessageStatus.sent) {
+        firebaseChatMessage.updateTextMessageFriendToViewed(
+          chatID: widget.chat.idChat,
+          messageID: widget.chatMessage.idMessage,
+        );
+      }
+    });
     super.initState();
   }
 
@@ -51,7 +69,7 @@ class _MessageCardState extends State<MessageCard> {
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: kDefaultPadding * 0.25,
-        horizontal: kDefaultPadding * 0.75,
+        horizontal: kDefaultPadding * 0.2,
       ),
       child: Row(
         mainAxisAlignment: widget.chatMessage.hasSender == true
@@ -65,11 +83,15 @@ class _MessageCardState extends State<MessageCard> {
             if (widget.chatMessage.isSender == false)
               FutureBuilder<UserProfile?>(
                 future: firebaseUserProfile.getUserProfile(
-                    userID: widget.chatMessage.userID),
+                  userID: widget.chatMessage.userID,
+                ),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     final userProfile = snapshot.data;
-                    if (userProfile!.urlImage == null) {
+                    urlStringImage = userProfile!.urlImage != null
+                        ? userProfile.urlImage
+                        : null;
+                    if (userProfile.urlImage == null) {
                       return FittedBox(
                         fit: BoxFit.fill,
                         child: CircleAvatar(
@@ -102,38 +124,118 @@ class _MessageCardState extends State<MessageCard> {
               ),
           const SizedBox(width: kDefaultPadding * 0.5),
           messageContaint(widget.chatMessage),
-          if (widget.chatMessage.messageStatus == MessageStatus.viewed ||
-              widget.chatMessage.messageStatus == MessageStatus.sent)
-            MessageStatusDot(
-              messageStatus: widget.chatMessage.messageStatus,
-            ),
+          if (widget.chat.userID!.compareTo(idUser) != 0)
+            if (widget.chatMessage.messageStatus == MessageStatus.viewed ||
+                widget.chatMessage.messageStatus == MessageStatus.sent)
+              MessageStatusDot(
+                messageStatus: widget.chatMessage.messageStatus,
+                urlStringImage: urlStringImage,
+                chatID: widget.chat.idChat,
+                idMessage: widget.chatMessage.idMessage,
+                idUserFriend: widget.chat.userID!,
+                isSender: widget.chatMessage.hasSender
+                    ? widget.chatMessage.isSender!
+                    : false,
+              ),
+          if (widget.chat.userID!.compareTo(idUser) == 0)
+            Container(
+              margin: const EdgeInsets.only(left: 2),
+              width: 16,
+              height: 16,
+            )
         ],
       ),
     );
   }
 }
-
-class MessageStatusDot extends StatelessWidget {
-  const MessageStatusDot({Key? key, required, required this.messageStatus})
+class MessageStatusDot extends StatefulWidget {
+  const MessageStatusDot(
+      {Key? key,
+      required,
+      required this.messageStatus,
+      required this.urlStringImage,
+      required this.chatID,
+      required this.idMessage,
+      required this.idUserFriend,
+      required this.isSender})
       : super(key: key);
   final MessageStatus messageStatus;
+  final String? urlStringImage;
+  final String chatID;
+  final String idMessage;
+  final String idUserFriend;
+  final bool isSender;
+  @override
+  State<MessageStatusDot> createState() => _MessageStatusDotState();
+}
+
+class _MessageStatusDotState extends State<MessageStatusDot> {
+  late final FirebaseChatMessage firebaseChatMessage;
+  @override
+  void initState() {
+    firebaseChatMessage = FirebaseChatMessage();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: kDefaultPadding / 2),
-      width: 12,
-      height: 12,
-      decoration: BoxDecoration(
-        color: (messageStatus == MessageStatus.viewed)
-            ? kPrimaryColor
-            : Colors.black.withOpacity(0.3),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        Icons.done,
-        size: 8,
-        color: Theme.of(context).scaffoldBackgroundColor,
-      ),
+      margin: const EdgeInsets.only(left: 2),
+      width: 16,
+      height: 16,
+      decoration: widget.messageStatus == MessageStatus.viewed
+          ? null
+          : BoxDecoration(
+              color: (widget.messageStatus == MessageStatus.sent)
+                  ? kPrimaryColor
+                  : null,
+              shape: BoxShape.circle,
+            ),
+      child: widget.messageStatus == MessageStatus.viewed &&
+              widget.isSender == true
+          ? FutureBuilder<UserProfile?>(
+              future: firebaseChatMessage.checkLastMessageOfChatRoom(
+                chatID: widget.chatID,
+                idMessage: widget.idMessage,
+                userIDFriend: widget.idUserFriend,
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final userProfile = snapshot.data;
+                  if (userProfile!.urlImage == null) {
+                    return FittedBox(
+                      fit: BoxFit.fill,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.cyan[100],
+                        backgroundImage: const AssetImage(
+                          "assets/images/defaultImage.png",
+                        ),
+                      ),
+                    );
+                  } else {
+                    return CircleAvatar(
+                      backgroundColor: Colors.cyan[100],
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: userProfile.urlImage!,
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        ),
+                      ),
+                    );
+                  }
+                } else {
+                  return const Text('');
+                }
+              },
+            )
+          : Icon(
+              Icons.done,
+              size: 8,
+              color: Theme.of(context).scaffoldBackgroundColor,
+            ),
     );
   }
 }

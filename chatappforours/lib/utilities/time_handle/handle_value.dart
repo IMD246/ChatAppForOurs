@@ -22,7 +22,7 @@ String differenceInCalendarDays(DateTime earlier) {
   return "no time to die";
 }
 
-String handleString(String value) {
+String handleStringMessage(String value) {
   final count = (value.length / 17).round();
   String v = "";
   for (int i = 0; i < count; i++) {

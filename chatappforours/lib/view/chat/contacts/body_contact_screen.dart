@@ -43,19 +43,41 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
           color: kPrimaryColor,
           child: Row(
             children: [
-              FillOutlineButton(
-                isFilled: isFilledRecent,
-                press: () {
-                  if (isFilledRequestFriend == true) {
-                    setState(
-                      () {
-                        isFilledRecent = true;
-                        isFilledRequestFriend = false;
+              StreamBuilder(
+                stream:
+                    firebaseFriendList.getAllFriendIsAccepted(ownerUserID: id),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final friendList = snapshot.data as Iterable<FriendList>;
+                    String? lengthText =
+                        friendList.isEmpty ? '' : "(${friendList.length})";
+                    return FillOutlineButton(
+                      press: () {
+                        if (isFilledRequestFriend == true) {
+                          setState(() {
+                            isFilledRequestFriend = false;
+                            isFilledRecent = true;
+                          });
+                        }
                       },
+                      text: "Recent Friend $lengthText",
+                      isFilled: isFilledRecent,
+                    );
+                  } else {
+                    return FillOutlineButton(
+                      press: () {
+                        if (isFilledRequestFriend == true) {
+                          setState(() {
+                            isFilledRequestFriend = false;
+                            isFilledRecent = true;
+                          });
+                        }
+                      },
+                      text: "Recent Friend",
+                      isFilled: isFilledRecent,
                     );
                   }
                 },
-                text: "Recent Friend",
               ),
               const SizedBox(width: kDefaultPadding * 0.7),
               StreamBuilder(
@@ -70,8 +92,8 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                       press: () {
                         if (isFilledRequestFriend == false) {
                           setState(() {
-                            isFilledRecent = false;
                             isFilledRequestFriend = true;
+                            isFilledRecent = false;
                           });
                         }
                       },
@@ -83,8 +105,8 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                       press: () {
                         if (isFilledRequestFriend == false) {
                           setState(() {
-                            isFilledRecent = false;
                             isFilledRequestFriend = true;
+                            isFilledRecent = false;
                           });
                         }
                       },

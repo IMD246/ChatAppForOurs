@@ -60,6 +60,7 @@ class _BodyMessageState extends State<BodyMessage> {
                       if (index != -1) {
                         return MessageCard(
                           chatMessage: allChat.elementAt(index),
+                          chat: widget.chat,
                         );
                       } else {
                         return Container(
@@ -87,6 +88,7 @@ class _BodyMessageState extends State<BodyMessage> {
         ChatInputFieldMessage(
           idChat: widget.chat.idChat,
           scroll: scrollController,
+          userIDFriend: widget.chat.userID!,
         ),
       ],
     );
