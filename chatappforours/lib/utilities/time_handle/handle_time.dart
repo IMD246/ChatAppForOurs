@@ -21,3 +21,18 @@ String differenceInCalendarDays(DateTime earlier) {
   }
   return "no time to die";
 }
+
+String handleString(String value) {
+  final count = (value.length / 17).round();
+  String v = "";
+  for (int i = 0; i < count; i++) {
+    if (i != count - 1) {
+      final v1 = "${value.substring((17 * i) + i, (17 * (i + 1)))} \n";
+      v = v + v1;
+    } else {
+      final v1 = value.substring((17 * i) + i, value.length);
+      v = v + v1;
+    }
+  }
+  return v;
+}

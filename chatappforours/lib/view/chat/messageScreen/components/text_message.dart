@@ -1,5 +1,6 @@
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
+import 'package:chatappforours/utilities/time_handle/handle_time.dart';
 import 'package:flutter/material.dart';
 
 class TextMessage extends StatelessWidget {
@@ -28,7 +29,10 @@ class TextMessage extends StatelessWidget {
         ),
       ),
       child: Text(
-        chatMessage.value,
+        chatMessage.value.length >= 17
+            ? handleString(chatMessage.value)
+            : chatMessage.value,
+        softWrap: true,
         style: TextStyle(
           fontSize: chatMessage.hasSender ? 14 : 30,
           color: textColorMode(ThemeMode.light).withOpacity(
