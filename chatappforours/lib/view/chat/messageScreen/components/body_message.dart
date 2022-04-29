@@ -19,6 +19,7 @@ class _BodyMessageState extends State<BodyMessage> {
   late final FirebaseChatMessage firebaseChatMessage;
   String id = FirebaseAuth.instance.currentUser!.uid;
   late final ItemScrollController scrollController;
+
   @override
   void initState() {
     firebaseChatMessage = FirebaseChatMessage();

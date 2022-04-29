@@ -33,13 +33,13 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
 
   @override
   void dispose() {
+    textController.clear();
     textController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -77,13 +77,16 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                     Expanded(
                       child: TextField(
                         controller: textController,
-                        onTap: () => {
-                          setState(() {
-                            widget.scroll.scrollTo(
-                                index: intMaxValue,
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeIn);
-                          })
+                        onTap: () async {
+                          await firebaseChatMessage.createTextMessageNotSent(
+                            userID: id,
+                            chatID: widget.idChat,
+                          );
+                          widget.scroll.scrollTo(
+                            index: intMaxValue,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeIn,
+                          );
                         },
                         onChanged: (value) async {
                           if (textController.text.isNotEmpty) {
@@ -135,22 +138,24 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
             if (textController.text.isNotEmpty)
               IconButton(
                 onPressed: () async {
-                  setState(() {
-                    firebaseChatMessage.deleteMessageNotSent(
-                      ownerUserID: id,
-                      chatID: widget.idChat,
-                    );
-                    firebaseChatMessage.updateTextMessageSent(
-                      userID: id,
-                      chatID: widget.idChat,
-                      text: textController.text,
-                    );
-                    textController.clear();
-                    widget.scroll.scrollTo(
-                        index: intMaxValue,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeIn);
-                  });
+                  setState(
+                    () {
+                      firebaseChatMessage.deleteMessageNotSent(
+                        ownerUserID: id,
+                        chatID: widget.idChat,
+                      );
+                      firebaseChatMessage.updateTextMessageSent(
+                        userID: id,
+                        chatID: widget.idChat,
+                        text: textController.text,
+                      );
+                      textController.clear();
+                      widget.scroll.scrollTo(
+                          index: intMaxValue,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeIn);
+                    },
+                  );
                 },
                 icon: const Icon(Icons.send),
                 color: Theme.of(context).primaryColor,
