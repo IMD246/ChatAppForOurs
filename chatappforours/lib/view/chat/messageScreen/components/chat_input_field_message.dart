@@ -24,15 +24,12 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   String id = FirebaseAuth.instance.currentUser!.uid;
   bool isSelected = false;
   bool isTaped = false;
-  late final String idChat;
-  late final ItemScrollController scroll;
+
   @override
   void initState() {
     super.initState();
     textController = TextEditingController();
     firebaseChatMessage = FirebaseChatMessage();
-    scroll = widget.scroll;
-    idChat = widget.idChat;
     KeyboardVisibilityController().onChange.listen(
       (isVisible) {
         if (isVisible) {
@@ -94,24 +91,27 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                         controller: textController,
                         onTap: () => {
                           setState(() {
-                            !isKeyboard
-                                ? scroll.scrollTo(
-                                    index: intMaxValue,
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeIn)
-                                : null;
-                            isTaped = true;
-                          }),
+                            widget.scroll.scrollTo(
+                                index: intMaxValue,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeIn);
+                          })
                         },
-                        onChanged: (value) async {
+                        onChanged: (value) {
                           setState(() {
-                            textController.text.isEmpty
-                                ? firebaseChatMessage.deleteMessageNotSent(
-                                    ownerUserID: id, chatID: idChat)
-                                : firebaseChatMessage.createTextMessageNotSent(
-                                    userID: id,
-                                    chatID: idChat,
-                                  );
+                            if (textController.text.isNotEmpty) {
+                              firebaseChatMessage.createTextMessageNotSent(
+                                userID: id,
+                                chatID: widget.idChat,
+                              );
+                              widget.scroll.scrollTo(
+                                  index: intMaxValue,
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeIn);
+                            } else {
+                              firebaseChatMessage.deleteMessageNotSent(
+                                  ownerUserID: id, chatID: widget.idChat);
+                            }
                           });
                         },
                         minLines: 1,
@@ -145,14 +145,18 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
             if (textController.text.isNotEmpty)
               IconButton(
                 onPressed: () async {
-                  await firebaseChatMessage.updateTextMessageSent(
-                    userID: id,
+                  await firebaseChatMessage.deleteMessageNotSent(
+                    ownerUserID: id,
                     chatID: widget.idChat,
-                    text: textController.text,
                   );
                   setState(() {
                     textController.clear();
-                    scroll.scrollTo(
+                    firebaseChatMessage.updateTextMessageSent(
+                      userID: id,
+                      chatID: widget.idChat,
+                      text: textController.text,
+                    );
+                    widget.scroll.scrollTo(
                         index: intMaxValue,
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeIn);
