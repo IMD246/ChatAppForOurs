@@ -1,3 +1,4 @@
+import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
@@ -5,6 +6,7 @@ import 'package:chatappforours/view/chat/messageScreen/components/chat_input_fie
 import 'package:chatappforours/view/chat/messageScreen/components/message_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class BodyMessage extends StatefulWidget {
@@ -17,10 +19,22 @@ class BodyMessage extends StatefulWidget {
 class _BodyMessageState extends State<BodyMessage> {
   late final FirebaseChatMessage firebaseChatMessage;
   String id = FirebaseAuth.instance.currentUser!.uid;
-  ItemScrollController scrollController = ItemScrollController();
+  late final ItemScrollController scrollController;
   @override
   void initState() {
     firebaseChatMessage = FirebaseChatMessage();
+    scrollController = ItemScrollController();
+    KeyboardVisibilityController().onChange.listen(
+      (isVisible) {
+        if (isVisible) {
+        } else {
+          firebaseChatMessage.deleteMessageNotSent(
+            ownerUserID: id,
+            chatID: widget.chat.idChat,
+          );
+        }
+      },
+    );
     super.initState();
   }
 
@@ -44,32 +58,43 @@ class _BodyMessageState extends State<BodyMessage> {
                       itemScrollController: scrollController,
                       itemCount: allChat.length,
                       itemBuilder: (context, index) {
-                        return MessageCard(
-                          chatMessage: allChat.elementAt(index),
-                        );
+                        if (index != -1) {
+                          return MessageCard(
+                            chatMessage: allChat.elementAt(index),
+                          );
+                        } else {
+                          return Container(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                          );
+                        }
                       },
                     ),
                   );
                 } else {
-                  return Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
+                  return Expanded(
+                    child: ScrollablePositionedList.builder(
+                      initialScrollIndex: 0,
+                      itemScrollController: scrollController,
+                      itemCount: 0,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                        );
+                      },
+                    ),
                   );
                 }
               case ConnectionState.waiting:
-                return const Center(
-                  child: SizedBox(
-                    height: 100,
-                    width: 100,
-                    child: CircularProgressIndicator(),
-                  ),
+                return const SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: CircularProgressIndicator(),
                 );
               default:
-                return const Center(
-                  child: SizedBox(
-                    height: 100,
-                    width: 100,
-                    child: CircularProgressIndicator(),
-                  ),
+                return const SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: CircularProgressIndicator(),
                 );
             }
           },
