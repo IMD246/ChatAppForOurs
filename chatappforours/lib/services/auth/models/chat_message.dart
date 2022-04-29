@@ -4,17 +4,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatMessage {
   final String value;
-  final String userID;
   final TypeMessage messageType;
   final MessageStatus messageStatus;
-  final bool isSender;
-
+  final String? userID;
+  final bool? isSender;
+  final bool hasSender;
   ChatMessage({
     this.value = '',
     required this.messageType,
     required this.messageStatus,
     required this.isSender,
     required this.userID,
+    required this.hasSender,
   });
   factory ChatMessage.fromSnapshot(
       {required QueryDocumentSnapshot<Map<String, dynamic>> docs,
@@ -24,10 +25,12 @@ class ChatMessage {
       messageType: getTypeMessage(value: docs.get(typeMessageField).toString()),
       messageStatus:
           getMessageStatus(value: docs.get(messageStatusField).toString()),
-      isSender: ownerUserID.compareTo(docs.get(idSenderField).toString()) == 0
-          ? true
-          : false,
-      userID: docs.get(idSenderField).toString(),
+      isSender: docs.get(hasSenderField) == true
+          ? ownerUserID.compareTo(docs.get(idSenderField).toString()) == 0
+              ? true
+              : false
+          : null,
+      userID: docs.get(idSenderField).toString(), hasSender: docs.get(hasSenderField),
     );
   }
 }

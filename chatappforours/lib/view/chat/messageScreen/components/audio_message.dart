@@ -22,13 +22,23 @@ class _AudioMessasgeState extends State<AudioMessasge> {
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: kPrimaryColor.withOpacity(widget.chatMessage.isSender ? 1 : 0.1),
+        color: kPrimaryColor.withOpacity(
+          widget.chatMessage.isSender != null
+              ? widget.chatMessage.isSender!
+                  ? 1
+                  : 0.1
+              : 0.1,
+        ),
       ),
       child: Row(
         children: [
           Icon(
             Icons.play_arrow,
-            color: widget.chatMessage.isSender ? Colors.white : kPrimaryColor,
+            color: widget.chatMessage.isSender != null
+                ? widget.chatMessage.isSender!
+                    ? Colors.white
+                    : kPrimaryColor
+                : kPrimaryColor,
           ),
           Expanded(
             child: Padding(

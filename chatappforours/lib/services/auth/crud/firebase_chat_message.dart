@@ -15,10 +15,11 @@ class FirebaseChatMessage {
     String? text,
   }) async {
     Map<String, dynamic> map = {
-      idSenderField: userID,
+      idSenderField: '',
+      hasSenderField: false,
       messageField: "Let make some chat",
       typeMessageField: TypeMessage.text.toString(),
-      messageStatusField: MessageStatus.sent.toString(),
+      messageStatusField: MessageStatus.notSent.toString(),
       stampTimeField: DateTime.now(),
     };
     await firebaseChatMessageDocument
@@ -63,6 +64,7 @@ class FirebaseChatMessage {
       {required userID, required chatID}) async {
     Map<String, dynamic> map = {
       idSenderField: userID,
+      hasSenderField: true,
       messageField: ". . .",
       typeMessageField: TypeMessage.text.toString(),
       messageStatusField: MessageStatus.notSent.toString(),
@@ -116,6 +118,7 @@ class FirebaseChatMessage {
 
     Map<String, dynamic> mapCreate = {
       idSenderField: userID,
+      hasSenderField: true,
       messageField: text,
       typeMessageField: TypeMessage.text.toString(),
       messageStatusField: MessageStatus.sent.toString(),

@@ -91,19 +91,28 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.active:
-                  final allUersJoinChat =
-                      snapshot.data as Iterable<UsersJoinChat>;
-                  final List<UsersJoinChat> allUsers = [];
-                  allUsers.addAll(allUersJoinChat);
-                  if (allUersJoinChat.isNotEmpty) {
-                    return ChatListView(
-                      allChat: allUersJoinChat.elementAt(0).userID == userID
-                          ? allUsers
-                          : allUersJoinChat
-                              .where((element) => element.userID != userID)
-                              .toList(),
-                      isFilledActive: isFilledActive,
-                    );
+                  if (snapshot.hasData) {
+                    final allUersJoinChat =
+                        snapshot.data as Iterable<UsersJoinChat>;
+                    final List<UsersJoinChat> allUsers = [];
+                    allUsers.addAll(allUersJoinChat);
+                    if (allUersJoinChat.isNotEmpty) {
+                      return ChatListView(
+                        allChat: allUersJoinChat.elementAt(0).userID == userID
+                            ? allUsers
+                            : allUersJoinChat
+                                .where((element) => element.userID != userID)
+                                .toList(),
+                        isFilledActive: isFilledActive,
+                      );
+                    } else {
+                      return const Center(
+                        child: Text(
+                          "Don't have any chat",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      );
+                    }
                   } else {
                     return const Center(
                       child: Text(

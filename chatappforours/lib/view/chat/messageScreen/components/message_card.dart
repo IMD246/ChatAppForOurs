@@ -54,48 +54,52 @@ class _MessageCardState extends State<MessageCard> {
         horizontal: kDefaultPadding * 0.75,
       ),
       child: Row(
-        mainAxisAlignment: widget.chatMessage.isSender
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
+        mainAxisAlignment: widget.chatMessage.hasSender == true
+            ? widget.chatMessage.isSender!
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start
+            : MainAxisAlignment.center,
         children: [
-          if (!widget.chatMessage.isSender)
-            FutureBuilder<UserProfile?>(
-              future: firebaseUserProfile.getUserProfile(
-                  userID: widget.chatMessage.userID),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final userProfile = snapshot.data;
-                  if (userProfile!.urlImage == null) {
-                    return FittedBox(
-                      fit: BoxFit.fill,
-                      child: CircleAvatar(
+          if (widget.chatMessage.hasSender &&
+              widget.chatMessage.isSender != null)
+            if (widget.chatMessage.isSender == false)
+              FutureBuilder<UserProfile?>(
+                future: firebaseUserProfile.getUserProfile(
+                    userID: widget.chatMessage.userID),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final userProfile = snapshot.data;
+                    if (userProfile!.urlImage == null) {
+                      return FittedBox(
+                        fit: BoxFit.fill,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.cyan[100],
+                          backgroundImage: const AssetImage(
+                            "assets/images/defaultImage.png",
+                          ),
+                          radius: 20,
+                        ),
+                      );
+                    } else {
+                      return CircleAvatar(
                         backgroundColor: Colors.cyan[100],
-                        backgroundImage: const AssetImage(
-                          "assets/images/defaultImage.png",
-                        ),
                         radius: 20,
-                      ),
-                    );
-                  } else {
-                    return CircleAvatar(
-                      backgroundColor: Colors.cyan[100],
-                      radius: 20,
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: userProfile.urlImage!,
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: userProfile.urlImage!,
+                            placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
+                  } else {
+                    return const Text('');
                   }
-                } else {
-                  return const Text('');
-                }
-              },
-            ),
+                },
+              ),
           const SizedBox(width: kDefaultPadding * 0.5),
           messageContaint(widget.chatMessage),
           if (widget.chatMessage.messageStatus == MessageStatus.viewed ||

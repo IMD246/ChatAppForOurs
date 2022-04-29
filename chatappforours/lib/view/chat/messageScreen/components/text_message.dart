@@ -19,13 +19,26 @@ class TextMessage extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: kPrimaryColor.withOpacity(chatMessage.isSender ? 1 : 0.1),
+        color: kPrimaryColor.withOpacity(
+          chatMessage.isSender != null
+              ? chatMessage.isSender!
+                  ? 1
+                  : 0.3
+              : 0.3,
+        ),
       ),
       child: Text(
         chatMessage.value,
         style: TextStyle(
-            color: textColorMode(ThemeMode.light)
-                .withOpacity(chatMessage.isSender ? 0.7 : 1),),
+          fontSize: chatMessage.hasSender ? 14 : 30,
+          color: textColorMode(ThemeMode.light).withOpacity(
+            chatMessage.isSender != null
+                ? chatMessage.isSender!
+                    ? 1
+                    : 0.7
+                : 0.7,
+          ),
+        ),
       ),
     );
   }

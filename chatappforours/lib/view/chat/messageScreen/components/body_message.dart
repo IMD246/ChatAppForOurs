@@ -1,4 +1,3 @@
-import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
@@ -50,40 +49,25 @@ class _BodyMessageState extends State<BodyMessage> {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.active:
-                if (snapshot.hasData) {
-                  final allChat = snapshot.data as Iterable<ChatMessage>;
-                  return Expanded(
-                    child: ScrollablePositionedList.builder(
-                      initialScrollIndex: allChat.length,
-                      itemScrollController: scrollController,
-                      itemCount: allChat.length,
-                      itemBuilder: (context, index) {
-                        if (index != -1) {
-                          return MessageCard(
-                            chatMessage: allChat.elementAt(index),
-                          );
-                        } else {
-                          return Container(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                          );
-                        }
-                      },
-                    ),
-                  );
-                } else {
-                  return Expanded(
-                    child: ScrollablePositionedList.builder(
-                      initialScrollIndex: 0,
-                      itemScrollController: scrollController,
-                      itemCount: 0,
-                      itemBuilder: (context, index) {
+                final allChat = snapshot.data as Iterable<ChatMessage>;
+                return Expanded(
+                  child: ScrollablePositionedList.builder(
+                    initialScrollIndex: allChat.length,
+                    itemScrollController: scrollController,
+                    itemCount: allChat.length,
+                    itemBuilder: (context, index) {
+                      if (index != -1) {
+                        return MessageCard(
+                          chatMessage: allChat.elementAt(index),
+                        );
+                      } else {
                         return Container(
                           color: Theme.of(context).scaffoldBackgroundColor,
                         );
-                      },
-                    ),
-                  );
-                }
+                      }
+                    },
+                  ),
+                );
               case ConnectionState.waiting:
                 return const SizedBox(
                   height: 100,

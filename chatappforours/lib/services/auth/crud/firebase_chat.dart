@@ -37,12 +37,12 @@ class FirebaseChat {
       );
       final userJoinChat = await firebaseUserJoinChat.getChatNormalByIDUser(
           userIDFriend: userIDFriend);
-      // final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
-      // firebaseChatMessage.createFirstTextMessage(
-      //   userID: ownerUserID,
-      //   chatID: userJoinChat!.chatID,
-      // );
-      await firebaseChat.doc(userJoinChat!.chatID).set(map);
+      final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
+      firebaseChatMessage.createFirstTextMessage(
+        userID: ownerUserID,
+        chatID: userJoinChat!.chatID,
+      );
+      await firebaseChat.doc(userJoinChat.chatID).set(map);
     }
   }
 
