@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
+import 'package:chatappforours/utilities/time_handle/handle_value.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../constants/constants.dart';
@@ -131,7 +132,7 @@ class _ChatCardState extends State<ChatCard> {
                     Opacity(
                       opacity: 0.64,
                       child: Text(
-                        widget.chat.lastText,
+                        getStringFromList(widget.chat.lastText),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

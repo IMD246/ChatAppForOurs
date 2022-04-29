@@ -29,9 +29,10 @@ class TextMessage extends StatelessWidget {
         ),
       ),
       child: Text(
-        chatMessage.value.length >= 17
-            ? handleStringMessage(chatMessage.value)
-            : chatMessage.value,
+        // chatMessage.value.length >= 17
+        //     ? handleStringMessage(chatMessage.value)
+        //     : chatMessage.value,
+        handleStringMessage(chatMessage.value),
         softWrap: true,
         style: TextStyle(
           fontSize: chatMessage.hasSender ? 14 : 30,

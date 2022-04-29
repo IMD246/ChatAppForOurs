@@ -9,7 +9,8 @@ class ChatInputFieldMessage extends StatefulWidget {
   const ChatInputFieldMessage({
     Key? key,
     required this.idChat,
-    required this.scroll,required this.userIDFriend,
+    required this.scroll,
+    required this.userIDFriend,
   }) : super(key: key);
   final String idChat;
   final String userIDFriend;
@@ -83,11 +84,13 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                             userID: id,
                             chatID: widget.idChat,
                           );
-                          widget.scroll.scrollTo(
-                            index: intMaxValue,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeIn,
-                          );
+                          if (widget.scroll.isAttached) {
+                            widget.scroll.scrollTo(
+                              index: intMaxValue,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeIn,
+                            );
+                          }
                         },
                         onChanged: (value) async {
                           if (textController.text.isNotEmpty) {
@@ -95,11 +98,13 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                               userID: id,
                               chatID: widget.idChat,
                             );
-                            widget.scroll.scrollTo(
-                              index: intMaxValue,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeIn,
-                            );
+                            if (widget.scroll.isAttached) {
+                              widget.scroll.scrollTo(
+                                index: intMaxValue,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeIn,
+                              );
+                            }
                           }
                           setState(() {
                             if (textController.text.isEmpty) {
@@ -152,10 +157,13 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                         userIDFriend: widget.userIDFriend,
                       );
                       textController.clear();
-                      widget.scroll.scrollTo(
+                      if (widget.scroll.isAttached) {
+                        widget.scroll.scrollTo(
                           index: intMaxValue,
                           duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeIn);
+                          curve: Curves.easeIn,
+                        );
+                      }
                     },
                   );
                 },

@@ -23,16 +23,57 @@ String differenceInCalendarDays(DateTime earlier) {
 }
 
 String handleStringMessage(String value) {
-  final count = (value.length / 17).round();
-  String v = "";
-  for (int i = 0; i < count; i++) {
-    if (i != count - 1) {
-      final v1 = "${value.substring((17 * i) + i, (17 * (i + 1)))} \n";
-      v = v + v1;
+  final list = value.split('\n');
+  if (list.length > 1) {
+    return value;
+  } else {
+    if (value.length >= 18) {
+      final count = (value.length / 17).round();
+      String v = "";
+      for (int i = 0; i < count; i++) {
+        if (i != count - 1) {
+          final v1 = "${value.substring((17 * i) + i, (17 * (i + 1)))} \n";
+          v = v + v1;
+        } else {
+          final v1 = value.substring((17 * i) + i, value.length);
+          v = v + v1;
+        }
+      }
+      return v;
     } else {
-      final v1 = value.substring((17 * i) + i, value.length);
-      v = v + v1;
+      return value;
     }
   }
-  return v;
+}
+
+String getStringFromList(String value) {
+  final list = value.split('\n');
+  if (list.length > 1) {
+    final list = value.split('\n').toString();
+    return list.substring(1, list.length - 1).replaceAll(',', ' ');
+  } else {
+    return value;
+  }
+}
+
+List<String> splitList(String string, String separator, {int max = 0}) {
+  List<String> result = [];
+
+  if (separator.isEmpty) {
+    result.add(string);
+    return result;
+  }
+
+  while (true) {
+    var index = string.indexOf(separator, 0);
+    if (index == -1 || (max > 0 && result.length >= max)) {
+      result.add(string);
+      break;
+    }
+
+    result.add(string.substring(0, index));
+    string = string.substring(index + separator.length);
+  }
+
+  return result;
 }
