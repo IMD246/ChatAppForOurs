@@ -27,6 +27,7 @@ class _WelcomePageState extends State<WelcomePage> {
     super.initState();
     Firebase.initializeApp();
   }
+
   @override
   Widget build(BuildContext context) {
     final ThemeChanger themeChanger = Provider.of<ThemeChanger>(context);

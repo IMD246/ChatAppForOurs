@@ -37,13 +37,13 @@ class Material extends StatelessWidget {
     final isDarkTheme = Provider.of<ThemeChanger>(context).getTheme();
     return BlocProvider<AuthBloc>(
       create: (context) => AuthBloc(FirebaseAuthProvider()),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: lightThemeData(context),
-        darkTheme: darkThemeData(context),
-        themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
-        home: const WelcomePage(),
-      ),
+      child:  MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: lightThemeData(context),
+          darkTheme: darkThemeData(context),
+          themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+          home: const WelcomePage(),
+        ),
     );
   }
 }

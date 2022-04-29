@@ -29,6 +29,7 @@ class _ChatCardState extends State<ChatCard> {
   @override
   Widget build(BuildContext context) {
     final firebaseUserProfile = FirebaseUserProfile();
+    
     return GestureDetector(
       onTap: widget.press,
       child: Padding(

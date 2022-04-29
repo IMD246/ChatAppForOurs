@@ -1,15 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
+import 'package:chatappforours/utilities/time_handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/audio_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/image_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/text_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../../constants/constants.dart';
 
@@ -18,10 +22,11 @@ class MessageCard extends StatefulWidget {
     Key? key,
     required this.chatMessage,
     required this.chat,
+    required this.scrollController,
   }) : super(key: key);
   final ChatMessage chatMessage;
   final Chat chat;
-
+  final ItemScrollController scrollController;
   @override
   State<MessageCard> createState() => _MessageCardState();
 }
@@ -31,6 +36,8 @@ class _MessageCardState extends State<MessageCard> {
   late final FirebaseChatMessage firebaseChatMessage;
   String idUser = FirebaseAuth.instance.currentUser!.uid;
   String? urlStringImage;
+  bool isSelected = false;
+  bool isCheckLastMessage = false;
   @override
   void initState() {
     firebaseUserProfile = FirebaseUserProfile();
@@ -49,10 +56,14 @@ class _MessageCardState extends State<MessageCard> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeChanger themeChanger = Provider.of<ThemeChanger>(context);
     Widget messageContaint(ChatMessage chatMessage) {
       switch (chatMessage.messageType) {
         case TypeMessage.text:
-          return TextMessage(chatMessage: chatMessage);
+          return TextMessage(
+            chatMessage: chatMessage,
+            isSelected: isSelected,
+          );
         case TypeMessage.audio:
           return AudioMessasge(
             chatMessage: chatMessage,
@@ -66,88 +77,166 @@ class _MessageCardState extends State<MessageCard> {
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: kDefaultPadding * 0.25,
-        horizontal: kDefaultPadding * 0.2,
-      ),
-      child: Row(
-        mainAxisAlignment: widget.chatMessage.hasSender == true
-            ? widget.chatMessage.isSender!
-                ? MainAxisAlignment.end
-                : MainAxisAlignment.start
-            : MainAxisAlignment.center,
-        children: [
-          if (widget.chatMessage.hasSender &&
-              widget.chatMessage.isSender != null)
-            if (widget.chatMessage.isSender == false)
-              FutureBuilder<UserProfile?>(
-                future: firebaseUserProfile.getUserProfile(
-                  userID: widget.chatMessage.userID,
+    return Column(
+      children: [
+        if (widget.chatMessage.checkTimeGreaterOneMinute)
+          Visibility(
+            visible: isSelected,
+            child: Center(
+              child: Text(
+                widget.chatMessage.stampTime,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: textColorMode(
+                    themeChanger.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+                  ).withOpacity(0.5),
                 ),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final userProfile = snapshot.data;
-                    urlStringImage = userProfile!.urlImage != null
-                        ? userProfile.urlImage
-                        : null;
-                    if (userProfile.urlImage == null) {
-                      return FittedBox(
-                        fit: BoxFit.fill,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.cyan[100],
-                          backgroundImage: const AssetImage(
-                            "assets/images/defaultImage.png",
-                          ),
-                          radius: 20,
-                        ),
-                      );
-                    } else {
-                      return CircleAvatar(
-                        backgroundColor: Colors.cyan[100],
-                        radius: 20,
-                        child: ClipOval(
-                          child: CachedNetworkImage(
-                            imageUrl: userProfile.urlImage!,
-                            placeholder: (context, url) =>
-                                const CircularProgressIndicator(),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
-                          ),
-                        ),
-                      );
-                    }
-                  } else {
-                    return const Text('');
-                  }
-                },
               ),
-          const SizedBox(width: kDefaultPadding * 0.5),
-          messageContaint(widget.chatMessage),
-          if (widget.chat.userID!.compareTo(idUser) != 0)
-            if (widget.chatMessage.messageStatus == MessageStatus.viewed ||
-                widget.chatMessage.messageStatus == MessageStatus.sent)
-              MessageStatusDot(
-                messageStatus: widget.chatMessage.messageStatus,
-                urlStringImage: urlStringImage,
+            ),
+          ),
+        GestureDetector(
+          onTap: () async {
+            if (isCheckLastMessage == false) {
+              isCheckLastMessage =
+                  await firebaseChatMessage.checkLastMessageOfChatRoom(
                 chatID: widget.chat.idChat,
                 idMessage: widget.chatMessage.idMessage,
-                idUserFriend: widget.chat.userID!,
-                isSender: widget.chatMessage.hasSender
-                    ? widget.chatMessage.isSender!
-                    : false,
-              ),
-          if (widget.chat.userID!.compareTo(idUser) == 0)
-            Container(
-              margin: const EdgeInsets.only(left: 2),
-              width: 16,
-              height: 16,
-            )
-        ],
-      ),
+              );
+            }
+            setState(
+              () {
+                isSelected = !isSelected;
+                if (isCheckLastMessage && isSelected == true) {
+                  if (widget.scrollController.isAttached) {
+                    widget.scrollController.scrollTo(
+                      index: intMaxValue,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeIn,
+                    );
+                  }
+                }
+              },
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: kDefaultPadding * 0.25,
+              horizontal: kDefaultPadding * 0.2,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: widget.chatMessage.hasSender == true
+                      ? widget.chatMessage.isSender!
+                          ? MainAxisAlignment.end
+                          : MainAxisAlignment.start
+                      : MainAxisAlignment.center,
+                  children: [
+                    if (widget.chatMessage.hasSender &&
+                        widget.chatMessage.isSender != null)
+                      if (widget.chatMessage.isSender == false)
+                        FutureBuilder<UserProfile?>(
+                          future: firebaseUserProfile.getUserProfile(
+                            userID: widget.chatMessage.userID,
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final userProfile = snapshot.data;
+                              urlStringImage = userProfile!.urlImage != null
+                                  ? userProfile.urlImage
+                                  : null;
+                              if (userProfile.urlImage == null) {
+                                return FittedBox(
+                                  fit: BoxFit.fill,
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.cyan[100],
+                                    backgroundImage: const AssetImage(
+                                      "assets/images/defaultImage.png",
+                                    ),
+                                    radius: 20,
+                                  ),
+                                );
+                              } else {
+                                return CircleAvatar(
+                                  backgroundColor: Colors.cyan[100],
+                                  radius: 20,
+                                  child: ClipOval(
+                                    child: CachedNetworkImage(
+                                      imageUrl: userProfile.urlImage!,
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else {
+                              return const Text('');
+                            }
+                          },
+                        ),
+                    const SizedBox(width: kDefaultPadding * 0.5),
+                    messageContaint(widget.chatMessage),
+                    if (widget.chat.userID!.compareTo(idUser) != 0)
+                      if (widget.chatMessage.messageStatus ==
+                              MessageStatus.viewed ||
+                          widget.chatMessage.messageStatus ==
+                              MessageStatus.sent)
+                        MessageStatusDot(
+                          messageStatus: widget.chatMessage.messageStatus,
+                          urlStringImage: urlStringImage,
+                          chatID: widget.chat.idChat,
+                          idMessage: widget.chatMessage.idMessage,
+                          idUserFriend: widget.chat.userID!,
+                          isSender: widget.chatMessage.hasSender
+                              ? widget.chatMessage.isSender!
+                              : false,
+                        ),
+                    if (widget.chat.userID!.compareTo(idUser) == 0)
+                      Container(
+                        margin: const EdgeInsets.only(left: 2),
+                        width: 16,
+                        height: 16,
+                      )
+                  ],
+                ),
+                Visibility(
+                  visible: isSelected,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: kDefaultPadding * 1.25,
+                    ),
+                    child: Align(
+                      alignment: widget.chatMessage.hasSender == true
+                          ? widget.chatMessage.isSender!
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft
+                          : Alignment.center,
+                      child: Text(
+                        getStringMessageStatus(
+                            widget.chatMessage.messageStatus),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: textColorMode(
+                            themeChanger.isDarkTheme
+                                ? ThemeMode.dark
+                                : ThemeMode.light,
+                          ).withOpacity(0.6),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
+
 class MessageStatusDot extends StatefulWidget {
   const MessageStatusDot(
       {Key? key,
@@ -194,7 +283,8 @@ class _MessageStatusDotState extends State<MessageStatusDot> {
       child: widget.messageStatus == MessageStatus.viewed &&
               widget.isSender == true
           ? FutureBuilder<UserProfile?>(
-              future: firebaseChatMessage.checkLastMessageOfChatRoom(
+              future: firebaseChatMessage
+                  .checkLastMessageOfChatRoomForUploadStatusMessage(
                 chatID: widget.chatID,
                 idMessage: widget.idMessage,
                 userIDFriend: widget.idUserFriend,

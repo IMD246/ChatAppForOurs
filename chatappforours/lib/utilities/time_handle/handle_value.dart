@@ -1,3 +1,5 @@
+import 'package:chatappforours/enum/enum.dart';
+
 String differenceInCalendarDays(DateTime earlier) {
   DateTime later = DateTime.now();
   if (later.difference(earlier).inHours >= 0 &&
@@ -20,6 +22,22 @@ String differenceInCalendarDays(DateTime earlier) {
     return "$month m ago";
   }
   return "no time to die";
+}
+
+String differenceInCalendarStampTime(DateTime earlier) {
+  final String value =
+      "${earlier.day}/${earlier.month} ${earlier.hour.toString().padLeft(0)}:${earlier.minute.toString().padLeft(0)}";
+
+  return value;
+}
+
+bool checkDifferenceInCalendarInMinutes(DateTime earlier) {
+  DateTime later = DateTime.now();
+  if (later.difference(earlier).inMinutes <= 0) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 String handleStringMessage(String value) {
@@ -56,24 +74,12 @@ String getStringFromList(String value) {
   }
 }
 
-List<String> splitList(String string, String separator, {int max = 0}) {
-  List<String> result = [];
-
-  if (separator.isEmpty) {
-    result.add(string);
-    return result;
+String getStringMessageStatus(MessageStatus messageStatus) {
+  if (messageStatus == MessageStatus.notSent) {
+    return "Not Sent";
+  } else if (messageStatus == MessageStatus.sent) {
+    return "Sent";
+  } else {
+    return "Viewed";
   }
-
-  while (true) {
-    var index = string.indexOf(separator, 0);
-    if (index == -1 || (max > 0 && result.length >= max)) {
-      result.add(string);
-      break;
-    }
-
-    result.add(string.substring(0, index));
-    string = string.substring(index + separator.length);
-  }
-
-  return result;
 }

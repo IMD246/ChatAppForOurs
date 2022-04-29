@@ -1,5 +1,7 @@
 import 'package:chatappforours/constants/message_chat_field.dart';
+import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/utilities/time_handle/handle_value.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatMessage {
@@ -10,9 +12,13 @@ class ChatMessage {
   final String? userID;
   final bool? isSender;
   final bool hasSender;
+  final String stampTime;
+  final bool checkTimeGreaterOneMinute;
   ChatMessage({
-    required this.idMessage, 
+    required this.idMessage,
+    required this.stampTime,
     this.value = '',
+    required this.checkTimeGreaterOneMinute,
     required this.messageType,
     required this.messageStatus,
     required this.isSender,
@@ -33,7 +39,14 @@ class ChatMessage {
               ? true
               : false
           : null,
-      userID: docs.get(idSenderField).toString(), hasSender: docs.get(hasSenderField), 
+      userID: docs.get(idSenderField).toString(),
+      hasSender: docs.get(hasSenderField),
+      stampTime: differenceInCalendarStampTime(
+        docs.get(stampTimeField).toDate(),
+      ),
+      checkTimeGreaterOneMinute: checkDifferenceInCalendarInMinutes(
+        docs.get(stampTimeField).toDate(),
+      ),
     );
   }
 }

@@ -61,6 +61,7 @@ class _BodyMessageState extends State<BodyMessage> {
                         return MessageCard(
                           chatMessage: allChat.elementAt(index),
                           chat: widget.chat,
+                          scrollController:scrollController,
                         );
                       } else {
                         return Container(

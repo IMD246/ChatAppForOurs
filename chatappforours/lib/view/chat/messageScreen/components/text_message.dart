@@ -7,10 +7,11 @@ class TextMessage extends StatelessWidget {
   const TextMessage({
     Key? key,
     required this.chatMessage,
+    required this.isSelected,
   }) : super(key: key);
 
   final ChatMessage chatMessage;
-
+  final bool isSelected;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -20,22 +21,19 @@ class TextMessage extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: kPrimaryColor.withOpacity(
-          chatMessage.isSender != null
-              ? chatMessage.isSender!
-                  ? 1
-                  : 0.3
-              : 0.3,
-        ),
+        color: !isSelected
+            ? kPrimaryColor.withOpacity(chatMessage.isSender != null
+                ? chatMessage.isSender!
+                    ? 0.8
+                    : 0.3
+                : 0.3)
+            : kPrimaryColor.withOpacity(0.9),
       ),
       child: Text(
-        // chatMessage.value.length >= 17
-        //     ? handleStringMessage(chatMessage.value)
-        //     : chatMessage.value,
         handleStringMessage(chatMessage.value),
         softWrap: true,
         style: TextStyle(
-          fontSize: chatMessage.hasSender ? 14 : 30,
+          fontSize: chatMessage.hasSender ? 14 : 24,
           color: textColorMode(ThemeMode.light).withOpacity(
             chatMessage.isSender != null
                 ? chatMessage.isSender!

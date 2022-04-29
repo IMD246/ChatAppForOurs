@@ -153,7 +153,7 @@ class FirebaseChatMessage {
     );
   }
 
-  Future<UserProfile?> checkLastMessageOfChatRoom(
+  Future<UserProfile?> checkLastMessageOfChatRoomForUploadStatusMessage(
       {required String chatID,
       required String idMessage,
       required String userIDFriend}) async {
@@ -182,6 +182,32 @@ class FirebaseChatMessage {
     } else {
       return null;
     }
+  }
+
+  Future<bool> checkLastMessageOfChatRoom({
+    required String chatID,
+    required String idMessage,
+  }) async {
+    final bool lastMessage = await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .where(messageStatusField, isEqualTo: MessageStatus.viewed.toString())
+        .orderBy(
+          stampTimeField,
+          descending: true,
+        )
+        .limit(1)
+        .get()
+        .then(
+      (value) {
+        if (value.docs.first.id.isNotEmpty) {
+          return value.docs.first.id == idMessage ? true : false;
+        } else {
+          return false;
+        }
+      },
+    );
+    return lastMessage;
   }
 
   Stream<Iterable<ChatMessage>> getAllMessage(
