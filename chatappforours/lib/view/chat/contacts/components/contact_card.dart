@@ -34,6 +34,7 @@ class _ContactCardState extends State<ContactCard> {
   late final FirebaseFriendList firebaseFriendList;
   late final FirebaseUsersJoinChat firebaseUsersJoinChat;
   String id = FirebaseAuth.instance.currentUser!.uid;
+  late final DateTime stampTime;
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class _ContactCardState extends State<ContactCard> {
         final data = Map<String, dynamic>.from(event.snapshot.value as Map);
         bool isOnline = data['presence'];
         final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
+        stampTime = stampTimeUser;
         final date = differenceInCalendarDays(stampTimeUser);
         setState(() {
           widget.friend.presence = isOnline;
@@ -77,7 +79,7 @@ class _ContactCardState extends State<ContactCard> {
             idChat: userJoinChat!.chatID,
           );
           chat.presence = widget.friend.presence;
-          chat.stampTimeUser = widget.friend.stampTimeUser;
+          chat.stampTimeUserFormated = widget.friend.stampTimeUser;
           chat.userID = widget.friend.userID;
           Navigator.push(
             context,
@@ -124,24 +126,31 @@ class _ContactCardState extends State<ContactCard> {
                               backgroundImage: const AssetImage(
                                   "assets/images/defaultImage.png"),
                             ),
-                          if (widget.friend.presence)
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                width: 16,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: kPrimaryColor,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    width: 3,
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
+                          widget.friend.presence
+                              ? Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    width: 16,
+                                    height: 16,
+                                    decoration: BoxDecoration(
+                                      color: kPrimaryColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        width: 3,
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Text(
+                                    differenceInCalendarPresence(stampTime),
                                   ),
                                 ),
-                              ),
-                            )
                         ],
                       ),
                       Padding(

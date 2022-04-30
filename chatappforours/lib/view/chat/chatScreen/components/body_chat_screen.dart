@@ -180,7 +180,8 @@ class _ChatListViewState extends State<ChatListView> {
           final isOnline = data['presence'];
           final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
           final date = differenceInCalendarDays(stampTimeUser);
-          chat.stampTimeUser = date;
+          chat.stampTimeUser = stampTimeUser;
+          chat.stampTimeUserFormated = date;
           chat.presence = isOnline;
           listChatData.add(chat);
           if (listChatData.length == list.length) {
@@ -209,7 +210,8 @@ class _ChatListViewState extends State<ChatListView> {
           final isOnline = data['presence'];
           final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
           final date = differenceInCalendarDays(stampTimeUser);
-          chat.stampTimeUser = date;
+          chat.stampTimeUser = stampTimeUser;
+          chat.stampTimeUserFormated = date;
           chat.presence = isOnline;
           if (chat.presence!) {
             listChatData.add(chat);

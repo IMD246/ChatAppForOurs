@@ -87,6 +87,14 @@ class _ChatCardState extends State<ChatCard> {
                                 ),
                               ),
                             ),
+                          if (widget.chat.presence == false)
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Text(
+                                differenceInCalendarPresence(widget.chat.stampTimeUser!),
+                              ),
+                            ),
                         ],
                       );
                     } else {

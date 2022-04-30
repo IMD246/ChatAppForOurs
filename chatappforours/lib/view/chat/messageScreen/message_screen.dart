@@ -93,7 +93,7 @@ class MesssageScreen extends StatelessWidget {
                         Text(
                           chat.presence!
                               ? 'Online'
-                              : 'Online ${chat.stampTimeUser}',
+                              : 'Online ${chat.stampTimeUserFormated}',
                           style: TextStyle(
                             color: Colors.black.withOpacity(
                               themeMode == ThemeMode.light ? 0.4 : 0.6,

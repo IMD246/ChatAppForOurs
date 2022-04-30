@@ -13,7 +13,8 @@ class Chat {
   RuleChat? rule;
   String? time;
   bool? presence = false;
-  String? stampTimeUser;
+  String? stampTimeUserFormated;
+  DateTime? stampTimeUser;
   Chat({
     required this.idChat,
     required this.stampTime,
@@ -25,6 +26,7 @@ class Chat {
     this.presence,
     this.time,
     this.stampTimeUser,
+    this.stampTimeUserFormated
   });
   factory Chat.fromSnapshot({
     required DocumentSnapshot<Map<String, dynamic>> docs,
