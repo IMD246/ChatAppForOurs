@@ -1,6 +1,6 @@
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
-import 'package:chatappforours/utilities/time_handle/handle_value.dart';
+import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:flutter/material.dart';
 
 class TextMessage extends StatelessWidget {

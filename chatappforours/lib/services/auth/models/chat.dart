@@ -1,8 +1,7 @@
 import 'package:chatappforours/constants/chat_constant_field.dart';
 import 'package:chatappforours/enum/enum.dart';
-import 'package:chatappforours/utilities/time_handle/handle_value.dart';
+import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Chat {
   final String idChat;
   final String stampTime;

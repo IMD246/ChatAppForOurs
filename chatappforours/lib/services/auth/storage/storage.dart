@@ -55,10 +55,10 @@ class Storage {
           (p0) async {
             final urlImage = await getDownloadURL(fileName: fileName);
             listUrlImage.add(urlImage!);
-            if (i == listFile.length - 1) {
+            if (listUrlImage.length == listFile.length) {
               final userProfile = await firebaseUserProfile.getUserProfile(
                   userID: lastMessageUserOwner.userID);
-              await firebaseChatMessage.uploadImageMessage(
+              await firebaseChatMessage.uploadImageMessageNotSent(
                 chatID: idChat,
                 lastMessageUserOwner: lastMessageUserOwner,
                 listUrlImage: listUrlImage,

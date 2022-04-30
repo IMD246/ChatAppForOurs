@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
@@ -6,11 +8,12 @@ import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
-import 'package:chatappforours/utilities/time_handle/handle_value.dart';
+import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/audio_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/image_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/text_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -83,8 +86,36 @@ class _MessageCardState extends State<MessageCard> {
             chatMessage: chatMessage,
           );
         case TypeMessage.image:
-          return const ImageMesage(
-            urlImage: "assets/images/defaultImage.png",
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: kDefaultPadding,
+              ),
+              child: Directionality(
+                textDirection: widget.chatMessage.hasSender == true
+                    ? widget.chatMessage.isSender!
+                        ? TextDirection.rtl
+                        : TextDirection.ltr
+                    : TextDirection.rtl,
+                child: GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: widget.chatMessage.listURLImage == null
+                      ? 0
+                      : widget.chatMessage.listURLImage!.length,
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: 3 / 2,
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 2,
+                  ),
+                  itemBuilder: (BuildContext context, int index) {
+                    return const ImageMessage(
+                      urlImage: "assets/images/defaultImage.png",
+                    );
+                  },
+                ),
+              ),
+            ),
           );
         default:
           return const SizedBox();

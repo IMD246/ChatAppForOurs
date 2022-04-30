@@ -6,12 +6,13 @@ import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart'
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/users_join_chat.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
-import 'package:chatappforours/utilities/time_handle/handle_value.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/chat_card.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../utilities/handle/handle_value.dart';
 
 class BodyChatScreen extends StatefulWidget {
   const BodyChatScreen({Key? key}) : super(key: key);

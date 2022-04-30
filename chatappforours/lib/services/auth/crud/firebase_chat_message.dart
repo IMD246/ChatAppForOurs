@@ -83,11 +83,12 @@ class FirebaseChatMessage {
     required userID,
     required chatID,
   }) async {
-    List<String> list = [". . ."];
+    List<String> list = ["."];
     Map<String, dynamic> map = {
       idSenderField: userID,
       hasSenderField: true,
-      messageField: list,
+      messageField: ". . .",
+      listURLImageField: list,
       typeMessageField: TypeMessage.image.toString(),
       messageStatusField: MessageStatus.notSent.toString(),
       stampTimeField: DateTime.now(),
@@ -118,7 +119,7 @@ class FirebaseChatMessage {
         );
   }
 
-  Future<void> uploadImageMessage({
+  Future<void> uploadImageMessageNotSent({
     required String chatID,
     required List<String> listUrlImage,
     required String nameSender,
@@ -126,7 +127,8 @@ class FirebaseChatMessage {
   }) async {
     final firebaseChat = FirebaseChat();
     Map<String, dynamic> map = {
-      messageField: listUrlImage,
+      listURLImageField: listUrlImage,
+      messageField: "n",
       typeMessageField: TypeMessage.image.toString(),
       messageStatusField: MessageStatus.sent.toString(),
     };
