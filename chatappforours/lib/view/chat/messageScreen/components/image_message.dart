@@ -10,11 +10,13 @@ class ImageMessage extends StatefulWidget {
 class _ImageMessageState extends State<ImageMessage> {
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 0.2,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Image.asset(widget.urlImage),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Image(
+        image: AssetImage(
+          widget.urlImage,
+        ),
+        fit: BoxFit.fill,
       ),
     );
   }

@@ -46,11 +46,11 @@ class Storage {
     required String idChat,
   }) async {
     try {
+      List<String> listUrlImage = [];
       for (var i = 0; i < listFile.length; i++) {
         File file = File(listFile.elementAt(i).path!);
         final String fileName =
             '${lastMessageUserOwner.idMessage}/${listFile.elementAt(i).name}';
-        List<String> listUrlImage = [];
         await storage.ref('image/$fileName').putFile(file).then(
           (p0) async {
             final urlImage = await getDownloadURL(fileName: fileName);
@@ -63,14 +63,6 @@ class Storage {
                 lastMessageUserOwner: lastMessageUserOwner,
                 listUrlImage: listUrlImage,
                 nameSender: userProfile!.fullName,
-              );
-              ScaffoldMessenger.of(context!).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Upload Image Successful',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
               );
             }
           },
