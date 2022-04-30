@@ -10,9 +10,10 @@ import 'package:provider/provider.dart';
 import '../../../constants/constants.dart';
 
 class MesssageScreen extends StatelessWidget {
-  const MesssageScreen({Key? key, required this.chat}) : super(key: key);
+  const MesssageScreen(
+      {Key? key, required this.chat,})
+      : super(key: key);
   final Chat chat;
-
   @override
   Widget build(BuildContext context) {
     final isDarkTheme = Provider.of<ThemeChanger>(context).getTheme();
@@ -24,7 +25,6 @@ class MesssageScreen extends StatelessWidget {
       ),
     );
   }
-
   AppBar buildAppbar(Chat chat, ThemeMode themeMode, BuildContext context) {
     final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
     return AppBar(

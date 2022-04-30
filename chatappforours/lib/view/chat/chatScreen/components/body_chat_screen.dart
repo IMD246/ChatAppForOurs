@@ -163,6 +163,7 @@ class _ChatListViewState extends State<ChatListView> {
   final List<Chat> listChatData = [];
   final StreamController _streamController = StreamController();
   late final FirebaseChat firebaseChat;
+  String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
 
@@ -255,13 +256,16 @@ class _ChatListViewState extends State<ChatListView> {
             itemBuilder: (context, index) {
               return ChatCard(
                 chat: allChatCard.elementAt(index),
-                press: () {
+                press: () async {
                   final chatData = listChatData[index];
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return MesssageScreen(chat: chatData);
+                        return MesssageScreen(
+                          chat: chatData,
+                        );
                       },
                     ),
                   );

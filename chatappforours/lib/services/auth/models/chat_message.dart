@@ -28,7 +28,7 @@ class ChatMessage {
     required this.hasSender,
   });
   factory ChatMessage.fromSnapshot(
-      {required QueryDocumentSnapshot<Map<String, dynamic>> docs,
+      {required DocumentSnapshot<Map<String, dynamic>> docs,
       required String ownerUserID}) {
     return ChatMessage(
       idMessage: docs.id,

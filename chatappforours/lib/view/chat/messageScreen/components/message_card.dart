@@ -93,7 +93,8 @@ class _MessageCardState extends State<MessageCard> {
 
     return Column(
       children: [
-        if (checkCurrentAndIndexTimeGreater10Minute)
+        if (checkCurrentAndIndexTimeGreater10Minute &&
+            widget.chatMessage.messageStatus != MessageStatus.notSent)
           Visibility(
             visible: isSelected || checkCurrentAndIndexTimeGreater10Minute,
             child: Center(
@@ -108,7 +109,8 @@ class _MessageCardState extends State<MessageCard> {
               ),
             ),
           ),
-        if (!checkCurrentAndIndexTimeGreater10Minute)
+        if (!checkCurrentAndIndexTimeGreater10Minute &&
+            widget.chatMessage.messageStatus != MessageStatus.notSent)
           Visibility(
             visible: isSelected,
             child: Center(
@@ -125,27 +127,29 @@ class _MessageCardState extends State<MessageCard> {
           ),
         GestureDetector(
           onTap: () async {
-            if (isCheckLastMessage == false) {
-              isCheckLastMessage =
-                  await firebaseChatMessage.checkLastMessageOfChatRoom(
-                chatID: widget.chat.idChat,
-                idMessage: widget.chatMessage.idMessage,
+            if (widget.chatMessage.messageStatus != MessageStatus.notSent) {
+              if (isCheckLastMessage == false) {
+                isCheckLastMessage =
+                    await firebaseChatMessage.checkLastMessageOfChatRoom(
+                  chatID: widget.chat.idChat,
+                  idMessage: widget.chatMessage.idMessage,
+                );
+              }
+              setState(
+                () {
+                  isSelected = !isSelected;
+                  if (isCheckLastMessage && isSelected == true) {
+                    if (widget.scrollController.isAttached) {
+                      widget.scrollController.scrollTo(
+                        index: intMaxValue,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeIn,
+                      );
+                    }
+                  }
+                },
               );
             }
-            setState(
-              () {
-                isSelected = !isSelected;
-                if (isCheckLastMessage && isSelected == true) {
-                  if (widget.scrollController.isAttached) {
-                    widget.scrollController.scrollTo(
-                      index: intMaxValue,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeIn,
-                    );
-                  }
-                }
-              },
-            );
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(

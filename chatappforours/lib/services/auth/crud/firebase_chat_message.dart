@@ -8,9 +8,9 @@ import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseChatMessage {
-  final firebaseChatMessageDocument =
-      FirebaseFirestore.instance.collection('chatMessage');
-
+  final firebaseChatMessageDocument = FirebaseFirestore.instance.collection(
+    'chatMessage',
+  );
   Future<void> createFirstTextMessage({
     required userID,
     required chatID,
@@ -208,6 +208,32 @@ class FirebaseChatMessage {
       },
     );
     return lastMessage;
+  }
+
+  Future<ChatMessage?> getIDNotSentOwnerUser({
+    required String chatID,
+    required String ownerUserID,
+  }) async {
+    final id = await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .doc(ownerUserID)
+        .get()
+        .then(
+      (value) async {
+        if (value.exists) {
+          return await value.reference.get();
+        } else {
+          return null;
+        }
+      },
+    );
+    final chatMess = id;
+    if (chatMess != null) {
+      return ChatMessage.fromSnapshot(docs: chatMess, ownerUserID: ownerUserID);
+    } else {
+      return null;
+    }
   }
 
   Stream<Iterable<ChatMessage>> getAllMessage(

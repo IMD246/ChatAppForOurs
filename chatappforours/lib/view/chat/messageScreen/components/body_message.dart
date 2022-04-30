@@ -25,7 +25,7 @@ class _BodyMessageState extends State<BodyMessage> {
     firebaseChatMessage = FirebaseChatMessage();
     scrollController = ItemScrollController();
     KeyboardVisibilityController().onChange.listen(
-      (isVisible) {
+      (isVisible) async {
         if (isVisible) {
         } else {
           firebaseChatMessage.deleteMessageNotSent(
@@ -58,13 +58,46 @@ class _BodyMessageState extends State<BodyMessage> {
                     itemCount: allChat.length,
                     itemBuilder: (context, index) {
                       if (index != -1) {
-                        return MessageCard(
-                          chatMessage: allChat.elementAt(index),
-                          listChatMesage : allChat,
-                          index : index,
-                          beforeIndex : index -1,
-                          chat: widget.chat,
-                          scrollController:scrollController,
+                        return FutureBuilder<ChatMessage?>(
+                          future: firebaseChatMessage.getIDNotSentOwnerUser(
+                            chatID: widget.chat.idChat,
+                            ownerUserID: id,
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final chatMessage = snapshot.data!;
+                              if (chatMessage.idMessage ==
+                                      allChat.elementAt(index).idMessage &&
+                                  widget.chat.userID == chatMessage.userID) {
+                                return MessageCard(
+                                  chatMessage: allChat.elementAt(index),
+                                  listChatMesage: allChat,
+                                  index: index,
+                                  beforeIndex: index - 1,
+                                  chat: widget.chat,
+                                  scrollController: scrollController,
+                                );
+                              } else {
+                                return MessageCard(
+                                  chatMessage: allChat.elementAt(index),
+                                  listChatMesage: allChat,
+                                  index: index,
+                                  beforeIndex: index - 1,
+                                  chat: widget.chat,
+                                  scrollController: scrollController,
+                                );
+                              }
+                            } else {
+                              return MessageCard(
+                                chatMessage: allChat.elementAt(index),
+                                listChatMesage: allChat,
+                                index: index,
+                                beforeIndex: index - 1,
+                                chat: widget.chat,
+                                scrollController: scrollController,
+                              );
+                            }
+                          },
                         );
                       } else {
                         return Container(
