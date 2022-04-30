@@ -1,5 +1,9 @@
 import 'dart:io';
 
+import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/models/chat_message.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +25,57 @@ class Storage {
               ),
             ),
           );
+    } on FirebaseException catch (_) {
+      ScaffoldMessenger.of(context!).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Upload Image Failed',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> uploadMultipleFile({
+    required List<PlatformFile> listFile,
+    BuildContext? context,
+    required FirebaseChatMessage firebaseChatMessage,
+    required ChatMessage lastMessageUserOwner,
+    required FirebaseUserProfile firebaseUserProfile,
+    required String idChat,
+  }) async {
+    try {
+      for (var i = 0; i < listFile.length; i++) {
+        File file = File(listFile.elementAt(i).path!);
+        final String fileName =
+            '${lastMessageUserOwner.idMessage}/${listFile.elementAt(i).name}';
+        List<String> listUrlImage = [];
+        await storage.ref('image/$fileName').putFile(file).then(
+          (p0) async {
+            final urlImage = await getDownloadURL(fileName: fileName);
+            listUrlImage.add(urlImage!);
+            if (i == listFile.length - 1) {
+              final userProfile = await firebaseUserProfile.getUserProfile(
+                  userID: lastMessageUserOwner.userID);
+              await firebaseChatMessage.uploadImageMessage(
+                chatID: idChat,
+                lastMessageUserOwner: lastMessageUserOwner,
+                listUrlImage: listUrlImage,
+                nameSender: userProfile!.fullName,
+              );
+              ScaffoldMessenger.of(context!).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Upload Image Successful',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
+          },
+        );
+      }
     } on FirebaseException catch (_) {
       ScaffoldMessenger.of(context!).showSnackBar(
         const SnackBar(

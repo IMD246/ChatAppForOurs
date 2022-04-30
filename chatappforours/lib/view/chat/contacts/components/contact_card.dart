@@ -34,7 +34,7 @@ class _ContactCardState extends State<ContactCard> {
   late final FirebaseFriendList firebaseFriendList;
   late final FirebaseUsersJoinChat firebaseUsersJoinChat;
   String id = FirebaseAuth.instance.currentUser!.uid;
-  late final DateTime stampTime;
+  DateTime? stampTime;
 
   @override
   void initState() {
@@ -47,11 +47,11 @@ class _ContactCardState extends State<ContactCard> {
         final data = Map<String, dynamic>.from(event.snapshot.value as Map);
         bool isOnline = data['presence'];
         final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
-        stampTime = stampTimeUser;
         final date = differenceInCalendarDays(stampTimeUser);
         setState(() {
           widget.friend.presence = isOnline;
           widget.friend.stampTimeUser = date;
+          stampTime = stampTimeUser;
         });
       },
     );
@@ -148,7 +148,11 @@ class _ContactCardState extends State<ContactCard> {
                                   bottom: 0,
                                   right: 0,
                                   child: Text(
-                                    differenceInCalendarPresence(stampTime),
+                                    stampTime != null
+                                        ? differenceInCalendarPresence(
+                                            stampTime!,
+                                          )
+                                        : "",
                                   ),
                                 ),
                         ],

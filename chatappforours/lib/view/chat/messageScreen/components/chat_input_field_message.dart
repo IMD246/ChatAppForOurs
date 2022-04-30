@@ -1,4 +1,7 @@
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/storage/storage.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -22,15 +25,16 @@ class ChatInputFieldMessage extends StatefulWidget {
 class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   late final TextEditingController textController;
   late final FirebaseChatMessage firebaseChatMessage;
+  late final FirebaseUserProfile firebaseUserProfile;
   String id = FirebaseAuth.instance.currentUser!.uid;
-  bool isSelected = false;
-  bool isTaped = false;
-
+  late final Storage storage;
   @override
   void initState() {
-    super.initState();
     textController = TextEditingController();
     firebaseChatMessage = FirebaseChatMessage();
+    firebaseUserProfile = FirebaseUserProfile();
+    storage = Storage();
+    super.initState();
   }
 
   @override
@@ -57,7 +61,44 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
         child: Row(
           children: [
             IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                final results = await FilePicker.platform.pickFiles(
+                  allowMultiple: true,
+                  type: FileType.custom,
+                  allowedExtensions: [
+                    'jpg',
+                    'png',
+                    'PNG',
+                  ],
+                );
+                if (results == null) {
+                } else {
+                  await firebaseChatMessage.createImageMessage(
+                    userID: id,
+                    chatID: widget.idChat,
+                  );
+                  final lastMessageUserOwner =
+                      await firebaseChatMessage.getImageMessageNotSentOwnerUser(
+                    userID: id,
+                    chatID: widget.idChat,
+                  );
+                  await storage.uploadMultipleFile(
+                    listFile: results.files,
+                    idChat: widget.idChat,
+                    firebaseChatMessage: firebaseChatMessage,
+                    firebaseUserProfile: firebaseUserProfile,
+                    lastMessageUserOwner: lastMessageUserOwner,
+                    context: context,
+                  );
+                  if (widget.scroll.isAttached) {
+                    widget.scroll.scrollTo(
+                      index: intMaxValue,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeIn,
+                    );
+                  }
+                }
+              },
               icon: const Icon(Icons.photo),
               color: Theme.of(context).primaryColor,
             ),

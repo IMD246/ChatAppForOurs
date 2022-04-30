@@ -84,7 +84,7 @@ class _MessageCardState extends State<MessageCard> {
           );
         case TypeMessage.image:
           return const ImageMesage(
-            urlImage: "assets/images/Video Place Here.png",
+            urlImage: "assets/images/defaultImage.png",
           );
         default:
           return const SizedBox();

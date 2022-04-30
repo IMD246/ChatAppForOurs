@@ -79,6 +79,68 @@ class FirebaseChatMessage {
         .set(map);
   }
 
+  Future<void> createImageMessage({
+    required userID,
+    required chatID,
+  }) async {
+    List<String> list = [". . ."];
+    Map<String, dynamic> map = {
+      idSenderField: userID,
+      hasSenderField: true,
+      messageField: list,
+      typeMessageField: TypeMessage.image.toString(),
+      messageStatusField: MessageStatus.notSent.toString(),
+      stampTimeField: DateTime.now(),
+    };
+    await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .doc()
+        .set(map);
+  }
+
+  Future<ChatMessage> getImageMessageNotSentOwnerUser({
+    required userID,
+    required chatID,
+  }) async {
+    return await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .where(idSenderField, isEqualTo: userID)
+        .where(typeMessageField, isEqualTo: TypeMessage.image.toString())
+        .where(messageStatusField, isEqualTo: MessageStatus.notSent.toString())
+        .orderBy(stampTimeField, descending: true)
+        .limit(1)
+        .get()
+        .then(
+          (value) => ChatMessage.fromSnapshot(
+              docs: value.docs.first, ownerUserID: userID),
+        );
+  }
+
+  Future<void> uploadImageMessage({
+    required String chatID,
+    required List<String> listUrlImage,
+    required String nameSender,
+    required ChatMessage lastMessageUserOwner,
+  }) async {
+    final firebaseChat = FirebaseChat();
+    Map<String, dynamic> map = {
+      messageField: listUrlImage,
+      typeMessageField: TypeMessage.image.toString(),
+      messageStatusField: MessageStatus.sent.toString(),
+    };
+    await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .doc(lastMessageUserOwner.idMessage)
+        .update(map);
+    await firebaseChat.updateChat(
+      text: "$nameSender sent ${listUrlImage.length} image",
+      chatID: chatID,
+    );
+  }
+
   Future<void> deleteMessageNotSent({
     required ownerUserID,
     required chatID,

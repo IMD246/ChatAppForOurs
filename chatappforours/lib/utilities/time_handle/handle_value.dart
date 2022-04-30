@@ -23,6 +23,7 @@ String differenceInCalendarDays(DateTime earlier) {
   }
   return "no time to die";
 }
+
 String differenceInCalendarPresence(DateTime earlier) {
   DateTime later = DateTime.now();
   if (later.difference(earlier).inHours >= 0 &&
@@ -46,20 +47,25 @@ String differenceInCalendarPresence(DateTime earlier) {
   }
   return "no time to die";
 }
+
 String differenceInCalendarStampTime(DateTime earlier) {
   String month = earlier.month.toString();
   String minute = earlier.minute.toString();
   String hour = earlier.hour.toString();
-  if (earlier.month < 10) {
+  String day = earlier.day.toString();
+  if (earlier.month < 10 || earlier.month <= 1) {
     month = "0" + month.toString();
   }
-  if (earlier.hour <= 0) {
+  if (earlier.hour <= 0 || earlier.hour < 10) {
     hour = "0" + hour.toString();
   }
-  if (earlier.minute <= 0) {
+  if (earlier.minute <= 0 || earlier.minute < 10) {
     minute = "0" + minute.toString();
   }
-  final String value = "${earlier.day}/$month $hour:$minute";
+  if (earlier.day <= 1 || earlier.day < 10) {
+    day = "0" + day.toString();
+  }
+  final String value = "$day/$month $hour:$minute";
 
   return value;
 }

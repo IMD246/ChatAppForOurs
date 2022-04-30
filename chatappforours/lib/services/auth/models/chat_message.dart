@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatMessage {
   final String idMessage;
-  final String value;
+  final dynamic value;
   final TypeMessage messageType;
   final MessageStatus messageStatus;
   final String? userID;
@@ -31,26 +31,42 @@ class ChatMessage {
       {required DocumentSnapshot<Map<String, dynamic>> docs,
       required String ownerUserID}) {
     return ChatMessage(
-      idMessage: docs.id,
-      value: docs.get(messageField).toString(),
-      messageType: getTypeMessage(value: docs.get(typeMessageField).toString()),
-      messageStatus:
-          getMessageStatus(value: docs.get(messageStatusField).toString()),
-      isSender: docs.get(hasSenderField) == true
-          ? ownerUserID.compareTo(docs.get(idSenderField).toString()) == 0
-              ? true
-              : false
-          : null,
-      userID: docs.get(idSenderField).toString(),
-      hasSender: docs.get(hasSenderField),
-      stampTime: docs.get(stampTimeField).toDate(),
-      checkTimeGreaterOneMinute: checkDifferenceInCalendarInMinutes(
-        docs.get(stampTimeField).toDate(),
-      ),
-      stampTimeFormated: differenceInCalendarStampTime(
-        docs.get(stampTimeField).toDate(),
-      ),
-    );
+        idMessage: docs.id,
+        value: handleMessageValue(
+          value: docs.get(messageField).toString(),
+          typeMessage: getTypeMessage(
+            value: docs.get(typeMessageField).toString(),
+          ),
+        ),
+        messageType:
+            getTypeMessage(value: docs.get(typeMessageField).toString()),
+        messageStatus:
+            getMessageStatus(value: docs.get(messageStatusField).toString()),
+        isSender: docs.get(hasSenderField) == true
+            ? ownerUserID.compareTo(docs.get(idSenderField).toString()) == 0
+                ? true
+                : false
+            : null,
+        userID: docs.get(idSenderField).toString(),
+        hasSender: docs.get(hasSenderField),
+        stampTime: docs.get(stampTimeField).toDate(),
+        checkTimeGreaterOneMinute: checkDifferenceInCalendarInMinutes(
+          docs.get(stampTimeField).toDate(),
+        ),
+        stampTimeFormated: differenceInCalendarStampTime(
+          docs.get(stampTimeField).toDate(),
+        ));
+  }
+}
+
+dynamic handleMessageValue(
+    {required dynamic value, required TypeMessage typeMessage}) {
+  if (typeMessage == TypeMessage.text) {
+    return value.toString();
+  } else if (typeMessage == TypeMessage.image) {
+    return value;
+  } else {
+    return null;
   }
 }
 
