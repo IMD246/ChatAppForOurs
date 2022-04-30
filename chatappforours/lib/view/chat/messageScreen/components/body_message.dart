@@ -60,6 +60,9 @@ class _BodyMessageState extends State<BodyMessage> {
                       if (index != -1) {
                         return MessageCard(
                           chatMessage: allChat.elementAt(index),
+                          listChatMesage : allChat,
+                          index : index,
+                          beforeIndex : index -1,
                           chat: widget.chat,
                           scrollController:scrollController,
                         );

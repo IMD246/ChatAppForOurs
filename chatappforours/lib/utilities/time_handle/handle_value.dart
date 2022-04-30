@@ -25,8 +25,19 @@ String differenceInCalendarDays(DateTime earlier) {
 }
 
 String differenceInCalendarStampTime(DateTime earlier) {
-  final String value =
-      "${earlier.day}/${earlier.month} ${earlier.hour.toString().padLeft(0)}:${earlier.minute.toString().padLeft(0)}";
+  String month = earlier.month.toString();
+  String minute = earlier.minute.toString();
+  String hour = earlier.hour.toString();
+  if (earlier.month < 10) {
+    month = "0" + month.toString();
+  }
+  if (earlier.hour <= 0) {
+    hour = "0" + hour.toString();
+  }
+  if (earlier.minute <= 0) {
+    minute = "0" + minute.toString();
+  }
+  final String value = "${earlier.day}/$month $hour:$minute";
 
   return value;
 }
@@ -37,6 +48,24 @@ bool checkDifferenceInCalendarInMinutes(DateTime earlier) {
     return false;
   } else {
     return true;
+  }
+}
+
+bool checkDifferenceBeforeAndCurrentIndexInMinutes(
+    DateTime earlier, DateTime later) {
+  if (later.difference(earlier).inMinutes >= 30) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool checkDifferenceBeforeAndCurrentTimeGreaterThan10Minutes(
+    DateTime earlier, DateTime later) {
+  if (later.difference(earlier).inMinutes >= 30) {
+    return true;
+  } else {
+    return false;
   }
 }
 

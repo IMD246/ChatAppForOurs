@@ -12,11 +12,13 @@ class ChatMessage {
   final String? userID;
   final bool? isSender;
   final bool hasSender;
-  final String stampTime;
+  final String stampTimeFormated;
+  final DateTime stampTime;
   final bool checkTimeGreaterOneMinute;
   ChatMessage({
     required this.idMessage,
     required this.stampTime,
+    required this.stampTimeFormated,
     this.value = '',
     required this.checkTimeGreaterOneMinute,
     required this.messageType,
@@ -41,10 +43,11 @@ class ChatMessage {
           : null,
       userID: docs.get(idSenderField).toString(),
       hasSender: docs.get(hasSenderField),
-      stampTime: differenceInCalendarStampTime(
+      stampTime: docs.get(stampTimeField).toDate(),
+      checkTimeGreaterOneMinute: checkDifferenceInCalendarInMinutes(
         docs.get(stampTimeField).toDate(),
       ),
-      checkTimeGreaterOneMinute: checkDifferenceInCalendarInMinutes(
+      stampTimeFormated: differenceInCalendarStampTime(
         docs.get(stampTimeField).toDate(),
       ),
     );

@@ -23,9 +23,15 @@ class MessageCard extends StatefulWidget {
     required this.chatMessage,
     required this.chat,
     required this.scrollController,
+    required this.listChatMesage,
+    required this.index,
+    required this.beforeIndex,
   }) : super(key: key);
   final ChatMessage chatMessage;
   final Chat chat;
+  final int index;
+  final int beforeIndex;
+  final Iterable<ChatMessage> listChatMesage;
   final ItemScrollController scrollController;
   @override
   State<MessageCard> createState() => _MessageCardState();
@@ -38,10 +44,18 @@ class _MessageCardState extends State<MessageCard> {
   String? urlStringImage;
   bool isSelected = false;
   bool isCheckLastMessage = false;
+  late bool checkCurrentAndIndexTimeGreater10Minute;
   @override
   void initState() {
     firebaseUserProfile = FirebaseUserProfile();
     firebaseChatMessage = FirebaseChatMessage();
+    widget.index <= 0
+        ? checkCurrentAndIndexTimeGreater10Minute = true
+        : checkCurrentAndIndexTimeGreater10Minute =
+            checkDifferenceBeforeAndCurrentTimeGreaterThan10Minutes(
+            widget.listChatMesage.elementAt(widget.beforeIndex).stampTime,
+            widget.chatMessage.stampTime,
+          );
     setState(() {
       if (widget.chatMessage.isSender == false &&
           widget.chatMessage.messageStatus == MessageStatus.sent) {
@@ -79,12 +93,27 @@ class _MessageCardState extends State<MessageCard> {
 
     return Column(
       children: [
-        if (widget.chatMessage.checkTimeGreaterOneMinute)
+        if (checkCurrentAndIndexTimeGreater10Minute)
+          Visibility(
+            visible: isSelected || checkCurrentAndIndexTimeGreater10Minute,
+            child: Center(
+              child: Text(
+                widget.chatMessage.stampTimeFormated,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: textColorMode(
+                    themeChanger.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+                  ).withOpacity(0.5),
+                ),
+              ),
+            ),
+          ),
+        if (!checkCurrentAndIndexTimeGreater10Minute)
           Visibility(
             visible: isSelected,
             child: Center(
               child: Text(
-                widget.chatMessage.stampTime,
+                widget.chatMessage.stampTimeFormated,
                 style: TextStyle(
                   fontSize: 12,
                   color: textColorMode(
