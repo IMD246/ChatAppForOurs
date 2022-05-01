@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
@@ -13,7 +11,6 @@ import 'package:chatappforours/view/chat/messageScreen/components/audio_message.
 import 'package:chatappforours/view/chat/messageScreen/components/image_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/text_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -86,35 +83,7 @@ class _MessageCardState extends State<MessageCard> {
             chatMessage: chatMessage,
           );
         case TypeMessage.image:
-          return Expanded(
-            child: Directionality(
-              textDirection: widget.chatMessage.hasSender == true
-                  ? widget.chatMessage.isSender!
-                      ? TextDirection.rtl
-                      : TextDirection.ltr
-                  : TextDirection.rtl,
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: widget.chatMessage.listURLImage == null
-                    ? 0
-                    : widget.chatMessage.listURLImage!.length,
-                shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: widget.chatMessage.listURLImage!.length <= 1
-                      ? 0.5
-                      : 3 / 2,
-                  mainAxisSpacing: 2,
-                  crossAxisSpacing: 2,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  return ImageMessage(
-                    urlImage: widget.chatMessage.listURLImage?.elementAt(index),
-                  );
-                },
-              ),
-            ),
-          );
+          return ImageMessage(chatMessage: chatMessage);
         default:
           return const SizedBox();
       }
