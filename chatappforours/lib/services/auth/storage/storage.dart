@@ -69,7 +69,9 @@ class Storage {
         );
       }
     } on FirebaseException catch (_) {
-      ScaffoldMessenger.of(context!).showSnackBar(
+      if (context != null) {
+        
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
             'Upload Image Failed',
@@ -77,6 +79,7 @@ class Storage {
           ),
         ),
       );
+      }
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
@@ -58,47 +59,29 @@ class _BodyMessageState extends State<BodyMessage> {
                     itemCount: allChat.length,
                     itemBuilder: (context, index) {
                       if (index != -1) {
-                        return FutureBuilder<ChatMessage?>(
-                          future: firebaseChatMessage.getIDNotSentOwnerUser(
-                            chatID: widget.chat.idChat,
-                            ownerUserID: id,
-                          ),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              final chatMessage = snapshot.data!;
-                              if (chatMessage.idMessage ==
-                                      allChat.elementAt(index).idMessage &&
-                                  widget.chat.userID == chatMessage.userID) {
-                                return MessageCard(
-                                  chatMessage: allChat.elementAt(index),
-                                  listChatMesage: allChat,
-                                  index: index,
-                                  beforeIndex: index - 1,
-                                  chat: widget.chat,
-                                  scrollController: scrollController,
-                                );
-                              } else {
-                                return MessageCard(
-                                  chatMessage: allChat.elementAt(index),
-                                  listChatMesage: allChat,
-                                  index: index,
-                                  beforeIndex: index - 1,
-                                  chat: widget.chat,
-                                  scrollController: scrollController,
-                                );
-                              }
-                            } else {
-                              return MessageCard(
-                                chatMessage: allChat.elementAt(index),
-                                listChatMesage: allChat,
-                                index: index,
-                                beforeIndex: index - 1,
-                                chat: widget.chat,
-                                scrollController: scrollController,
-                              );
-                            }
-                          },
-                        );
+                        if (allChat.elementAt(index).messageStatus ==
+                            MessageStatus.notSent) {
+                          return Visibility(
+                            visible: allChat.elementAt(index).isSender == false,
+                            child: MessageCard(
+                              chatMessage: allChat.elementAt(index),
+                              listChatMesage: allChat,
+                              index: index,
+                              beforeIndex: index - 1,
+                              chat: widget.chat,
+                              scrollController: scrollController,
+                            ),
+                          );
+                        } else {
+                          return MessageCard(
+                            chatMessage: allChat.elementAt(index),
+                            listChatMesage: allChat,
+                            index: index,
+                            beforeIndex: index - 1,
+                            chat: widget.chat,
+                            scrollController: scrollController,
+                          );
+                        }
                       } else {
                         return Container(
                           color: Theme.of(context).scaffoldBackgroundColor,

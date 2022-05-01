@@ -286,7 +286,7 @@ class FirebaseChatMessage {
         .then(
       (value) async {
         if (value.exists) {
-          return await value.reference.get();
+          return value.id;
         } else {
           return null;
         }
@@ -294,10 +294,16 @@ class FirebaseChatMessage {
     );
     final chatMess = id;
     if (chatMess != null) {
-      return ChatMessage.fromSnapshot(docs: chatMess, ownerUserID: ownerUserID);
+      final a = await firebaseChatMessageDocument
+          .doc(chatID)
+          .collection('message')
+          .doc(chatMess)
+          .get();
+      ChatMessage.fromSnapshot(docs: a, ownerUserID: ownerUserID);
     } else {
       return null;
     }
+    return null;
   }
 
   Stream<Iterable<ChatMessage>> getAllMessage(
