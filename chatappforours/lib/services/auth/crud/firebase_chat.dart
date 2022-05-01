@@ -1,4 +1,5 @@
 import 'package:chatappforours/constants/chat_constant_field.dart';
+import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
@@ -8,41 +9,36 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirebaseChat {
   final firebaseChat = FirebaseFirestore.instance.collection('chat');
   Future<void> createChat({
-    required String ownerUserID,
-    required String userIDFriend,
-    required String nameChat,
     required TypeChat typeChat,
+    required List<String> listUserID,
   }) async {
     final firebaseUserJoinChat = FirebaseUsersJoinChat();
-    final userJoinChatCheck = await firebaseUserJoinChat.getChatNormalByIDUser(
-        userIDFriend: userIDFriend);
-    if (userJoinChatCheck == null) {
+    final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
+    final chatIDCheck = await getChatNormalByIDUserFriend(
+      listUserID: listUserID,
+    );
+    if (chatIDCheck == null) {
       Map<String, dynamic> map = <String, dynamic>{
-        nameChatField: nameChat,
+        nameChatField: " ",
+        listUserField: listUserID,
         lastTextField: 'Let make some chat',
         typeChatField: typeChat.toString(),
         timeLastChatField: DateTime.now(),
+        stampTimeField: DateTime.now(),
       };
-      List<String> listUser = <String>[];
-      if (ownerUserID.compareTo(userIDFriend) == 0) {
-        listUser.add(ownerUserID);
-        map.update(nameChatField, (value) => 'Only You');
-      } else {
-        listUser.add(ownerUserID);
-        listUser.add(userIDFriend);
-      }
+      await firebaseChat.doc().set(map);
+      final chatNormal = await getChatNormalByIDUserFriend(
+        listUserID: listUserID,
+      );
+      await firebaseChatMessage.createFirstTextMessage(
+        userID: "",
+        chatID: chatNormal!.idChat,
+      );
       await firebaseUserJoinChat.createUsersJoinChat(
-        listUserID: listUser,
+        listUserID: listUserID,
+        idChat: chatNormal.idChat,
         typeChat: typeChat,
       );
-      final userJoinChat = await firebaseUserJoinChat.getChatNormalByIDUser(
-          userIDFriend: userIDFriend);
-      final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
-      firebaseChatMessage.createFirstTextMessage(
-        userID: ownerUserID,
-        chatID: userJoinChat!.chatID,
-      );
-      await firebaseChat.doc(userJoinChat.chatID).set(map);
     }
   }
 
@@ -57,22 +53,29 @@ class FirebaseChat {
     await firebaseChat.doc(chatID).update(map);
   }
 
-  // Stream<Iterable<Chat>> getAllChat({
-  //   required String ownerUserID,
-  // }) {
-  //   final chat = firebaseChat
-  //       .where(userIDField, isEqualTo: userID)
-  //       .orderBy(timeLastChatField, descending: true)
-  //       .snapshots()
-  //       .map(
-  //         (event) => event.docs.map(
-  //           (e) => Chat.fromSnapshot(
-  //             docs: e,
-  //           ),
-  //         ),
-  //       );
-  //   return chat;
-  // }
+  Future<Chat?> getChatNormalByIDUserFriend({
+    required List<String> listUserID,
+  }) async {
+    final chatNormalID = await firebaseChat
+        .where(listUserField, arrayContainsAny: listUserID)
+        .where(typeChatField, isEqualTo: TypeChat.normal.toString())
+        .orderBy(stampTimeField, descending: true)
+        .limit(1)
+        .get()
+        .then(
+      (value) {
+        if (value.size > 0) {
+          return value.docs.first;
+        } else {
+          return null;
+        }
+      },
+    );
+    if (chatNormalID != null) {
+      return Chat.fromSnapshot(docs: chatNormalID);
+    }
+    return null;
+  }
 
   Future<Chat> getChatByID({
     required String idChat,
@@ -81,5 +84,21 @@ class FirebaseChat {
     return Chat.fromSnapshot(
       docs: chat,
     );
+  }
+
+  Stream<Iterable<Chat>> getAllChat({
+    required String ownerUserID,
+  }) {
+    return firebaseChat
+        .where(listUserField, arrayContains: ownerUserID)
+        .orderBy(timeLastChatField, descending: true)
+        .snapshots()
+        .map(
+          (event) => event.docs.map(
+            (e) => Chat.fromSnapshot(
+              docs: e,
+            ),
+          ),
+        );
   }
 }

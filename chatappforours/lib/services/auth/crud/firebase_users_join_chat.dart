@@ -13,6 +13,7 @@ class FirebaseUsersJoinChat {
   Future<void> createUsersJoinChat({
     required List<String> listUserID,
     required TypeChat typeChat,
+    required String idChat,
   }) async {
     for (var i = 0; i < listUserID.length; i++) {
       final rule = i == 0
@@ -26,49 +27,50 @@ class FirebaseUsersJoinChat {
         typeChatField: typeChat.toString(),
         stampTimeField: DateTime.now(),
       };
-      await firebaseUsersJoinChat.doc().collection('usersJoinedChat').doc(listUserID.elementAt(i))
+      await firebaseUsersJoinChat
+          .doc(idChat)
+          .collection('usersJoinedChat')
+          .doc(listUserID.elementAt(i))
           .set(map);
     }
   }
 
-  Stream<Iterable<UsersJoinChat>> getAllIDChatUserJoined({
+  Future<UsersJoinChat?> getUserJoinChatByIDChat({
+    required String idChat,
     required String ownerUserID,
-  }) {
-    final allIDChatUserJoined = firebaseUsersJoinChatGroup
+  }) async {
+    final idChatUserJoined = await firebaseUsersJoinChat
+        .doc(idChat)
+        .collection('usersJoinedChat')
         .where(userIDField, isEqualTo: ownerUserID)
-        .snapshots()
-        .map(
-          (event) => event.docs.map(
-            (docs) {
-              return UsersJoinChat.fromSnapshot(docs: docs);
-            },
-          ),
-        );
-    return allIDChatUserJoined;
+        .limit(1)
+        .get()
+        .then(
+      (value) {
+        if (value.size > 0 && value.docs.first.exists) {
+          return UsersJoinChat.fromSnapshot(docs: value.docs.first);
+        } else {
+          return null;
+        }
+      },
+    );
+
+    return idChatUserJoined;
   }
 
-  Future<UsersJoinChat?> getChatNormalByIDUser({
-    required String userIDFriend,
-  }) async {
-    if (firebaseUsersJoinChat.path.isNotEmpty) {
-      final userJoin = await firebaseUsersJoinChatGroup
-          .where(userIDField, isEqualTo: userIDFriend)
-          .where(typeChatField, isEqualTo: TypeChat.normal.toString())
-          .limit(1)
-          .get()
-          .then(
-        (value) {
-          if (value.docs.isNotEmpty) {
-            return value.docs.first;
-          } else {
-            return null;
-          }
-        },
-      );
-      return userJoin != null
-          ? UsersJoinChat.fromSnapshot(docs: userJoin)
-          : null;
-    }
-    return null;
-  }
+  // Stream<Iterable<UsersJoinChat>> getAllIDChatUserJoined({
+  //   required String ownerUserID,
+  // }) {
+  //   final allIDChatUserJoined = firebaseUsersJoinChatGroup
+  //       .where(userIDField, isEqualTo: ownerUserID)
+  //       .snapshots()
+  //       .map(
+  //         (event) => event.docs.map(
+  //           (docs) {
+  //             return UsersJoinChat.fromSnapshot(docs: docs);
+  //           },
+  //         ),
+  //       );
+  //   return allIDChatUserJoined;
+  // }
 }

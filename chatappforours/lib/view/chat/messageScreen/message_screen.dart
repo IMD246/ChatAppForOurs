@@ -10,9 +10,10 @@ import 'package:provider/provider.dart';
 import '../../../constants/constants.dart';
 
 class MesssageScreen extends StatelessWidget {
-  const MesssageScreen(
-      {Key? key, required this.chat,})
-      : super(key: key);
+  const MesssageScreen({
+    Key? key,
+    required this.chat,
+  }) : super(key: key);
   final Chat chat;
   @override
   Widget build(BuildContext context) {
@@ -25,6 +26,7 @@ class MesssageScreen extends StatelessWidget {
       ),
     );
   }
+
   AppBar buildAppbar(Chat chat, ThemeMode themeMode, BuildContext context) {
     final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
     return AppBar(
@@ -85,7 +87,7 @@ class MesssageScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          chat.nameChat,
+                          chat.nameChat ?? "as",
                           style: TextStyle(
                               color: textColorMode(themeMode).withOpacity(0.8),
                               fontSize: 16),

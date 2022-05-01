@@ -63,22 +63,13 @@ class _ContactCardState extends State<ContactCard> {
     return GestureDetector(
       onTap: () async {
         if (!widget.requestFriend) {
-          final userProfile = await firebaseUserProfile.getUserProfile(
-              userID: widget.friend.userID);
           await firebaseChat.createChat(
-            ownerUserID: id,
-            userIDFriend: widget.friend.userID,
-            nameChat: userProfile!.fullName,
             typeChat: TypeChat.normal,
+            listUserID: [id, widget.friend.userID],
           );
-          final userJoinChat =
-              await firebaseUsersJoinChat.getChatNormalByIDUser(
-            userIDFriend: widget.friend.userID,
-          );
-          final chat = await firebaseChat.getChatByID(
-            idChat: userJoinChat!.chatID,
-          );
-          chat.presence = widget.friend.presence;
+          final chat = await firebaseChat.getChatNormalByIDUserFriend(
+              listUserID: [id, widget.friend.userID]);
+          chat!.presence = widget.friend.presence;
           chat.stampTimeUserFormated = widget.friend.stampTimeUser;
           chat.userID = widget.friend.userID;
           Navigator.push(
@@ -111,7 +102,7 @@ class _ContactCardState extends State<ContactCard> {
                               backgroundColor: Colors.cyan[100],
                               child: ClipOval(
                                 child: CachedNetworkImage(
-                                  fit: BoxFit.fill,
+                                  fit: BoxFit.cover,
                                   imageUrl: userProfile.urlImage!,
                                   placeholder: (context, url) =>
                                       const CircularProgressIndicator(),

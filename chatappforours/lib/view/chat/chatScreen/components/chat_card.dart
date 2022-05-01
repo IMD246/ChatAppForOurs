@@ -40,7 +40,7 @@ class _ChatCardState extends State<ChatCard> {
           children: [
             FutureBuilder<UserProfile?>(
               future: firebaseUserProfile.getUserProfile(
-                  userID: widget.chat.userID),
+                  userID: widget.chat.listUser[1]),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.done:
@@ -92,7 +92,8 @@ class _ChatCardState extends State<ChatCard> {
                               bottom: 0,
                               right: 0,
                               child: Text(
-                                differenceInCalendarPresence(widget.chat.stampTimeUser!),
+                                differenceInCalendarPresence(
+                                    widget.chat.stampTimeUser!),
                               ),
                             ),
                         ],
@@ -130,7 +131,7 @@ class _ChatCardState extends State<ChatCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.chat.nameChat,
+                      widget.chat.nameChat ?? "a",
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 16,

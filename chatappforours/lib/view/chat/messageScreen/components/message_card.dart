@@ -209,7 +209,7 @@ class _MessageCardState extends State<MessageCard> {
                         ),
                     const SizedBox(width: kDefaultPadding * 0.5),
                     messageContaint(widget.chatMessage),
-                    if (widget.chat.userID!.compareTo(idUser) != 0)
+                    if (widget.chat.listUser[1].compareTo(idUser) != 0)
                       if (widget.chatMessage.messageStatus ==
                               MessageStatus.viewed ||
                           widget.chatMessage.messageStatus ==
@@ -219,12 +219,12 @@ class _MessageCardState extends State<MessageCard> {
                           urlStringImage: urlStringImage,
                           chatID: widget.chat.idChat,
                           idMessage: widget.chatMessage.idMessage,
-                          idUserFriend: widget.chat.userID!,
+                          idUserFriend: widget.chat.listUser[1],
                           isSender: widget.chatMessage.hasSender
                               ? widget.chatMessage.isSender!
                               : false,
                         ),
-                    if (widget.chat.userID!.compareTo(idUser) == 0)
+                    if (widget.chat.listUser[1].compareTo(idUser) == 0)
                       Container(
                         margin: const EdgeInsets.only(left: 2),
                         width: 16,
