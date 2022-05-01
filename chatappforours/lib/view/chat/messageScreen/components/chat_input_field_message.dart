@@ -199,10 +199,8 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                       );
                       textController.clear();
                       if (widget.scroll.isAttached) {
-                        widget.scroll.scrollTo(
+                        widget.scroll.jumpTo(
                           index: intMaxValue,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeIn,
                         );
                       }
                     },
