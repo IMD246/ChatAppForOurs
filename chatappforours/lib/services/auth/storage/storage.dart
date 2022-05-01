@@ -15,7 +15,15 @@ class Storage {
       BuildContext? context}) async {
     File file = File(filePath);
     try {
-      await storage.ref('image/$fileName').putFile(file).then(
+      await storage
+          .ref('image/$fileName')
+          .putFile(
+            file,
+            SettableMetadata(
+              contentType: 'image/jpeg,',
+            ),
+          )
+          .then(
             (p0) => ScaffoldMessenger.of(context!).showSnackBar(
               const SnackBar(
                 content: Text(
@@ -51,7 +59,10 @@ class Storage {
         File file = File(listFile.elementAt(i).path!);
         final String fileName =
             '${lastMessageUserOwner.idMessage}/${listFile.elementAt(i).name}';
-        await storage.ref('image/$fileName').putFile(file).then(
+        await storage
+            .ref('image/$fileName')
+            .putFile(file, SettableMetadata(contentType: 'image/jpeg'))
+            .then(
           (p0) async {
             final urlImage = await getDownloadURL(fileName: fileName);
             listUrlImage.add(urlImage!);
@@ -70,15 +81,14 @@ class Storage {
       }
     } on FirebaseException catch (_) {
       if (context != null) {
-        
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Upload Image Failed',
-            textAlign: TextAlign.center,
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Upload Image Failed',
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-      );
+        );
       }
     }
   }

@@ -56,12 +56,7 @@ class _BodySettingState extends State<BodySetting> {
                                 final results =
                                     await FilePicker.platform.pickFiles(
                                   allowMultiple: false,
-                                  type: FileType.custom,
-                                  allowedExtensions: [
-                                    'jpg',
-                                    'png',
-                                    'PNG',
-                                  ],
+                                  type: FileType.image,
                                 );
                                 if (results == null) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -82,7 +77,6 @@ class _BodySettingState extends State<BodySetting> {
                                           fileName: fileName,
                                         ),
                                       );
-                                      
                                 }
                               },
                               child: Stack(

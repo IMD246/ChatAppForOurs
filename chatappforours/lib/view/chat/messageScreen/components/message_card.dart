@@ -87,33 +87,31 @@ class _MessageCardState extends State<MessageCard> {
           );
         case TypeMessage.image:
           return Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: kDefaultPadding,
-              ),
-              child: Directionality(
-                textDirection: widget.chatMessage.hasSender == true
-                    ? widget.chatMessage.isSender!
-                        ? TextDirection.rtl
-                        : TextDirection.ltr
-                    : TextDirection.rtl,
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: widget.chatMessage.listURLImage == null
-                      ? 0
-                      : widget.chatMessage.listURLImage!.length,
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    childAspectRatio: 3 / 2,
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 2,
-                  ),
-                  itemBuilder: (BuildContext context, int index) {
-                    return const ImageMessage(
-                      urlImage: "assets/images/defaultImage.png",
-                    );
-                  },
+            child: Directionality(
+              textDirection: widget.chatMessage.hasSender == true
+                  ? widget.chatMessage.isSender!
+                      ? TextDirection.rtl
+                      : TextDirection.ltr
+                  : TextDirection.rtl,
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.chatMessage.listURLImage == null
+                    ? 0
+                    : widget.chatMessage.listURLImage!.length,
+                shrinkWrap: true,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: widget.chatMessage.listURLImage!.length <= 1
+                      ? 0.5
+                      : 3 / 2,
+                  mainAxisSpacing: 2,
+                  crossAxisSpacing: 2,
                 ),
+                itemBuilder: (BuildContext context, int index) {
+                  return ImageMessage(
+                    urlImage: widget.chatMessage.listURLImage?.elementAt(index),
+                  );
+                },
               ),
             ),
           );

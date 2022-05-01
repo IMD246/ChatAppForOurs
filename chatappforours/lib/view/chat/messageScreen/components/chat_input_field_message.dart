@@ -65,11 +65,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                 final results = await FilePicker.platform.pickFiles(
                   allowMultiple: true,
                   type: FileType.custom,
-                  allowedExtensions: [
-                    'jpg',
-                    'png',
-                    'PNG',
-                  ],
+                  allowedExtensions: ['jpg', 'jpeg', 'png'],
                 );
                 if (results == null) {
                 } else {
