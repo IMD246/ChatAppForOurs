@@ -63,21 +63,24 @@ class _ContactCardState extends State<ContactCard> {
     return GestureDetector(
       onTap: () async {
         if (!widget.requestFriend) {
-          await firebaseChat.createChat(
-            typeChat: TypeChat.normal,
+          await firebaseChat.updateChatToActive(
             listUserID: [id, widget.friend.userID],
           );
-          final chat = await firebaseChat.getChatNormalByIDUserFriend(
-              listUserID: [id, widget.friend.userID]);
-          chat!.presence = widget.friend.presence;
-          chat.stampTimeUserFormated = widget.friend.stampTimeUser;
-          chat.userID = widget.friend.userID;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MesssageScreen(chat: chat),
-            ),
-          );
+          // await firebaseChat.createChat(
+          //   typeChat: TypeChat.normal,
+          //   listUserID: [id, widget.friend.userID], context: context,
+          // );
+          // final chat = await firebaseChat.getChatNormalByIDUserFriend(
+          //     listUserID: [id, widget.friend.userID]);
+          // chat!.presence = widget.friend.pressence;
+          // chat.stampTimeUserFormated = widget.friend.stampTimeUser;
+          // chat.userID = widget.friend.userID;
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => MesssageScreen(chat: chat),
+          //   ),
+          // );
         }
       },
       child: Padding(
@@ -115,7 +118,8 @@ class _ContactCardState extends State<ContactCard> {
                             CircleAvatar(
                               backgroundColor: Colors.cyan[100],
                               backgroundImage: const AssetImage(
-                                  "assets/images/defaultImage.png"),
+                                "assets/images/defaultImage.png",
+                              ),
                             ),
                           widget.friend.presence
                               ? Positioned(
@@ -162,30 +166,40 @@ class _ContactCardState extends State<ContactCard> {
                           ),
                         ),
                       ),
-                      Visibility(
-                        child: FillOutlineButton(
-                          press: () async {
-                            await firebaseFriendList.updateRequestFriend(
-                              ownerUserID: id,
-                              userID: widget.friend.userID,
-                            );
-                          },
-                          text: 'Accept',
-                        ),
-                        visible: widget.requestFriend == true,
-                      ),
                       const Spacer(),
                       Visibility(
-                        child: FillOutlineButton(
-                          press: () async {
-                            await firebaseFriendList.deleteFriend(
-                              ownerUserID: id,
-                              userID: widget.friend.userID,
-                            );
-                          },
-                          text: 'Cancel',
-                        ),
                         visible: widget.requestFriend == true,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            FillOutlineButton(
+                              press: () async {
+                                await firebaseFriendList.updateRequestFriend(
+                                  ownerUserID: id,
+                                  userID: widget.friend.userID,
+                                );
+                                await firebaseChat.createChat(
+                                  typeChat: TypeChat.normal,
+                                  listUserID: [id, widget.friend.userID],
+                                  idFriendList: widget.friend.idFriendList,
+                                );
+                              },
+                              text: 'Accept',
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            FillOutlineButton(
+                              press: () async {
+                                await firebaseFriendList.deleteFriend(
+                                  ownerUserID: id,
+                                  userID: widget.friend.userID,
+                                );
+                              },
+                              text: 'Cancel',
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   );

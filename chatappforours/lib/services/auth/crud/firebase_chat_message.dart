@@ -137,7 +137,7 @@ class FirebaseChatMessage {
         .collection('message')
         .doc(lastMessageUserOwner.idMessage)
         .update(map);
-    await firebaseChat.updateChat(
+    await firebaseChat.updateChatLastText(
       text: "$nameSender sent ${listUrlImage.length} image",
       chatID: chatID,
     );
@@ -211,7 +211,7 @@ class FirebaseChatMessage {
         .collection('message')
         .doc()
         .set(mapCreate);
-    await firebaseChat.updateChat(
+    await firebaseChat.updateChatLastText(
       text: text,
       chatID: chatID,
     );

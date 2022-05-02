@@ -129,10 +129,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             urlImage: '',
             isDarkMode: false,
           );
-          await friendListFirebase.createNewFriend(
+          await friendListFirebase.createNewFriendDefault(
             userIDFriend: user.id!,
             ownerUserID: user.id!,
-            isRequest: true,
           );
           await authProvider.sendEmailVerification();
           final userProfileFirebase = FirebaseUserProfile();

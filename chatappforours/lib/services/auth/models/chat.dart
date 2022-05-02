@@ -1,4 +1,6 @@
 import 'package:chatappforours/constants/chat_constant_field.dart';
+import 'package:chatappforours/constants/user_join_chat_field.dart';
+import 'package:chatappforours/constants/user_profile_constant_field.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,11 +8,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Chat {
   final String idChat;
   final String stampTime;
+  final DateTime stampTimeChat;
   final String lastText;
   final TypeChat typeChat;
+  final String userID;
   String? nameChat;
   String? urlUserFriend;
-  String? userID;
   RuleChat? rule;
   String? time;
   bool? presence = false;
@@ -23,9 +26,10 @@ class Chat {
     required this.lastText,
     this.nameChat,
     required this.typeChat,
-    this.userID,
+    required this.userID,
     this.rule,
     this.presence,
+    required this.stampTimeChat,
     this.time,
     this.stampTimeUser,
     this.stampTimeUserFormated,
@@ -35,7 +39,7 @@ class Chat {
     required DocumentSnapshot<Map<String, dynamic>> docs,
   }) =>
       Chat(
-        idChat: docs.id,
+        idChat: docs.reference.parent.parent!.id,
         stampTime: differenceInCalendarDays(
           docs.get(timeLastChatField).toDate(),
         ),
@@ -49,6 +53,8 @@ class Chat {
         listUser: List<String>.from(
           docs.get(listUserField) as List,
         ),
+        stampTimeChat: docs.get(stampTimeField).toDate(),
+        userID: docs.get(userIDField),
       );
 }
 

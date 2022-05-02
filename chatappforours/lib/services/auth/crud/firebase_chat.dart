@@ -1,5 +1,6 @@
 import 'package:chatappforours/constants/chat_constant_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
+import 'package:chatappforours/constants/user_profile_constant_field.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
@@ -8,53 +9,52 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseChat {
   final firebaseChat = FirebaseFirestore.instance.collection('chat');
-  Future<void> createChat({
-    required TypeChat typeChat,
-    required List<String> listUserID,
-  }) async {
+  final firebaseChatGroup =
+      FirebaseFirestore.instance.collectionGroup('friendChatID');
+  Future<void> createChat(
+      {required TypeChat typeChat,
+      required List<String> listUserID,
+      required String idFriendList}) async {
     final firebaseUserJoinChat = FirebaseUsersJoinChat();
     final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
-    final chatIDCheck = await getChatNormalByIDUserFriend(
-      listUserID: listUserID,
+    Map<String, dynamic> map = <String, dynamic>{
+      nameChatField: "a",
+      userIDField: listUserID.elementAt(0),
+      isActiveField: false,
+      lastTextField: 'Let make some chat',
+      listUserField: listUserID,
+      typeChatField: typeChat.toString(),
+      timeLastChatField: DateTime.now(),
+      stampTimeField: DateTime.now(),
+    };
+    await firebaseChat
+        .doc(listUserID[0] + listUserID[1])
+        .collection('friendChatID')
+        .doc(idFriendList)
+        .set(map)
+        .whenComplete(
+      () async {
+        await firebaseUserJoinChat.createUsersJoinChat(
+          listUserID: listUserID,
+          idChat: listUserID[0] + listUserID[1],
+          typeChat: typeChat,
+        );
+        await firebaseChatMessage.createFirstTextMessage(
+          userID: "",
+          chatID: listUserID[0] + listUserID[1],
+        );
+        if (listUserID.elementAt(0) != listUserID.elementAt(1)) {
+          await firebaseChat
+              .doc(listUserID[0] + listUserID[1])
+              .collection('friendChatID')
+              .doc(listUserID.elementAt(1))
+              .set(map);
+        }
+      },
     );
-    if (chatIDCheck == null) {
-      Map<String, dynamic> map = <String, dynamic>{
-        nameChatField: " ",
-        listUserField: listUserID,
-        lastTextField: 'Let make some chat',
-        typeChatField: typeChat.toString(),
-        timeLastChatField: DateTime.now(),
-        stampTimeField: DateTime.now(),
-      };
-      await firebaseChat.doc().set(map);
-      await firebaseChat
-          .where(listUserField,
-              arrayContainsAny: [listUserID[0], listUserID[1]])
-          .where(typeChatField, isEqualTo: TypeChat.normal.toString())
-          .orderBy(stampTimeField, descending: true)
-          .limit(1)
-          .get()
-          .then(
-            (value) async {
-              if (value.docs.isNotEmpty) {
-                 await firebaseUserJoinChat.createUsersJoinChat(
-                listUserID: listUserID,
-                idChat: Chat.fromSnapshot(docs: value.docs.first).idChat,
-                typeChat: typeChat,
-              );
-                await firebaseChatMessage.createFirstTextMessage(
-                  userID: "",
-                  chatID: Chat.fromSnapshot(docs: value.docs.first).idChat,
-                );
-              } else {
-                return null;
-              }
-            },
-          );
-    }
   }
 
-  Future<void> updateChat({
+  Future<void> updateChatLastText({
     required String text,
     required String chatID,
   }) async {
@@ -65,24 +65,48 @@ class FirebaseChat {
     await firebaseChat.doc(chatID).update(map);
   }
 
-  Future<Chat?> getChatNormalByIDUserFriend({
+  Future<void> updateChatToActive({
     required List<String> listUserID,
   }) async {
+    Map<String, dynamic> map = <String, dynamic>{
+      isActiveField: true,
+    };
+    await firebaseChat.doc(listUserID[0] + listUserID[1]).get().then(
+      (value) async {
+        if (value.exists) {
+          await firebaseChat
+              .doc(value.id)
+              .collection('friendChatID')
+              .doc(listUserID.elementAt(0))
+              .update(map);
+        } else {
+          await firebaseChat.doc(listUserID[1] + listUserID[0]).get().then(
+            (value) async {
+              await firebaseChat
+                  .doc(value.id)
+                  .collection('friendChatID')
+                  .doc(listUserID.elementAt(0))
+                  .update(map);
+            },
+          );
+        }
+      },
+    );
+  }
+
+  Future<Chat> getIDParentDocumentChat({required String ownerUserID}) async {
     return await firebaseChat
-        .where(listUserField, whereIn: [listUserID])
+        .where(listUserField, arrayContains: ownerUserID)
         .where(typeChatField, isEqualTo: TypeChat.normal.toString())
+        .where(isActiveField, isEqualTo: true)
         .orderBy(stampTimeField, descending: true)
         .limit(1)
         .get()
         .then(
-          (value) {
-            if (value.docs.isNotEmpty) {
-              return Chat.fromSnapshot(docs: value.docs.first);
-            } else {
-              return null;
-            }
-          },
-        );
+      (value) {
+        return Chat.fromSnapshot(docs: value.docs.first);
+      },
+    );
   }
 
   Future<Chat> getChatByID({
@@ -97,8 +121,9 @@ class FirebaseChat {
   Stream<Iterable<Chat>> getAllChat({
     required String ownerUserID,
   }) {
-    return firebaseChat
-        .where(listUserField, arrayContains: ownerUserID)
+    return firebaseChatGroup
+        .where(userIDField, isEqualTo: ownerUserID)
+        .where(isActiveField, isEqualTo: true)
         .orderBy(timeLastChatField, descending: true)
         .snapshots()
         .map(

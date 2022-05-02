@@ -11,18 +11,35 @@ class FirebaseFriendList {
   Future<void> createNewFriend(
       {required String ownerUserID,
       required String userIDFriend,
-      bool? isRequest}) async {
+      required bool isRequest}) async {
     Map<String, dynamic> map = <String, dynamic>{
       userIDField: userIDFriend,
-      isRequestField: isRequest ?? false,
+      isRequestField: isRequest,
       stampTimeField: DateTime.now(),
     };
     await friendListDocumentDefault
         .doc(ownerUserID)
         .collection('friend')
-        .doc()
+        .doc(userIDFriend)
         .set(map);
   }
+
+  Future<void> createNewFriendDefault({
+    required String ownerUserID,
+    required String userIDFriend,
+  }) async {
+    Map<String, dynamic> map = <String, dynamic>{
+      userIDField: userIDFriend,
+      isRequestField: false,
+      stampTimeField: DateTime.now(),
+    };
+    await friendListDocumentDefault
+        .doc(ownerUserID)
+        .collection('friend')
+        .doc(userIDFriend)
+        .set(map);
+  }
+
   Future<String> getIDFriendListDocument(
       {required String ownerUserID,
       required String userID,
@@ -38,18 +55,18 @@ class FirebaseFriendList {
 
   Future<void> updateRequestFriend(
       {required String ownerUserID, required String userID}) async {
-    Map<String, dynamic> map = <String, dynamic>{
-      isRequestField: true,
-    };
-    String id = await getIDFriendListDocument(
+    await createNewFriend(
       ownerUserID: ownerUserID,
-      userID: userID,
+      userIDFriend: userID,
+      isRequest: true,
     );
-    await friendListDocumentDefault
-        .doc(ownerUserID)
-        .collection('friend')
-        .doc(id)
-        .update(map);
+    if (ownerUserID != userID) {
+      await createNewFriend(
+        ownerUserID: userID,
+        userIDFriend: ownerUserID,
+        isRequest: true,
+      );
+    }
   }
 
   Future<void> deleteFriend(

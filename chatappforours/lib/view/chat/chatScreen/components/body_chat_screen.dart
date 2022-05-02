@@ -91,19 +91,10 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final allChat = snapshot.data as Iterable<Chat>;
-                  if (allChat.isNotEmpty) {
-                    return ChatListView(
-                      allChat: allChat,
-                      isFilledActive: isFilledActive,
-                    );
-                  } else {
-                    return const Center(
-                      child: Text(
-                        "Don't have any chat",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    );
-                  }
+                  return ChatListView(
+                    allChat: allChat,
+                    isFilledActive: isFilledActive,
+                  );
                 } else {
                   return const Center(
                     child: Text(
@@ -239,11 +230,12 @@ class _ChatListViewState extends State<ChatListView> {
   void initState() {
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
     firebaseUserProfile = FirebaseUserProfile();
-    if (widget.isFilledActive == false) {
-      getAllDataChat(list: widget.allChat);
-    } else {
-      getAllDataChatOnline(list: widget.allChat);
-    }
+    _streamController.add(widget.allChat);
+    // if (widget.isFilledActive == false) {
+    //   getAllDataChat(list: widget.allChat);
+    // } else {
+    //   getAllDataChatOnline(list: widget.allChat);
+    // }
     super.initState();
   }
 
@@ -255,43 +247,38 @@ class _ChatListViewState extends State<ChatListView> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: _streamController.stream,
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.active:
-            if (snapshot.hasData) {
-              final allChatCard = snapshot.data as Iterable<Chat>;
-              return ListView.builder(
-                itemCount: allChatCard.length,
-                itemBuilder: (context, index) {
-                  return ChatCard(
-                    chat: allChatCard.elementAt(index),
-                    press: () {
-                      final chatData = listChatData[index];
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return MesssageScreen(
-                              chat: chatData,
-                            );
-                          },
-                        ),
-                      );
-                    },
+    // return StreamBuilder(
+    //   stream: _streamController.stream,
+    //   builder: (context, snapshot) {
+    //     if (snapshot.hasData) {
+    //       final allChatCard = snapshot.data as Iterable<Chat>;
+    return ListView.builder(
+      itemCount: widget.allChat.length,
+      itemBuilder: (context, index) {
+        return ChatCard(
+          chat: widget.allChat.elementAt(index),
+          press: () {
+            final chatData = widget.allChat.elementAt(index);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return MesssageScreen(
+                    chat: chatData,
                   );
                 },
-              );
-            } else {
-              return Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-              );
-            }
-          default:
-            return const CircularProgressIndicator();
-        }
+              ),
+            );
+          },
+        );
       },
     );
+    //     } else {
+    //       return Container(
+    //         color: Theme.of(context).scaffoldBackgroundColor,
+    //       );
+    //     }
+    //   },
+    // );
   }
 }
