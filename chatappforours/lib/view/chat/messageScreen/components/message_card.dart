@@ -83,12 +83,13 @@ class _MessageCardState extends State<MessageCard> {
             chatMessage: chatMessage,
           );
         case TypeMessage.image:
-          return ImageMessage(chatMessage: chatMessage);
+          return ImageMessage(
+            chatMessage: chatMessage,
+          );
         default:
           return const SizedBox();
       }
     }
-
     return Column(
       children: [
         if (checkCurrentAndIndexTimeGreater10Minute &&
@@ -208,7 +209,7 @@ class _MessageCardState extends State<MessageCard> {
                           },
                         ),
                     const SizedBox(width: kDefaultPadding * 0.5),
-                    messageContaint(widget.chatMessage),
+                     messageContaint(widget.chatMessage),
                     if (widget.chat.listUser[1].compareTo(idUser) != 0)
                       if (widget.chatMessage.messageStatus ==
                               MessageStatus.viewed ||

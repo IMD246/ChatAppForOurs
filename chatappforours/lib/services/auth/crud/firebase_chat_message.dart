@@ -21,7 +21,7 @@ class FirebaseChatMessage {
       hasSenderField: false,
       messageField: "Let make some chat",
       typeMessageField: TypeMessage.text.toString(),
-      messageStatusField: MessageStatus.notSent.toString(),
+      messageStatusField: MessageStatus.sent.toString(),
       stampTimeField: DateTime.now(),
     };
     await firebaseChatMessageDocument
@@ -304,6 +304,28 @@ class FirebaseChatMessage {
       return null;
     }
     return null;
+  }
+
+  Future<ChatMessage?> getAMessage({
+    required String chatID,
+    required String idMessage,
+    required String ownerUserID,
+  }) async {
+    return await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .doc(idMessage)
+        .get()
+        .then(
+      (value) async {
+        if (value.exists) {
+          return ChatMessage.fromSnapshot(
+              docs: value, ownerUserID: ownerUserID);
+        } else {
+          return null;
+        }
+      },
+    );
   }
 
   Stream<Iterable<ChatMessage>> getAllMessage(

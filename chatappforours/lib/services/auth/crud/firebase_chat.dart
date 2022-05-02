@@ -27,18 +27,30 @@ class FirebaseChat {
         stampTimeField: DateTime.now(),
       };
       await firebaseChat.doc().set(map);
-      final chatNormal = await getChatNormalByIDUserFriend(
-        listUserID: listUserID,
-      );
-      await firebaseChatMessage.createFirstTextMessage(
-        userID: "",
-        chatID: chatNormal!.idChat,
-      );
-      await firebaseUserJoinChat.createUsersJoinChat(
-        listUserID: listUserID,
-        idChat: chatNormal.idChat,
-        typeChat: typeChat,
-      );
+      await firebaseChat
+          .where(listUserField,
+              arrayContainsAny: [listUserID[0], listUserID[1]])
+          .where(typeChatField, isEqualTo: TypeChat.normal.toString())
+          .orderBy(stampTimeField, descending: true)
+          .limit(1)
+          .get()
+          .then(
+            (value) async {
+              if (value.docs.isNotEmpty) {
+                 await firebaseUserJoinChat.createUsersJoinChat(
+                listUserID: listUserID,
+                idChat: Chat.fromSnapshot(docs: value.docs.first).idChat,
+                typeChat: typeChat,
+              );
+                await firebaseChatMessage.createFirstTextMessage(
+                  userID: "",
+                  chatID: Chat.fromSnapshot(docs: value.docs.first).idChat,
+                );
+              } else {
+                return null;
+              }
+            },
+          );
     }
   }
 
@@ -56,25 +68,21 @@ class FirebaseChat {
   Future<Chat?> getChatNormalByIDUserFriend({
     required List<String> listUserID,
   }) async {
-    final chatNormalID = await firebaseChat
-        .where(listUserField, arrayContainsAny: listUserID)
+    return await firebaseChat
+        .where(listUserField, whereIn: [listUserID])
         .where(typeChatField, isEqualTo: TypeChat.normal.toString())
         .orderBy(stampTimeField, descending: true)
         .limit(1)
         .get()
         .then(
-      (value) {
-        if (value.size > 0) {
-          return value.docs.first;
-        } else {
-          return null;
-        }
-      },
-    );
-    if (chatNormalID != null) {
-      return Chat.fromSnapshot(docs: chatNormalID);
-    }
-    return null;
+          (value) {
+            if (value.docs.isNotEmpty) {
+              return Chat.fromSnapshot(docs: value.docs.first);
+            } else {
+              return null;
+            }
+          },
+        );
   }
 
   Future<Chat> getChatByID({

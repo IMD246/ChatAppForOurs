@@ -51,21 +51,22 @@ class _BodyMessageState extends State<BodyMessage> {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.active:
-                final allChat = snapshot.data as Iterable<ChatMessage>;
+                final allChatMessage = snapshot.data as Iterable<ChatMessage>;
                 return Expanded(
                   child: ScrollablePositionedList.builder(
-                    initialScrollIndex: allChat.length,
+                    initialScrollIndex: allChatMessage.length,
                     itemScrollController: scrollController,
-                    itemCount: allChat.length,
+                    itemCount: allChatMessage.length,
                     itemBuilder: (context, index) {
                       if (index != -1) {
-                        if (allChat.elementAt(index).messageStatus ==
+                        if (allChatMessage.elementAt(index).messageStatus ==
                             MessageStatus.notSent) {
                           return Visibility(
-                            visible: allChat.elementAt(index).isSender == false,
+                            visible: allChatMessage.elementAt(index).isSender ==
+                                false,
                             child: MessageCard(
-                              chatMessage: allChat.elementAt(index),
-                              listChatMesage: allChat,
+                              chatMessage: allChatMessage.elementAt(index),
+                              listChatMesage: allChatMessage,
                               index: index,
                               beforeIndex: index - 1,
                               chat: widget.chat,
@@ -73,14 +74,15 @@ class _BodyMessageState extends State<BodyMessage> {
                             ),
                           );
                         } else {
-                          return MessageCard(
-                            chatMessage: allChat.elementAt(index),
-                            listChatMesage: allChat,
-                            index: index,
-                            beforeIndex: index - 1,
-                            chat: widget.chat,
-                            scrollController: scrollController,
-                          );
+                           return MessageCard(
+                                      chatMessage:
+                                          allChatMessage.elementAt(index),
+                                      listChatMesage: allChatMessage,
+                                      index: index,
+                                      beforeIndex: index - 1,
+                                      chat: widget.chat,
+                                      scrollController: scrollController,
+                                    );
                         }
                       } else {
                         return Container(
