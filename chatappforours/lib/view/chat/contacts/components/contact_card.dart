@@ -63,24 +63,22 @@ class _ContactCardState extends State<ContactCard> {
     return GestureDetector(
       onTap: () async {
         if (!widget.requestFriend) {
-          await firebaseChat.updateChatToActive(
+          final chat = await firebaseChat.getChatByListIDUser(
             listUserID: [id, widget.friend.userID],
           );
-          // await firebaseChat.createChat(
-          //   typeChat: TypeChat.normal,
-          //   listUserID: [id, widget.friend.userID], context: context,
-          // );
-          // final chat = await firebaseChat.getChatNormalByIDUserFriend(
-          //     listUserID: [id, widget.friend.userID]);
-          // chat!.presence = widget.friend.pressence;
-          // chat.stampTimeUserFormated = widget.friend.stampTimeUser;
-          // chat.userID = widget.friend.userID;
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => MesssageScreen(chat: chat),
-          //   ),
-          // );
+          if (chat!.isActive == false) {
+            await firebaseChat.updateChatToActive(
+              listUserID: [id, widget.friend.userID],
+            );
+          }
+          chat.presence = widget.friend.presence;
+          chat.stampTimeUserFormated = widget.friend.stampTimeUser;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MesssageScreen(chat: chat),
+            ),
+          );
         }
       },
       child: Padding(

@@ -19,8 +19,9 @@ class Chat {
   bool? presence = false;
   String? stampTimeUserFormated;
   DateTime? stampTimeUser;
+  final bool isActive;
   List<String> listUser = [];
-  Chat({
+  Chat({required this.isActive,
     required this.idChat,
     required this.stampTime,
     required this.lastText,
@@ -54,7 +55,7 @@ class Chat {
           docs.get(listUserField) as List,
         ),
         stampTimeChat: docs.get(stampTimeField).toDate(),
-        userID: docs.get(userIDField),
+        userID: docs.get(userIDField), isActive: docs.get(isActiveField),
       );
 }
 

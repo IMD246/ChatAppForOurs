@@ -62,7 +62,17 @@ class FirebaseChat {
       lastTextField: text,
       timeLastChatField: DateTime.now(),
     };
-    await firebaseChat.doc(chatID).update(map);
+    await firebaseChat.doc(chatID).collection('friendChatID').get().then(
+      (value) {
+        for (var i = 0; i < value.docs.length; i++) {
+          firebaseChat
+              .doc(chatID)
+              .collection('friendChatID')
+              .doc(value.docs.elementAt(i).id)
+              .update(map);
+        }
+      },
+    );
   }
 
   Future<void> updateChatToActive({
@@ -111,11 +121,43 @@ class FirebaseChat {
 
   Future<Chat> getChatByID({
     required String idChat,
+    required String userChatID,
   }) async {
-    final chat = await firebaseChat.doc(idChat).get();
+    final chat = await firebaseChat
+        .doc(idChat)
+        .collection('friendChatID')
+        .doc(userChatID)
+        .get();
     return Chat.fromSnapshot(
       docs: chat,
     );
+  }
+
+  Future<Chat?> getChatByListIDUser({
+    required List<String> listUserID,
+  }) async {
+    final chat =
+        await firebaseChat.doc(listUserID[0] + listUserID[1]).get().then(
+      (value) async {
+        if (value.id.isNotEmpty) {
+          return value.id;
+        } else {
+          await firebaseChat.doc(listUserID[1] + listUserID[0]).get().then(
+            (value) {
+              return value.id;
+            },
+          );
+        }
+      },
+    );
+    return await firebaseChat
+        .doc(chat)
+        .collection('friendChatID')
+        .doc(listUserID[0])
+        .get()
+        .then(
+          (value) => Chat.fromSnapshot(docs: value),
+        );
   }
 
   Stream<Iterable<Chat>> getAllChat({

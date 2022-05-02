@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
@@ -127,6 +128,7 @@ class _ChatListViewState extends State<ChatListView> {
   final StreamController _streamController = StreamController();
   late final FirebaseUsersJoinChat firebaseUsersJoinChat;
   late final FirebaseUserProfile firebaseUserProfile;
+  late final FirebaseChat firebaseChat;
   String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
@@ -134,44 +136,42 @@ class _ChatListViewState extends State<ChatListView> {
   getAllDataChat({required Iterable<Chat> list}) async {
     listChatData.clear();
     for (var i = 0; i < list.length; i++) {
-      // final userJoinChat = await firebaseUsersJoinChat.getUserJoinChatByIDChat(
-      //   idChat: chat.idChat,
-      //   ownerUserID: ownerUserID,
-      // );
-      // if (list.elementAt(i).typeChat == TypeChat.normal) {
-      //   if (list.elementAt(i).listUser.length <= 1) {
-      //     chat.nameChat = 'Only You';
-      //     final userProfile = await firebaseUserProfile.getUserProfile(
-      //       userID: list.first.userID,
-      //     );
-      //     chat.urlUserFriend = userProfile!.urlImage;
-      //   } else {
-      //     final userFriend = list
-      //         .elementAt(i)
-      //         .listUser
-      //         .where((element) => element != ownerUserID)
-      //         .first;
-      //     final userProfile = await firebaseUserProfile.getUserProfile(
-      //       userID: userFriend,
-      //     );
-      //     chat.urlUserFriend = userProfile!.urlImage;
-      //     chat.nameChat = userProfile.fullName;
-      //   }
-      // }
+      final chat = await firebaseChat.getChatByID(
+          idChat: list.elementAt(i).idChat, userChatID: ownerUserID);
+      final userJoinChat = await firebaseUsersJoinChat.getUserJoinChatByIDChat(
+        idChat: chat.idChat,
+        ownerUserID: ownerUserID,
+      );
       userPresenceDatabaseReference
           .child(list.elementAt(i).listUser.elementAt(1))
           .once()
           .then(
-        (event) {
-          // chat.rule = userJoinChat!.ruleChat;
+        (event) async {
+          if (chat.typeChat == TypeChat.normal) {
+            if (chat.listUser.length <= 1) {
+              chat.nameChat = 'Only You';
+              final userProfile = await firebaseUserProfile.getUserProfile(
+                userID: list.first.userID,
+              );
+              chat.urlUserFriend = userProfile!.urlImage;
+            } else {
+              final userFriend = chat.listUser.elementAt(1);
+              final userProfile = await firebaseUserProfile.getUserProfile(
+                userID: userFriend,
+              );
+              chat.urlUserFriend = userProfile!.urlImage;
+              chat.nameChat = userProfile.fullName;
+            }
+          }
+          chat.rule = userJoinChat!.ruleChat;
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           final isOnline = data['presence'];
           final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
           final date = differenceInCalendarDays(stampTimeUser);
-          list.elementAt(i).stampTimeUser = stampTimeUser;
-          list.elementAt(i).stampTimeUserFormated = date;
-          list.elementAt(i).presence = isOnline;
-          listChatData.add(list.elementAt(i));
+          chat.stampTimeUser = stampTimeUser;
+          chat.stampTimeUserFormated = date;
+          chat.presence = isOnline;
+          listChatData.add(chat);
           _streamController.sink.add(listChatData);
         },
       );
@@ -181,48 +181,37 @@ class _ChatListViewState extends State<ChatListView> {
   getAllDataChatOnline({required Iterable<Chat> list}) async {
     listChatData.clear();
     for (var i = 0; i < list.length; i++) {
-      final chat = list.elementAt(i);
-      // final userJoinChat = await firebaseUsersJoinChat.getUserJoinChatByIDChat(
-      //   idChat: chat.idChat,
-      //   ownerUserID: ownerUserID,
-      // );
-      // if (list.elementAt(i).typeChat == TypeChat.normal) {
-      //   if (list.elementAt(i).listUser.length <= 1) {
-      //     chat.nameChat = 'Only You';
-      //     final userProfile = await firebaseUserProfile.getUserProfile(
-      //       userID: list.first.userID,
-      //     );
-      //     chat.urlUserFriend = userProfile!.urlImage;
-      //   } else {
-      //     final userFriend = list
-      //         .elementAt(i)
-      //         .listUser
-      //         .where((element) => element != ownerUserID)
-      //         .first;
-      //     final userProfile = await firebaseUserProfile.getUserProfile(
-      //       userID: userFriend,
-      //     );
-      //     chat.urlUserFriend = userProfile!.urlImage;
-      //     chat.nameChat = userProfile.fullName;
-      //   }
-      // }
-      userPresenceDatabaseReference
-          .child(list.elementAt(i).listUser[1])
-          .once()
-          .then(
-        (event) {
+      final chat = await firebaseChat.getChatByID(
+          idChat: list.elementAt(i).idChat, userChatID: ownerUserID);
+      final userJoinChat = await firebaseUsersJoinChat.getUserJoinChatByIDChat(
+        idChat: list.elementAt(i).idChat,
+        ownerUserID: ownerUserID,
+      );
+      userPresenceDatabaseReference.child(chat.listUser[1]).once().then(
+        (event) async {
+          if (chat.typeChat == TypeChat.normal) {
+            if (chat.listUser.length <= 1) {
+              chat.nameChat = 'Only You';
+            } else {
+              final userFriend = chat.listUser.elementAt(1);
+              final userProfile = await firebaseUserProfile.getUserProfile(
+                userID: userFriend,
+              );
+              chat.nameChat = userProfile!.fullName;
+            }
+          }
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
-          // chat.rule = userJoinChat!.ruleChat;
+          chat.rule = userJoinChat!.ruleChat;
           final isOnline = data['presence'];
           final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
           final date = differenceInCalendarDays(stampTimeUser);
-          list.elementAt(i).stampTimeUser = stampTimeUser;
-          list.elementAt(i).stampTimeUserFormated = date;
-          list.elementAt(i).presence = isOnline;
-          listChatData.add(chat);
-          _streamController.sink.add(listChatData);
+          chat.stampTimeUser = stampTimeUser;
+          chat.stampTimeUserFormated = date;
+          chat.presence = isOnline;
+          listChatData.add(list.elementAt(i));
         },
       );
+      _streamController.sink.add(listChatData);
     }
   }
 
@@ -230,12 +219,14 @@ class _ChatListViewState extends State<ChatListView> {
   void initState() {
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
     firebaseUserProfile = FirebaseUserProfile();
-    _streamController.add(widget.allChat);
-    // if (widget.isFilledActive == false) {
-    //   getAllDataChat(list: widget.allChat);
-    // } else {
-    //   getAllDataChatOnline(list: widget.allChat);
-    // }
+    firebaseChat = FirebaseChat();
+    setState(() {
+      if (widget.isFilledActive == false) {
+        getAllDataChat(list: widget.allChat);
+      } else {
+        getAllDataChatOnline(list: widget.allChat);
+      }
+    });
     super.initState();
   }
 
@@ -247,38 +238,42 @@ class _ChatListViewState extends State<ChatListView> {
 
   @override
   Widget build(BuildContext context) {
-    // return StreamBuilder(
-    //   stream: _streamController.stream,
-    //   builder: (context, snapshot) {
-    //     if (snapshot.hasData) {
-    //       final allChatCard = snapshot.data as Iterable<Chat>;
-    return ListView.builder(
-      itemCount: widget.allChat.length,
-      itemBuilder: (context, index) {
-        return ChatCard(
-          chat: widget.allChat.elementAt(index),
-          press: () {
-            final chatData = widget.allChat.elementAt(index);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return MesssageScreen(
-                    chat: chatData,
+    return StreamBuilder(
+      stream: _streamController.stream,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final allChatCard = snapshot.data as Iterable<Chat>;
+          return ListView.builder(
+            itemCount: allChatCard.length,
+            itemBuilder: (context, index) {
+              return ChatCard(
+                chat: allChatCard.elementAt(index),
+                press: () {
+                  final chatData = allChatCard.elementAt(index);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MesssageScreen(
+                          chat: chatData,
+                        );
+                      },
+                    ),
                   );
                 },
-              ),
-            );
-          },
-        );
+              );
+            },
+          );
+        } else {
+          return const Center(
+            child: SizedBox(
+              height: 200,
+              width: 200,
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
       },
     );
-    //     } else {
-    //       return Container(
-    //         color: Theme.of(context).scaffoldBackgroundColor,
-    //       );
-    //     }
-    //   },
-    // );
   }
 }
