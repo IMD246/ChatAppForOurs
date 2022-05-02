@@ -225,7 +225,8 @@ class FirebaseChatMessage {
     final bool lastMessage = await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
-        .where(messageStatusField, isEqualTo: MessageStatus.viewed.toString())
+        .where(messageStatusField,
+            isNotEqualTo: MessageStatus.notSent.toString())
         .orderBy(
           stampTimeField,
           descending: true,
@@ -255,7 +256,8 @@ class FirebaseChatMessage {
     final bool lastMessage = await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
-        .where(messageStatusField, isEqualTo: MessageStatus.viewed.toString())
+        .where(messageStatusField,
+            isNotEqualTo: MessageStatus.notSent.toString())
         .orderBy(
           stampTimeField,
           descending: true,

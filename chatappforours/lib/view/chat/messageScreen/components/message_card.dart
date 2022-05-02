@@ -90,6 +90,7 @@ class _MessageCardState extends State<MessageCard> {
           return const SizedBox();
       }
     }
+
     return Column(
       children: [
         if (checkCurrentAndIndexTimeGreater10Minute &&
@@ -127,7 +128,8 @@ class _MessageCardState extends State<MessageCard> {
         GestureDetector(
           onTap: () async {
             if (widget.chatMessage.messageStatus != MessageStatus.notSent) {
-              if (isCheckLastMessage == false) {
+              if (isCheckLastMessage == false &&
+                  widget.listChatMesage.length > 1) {
                 isCheckLastMessage =
                     await firebaseChatMessage.checkLastMessageOfChatRoom(
                   chatID: widget.chat.idChat,
@@ -209,7 +211,7 @@ class _MessageCardState extends State<MessageCard> {
                           },
                         ),
                     const SizedBox(width: kDefaultPadding * 0.5),
-                     messageContaint(widget.chatMessage),
+                    messageContaint(widget.chatMessage),
                     if (widget.chat.listUser[1].compareTo(idUser) != 0)
                       if (widget.chatMessage.messageStatus ==
                               MessageStatus.viewed ||
