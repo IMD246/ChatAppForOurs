@@ -44,9 +44,6 @@ class _SignInState extends State<SignIn> {
                 context: context,
                 title: 'Verification Error Dialog',
                 text: "Check your gmail ${[state.email]} to verification");
-          } else if (state.exception is GenericAuthException) {
-            await showErrorDialog(
-                context: context, title: 'Generic error', text: "Login failed",);
           }
         }
       },

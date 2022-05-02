@@ -102,13 +102,16 @@ class _ContactCardState extends State<ContactCard> {
                             CircleAvatar(
                               backgroundColor: Colors.cyan[100],
                               child: ClipOval(
-                                child: CachedNetworkImage(
-                                  fit: BoxFit.cover,
-                                  imageUrl: userProfile.urlImage!,
-                                  placeholder: (context, url) =>
-                                      const CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
+                                child: SizedBox.fromSize(
+                                  size: const Size.fromRadius(60),
+                                  child: CachedNetworkImage(
+                                    imageUrl: userProfile.urlImage!,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) =>
+                                        const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
                                 ),
                               ),
                             ),

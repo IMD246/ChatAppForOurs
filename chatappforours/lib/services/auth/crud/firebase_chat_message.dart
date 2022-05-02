@@ -138,7 +138,7 @@ class FirebaseChatMessage {
         .doc(lastMessageUserOwner.idMessage)
         .update(map);
     await firebaseChat.updateChatLastText(
-      text: "$nameSender sent ${listUrlImage.length} image",
+      text: "$nameSender sent ${listUrlImage.length} photo",
       chatID: chatID,
     );
   }
@@ -225,8 +225,7 @@ class FirebaseChatMessage {
     final bool lastMessage = await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
-        .where(messageStatusField,
-            isNotEqualTo: MessageStatus.notSent.toString())
+        .where(messageStatusField, isEqualTo: MessageStatus.viewed.toString())
         .orderBy(
           stampTimeField,
           descending: true,
@@ -256,8 +255,7 @@ class FirebaseChatMessage {
     final bool lastMessage = await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
-        .where(messageStatusField,
-            isNotEqualTo: MessageStatus.notSent.toString())
+        .where(messageStatusField, isEqualTo: MessageStatus.viewed.toString())
         .orderBy(
           stampTimeField,
           descending: true,

@@ -192,15 +192,18 @@ class _MessageCardState extends State<MessageCard> {
                                 );
                               } else {
                                 return CircleAvatar(
-                                  backgroundColor: Colors.cyan[100],
                                   radius: 20,
                                   child: ClipOval(
-                                    child: CachedNetworkImage(
-                                      imageUrl: userProfile.urlImage!,
-                                      placeholder: (context, url) =>
-                                          const CircularProgressIndicator(),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
+                                    child: SizedBox.fromSize(
+                                      size: const Size.fromRadius(60),
+                                      child: CachedNetworkImage(
+                                        imageUrl: userProfile.urlImage!,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) =>
+                                            const CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
+                                      ),
                                     ),
                                   ),
                                 );
@@ -212,7 +215,7 @@ class _MessageCardState extends State<MessageCard> {
                         ),
                     const SizedBox(width: kDefaultPadding * 0.5),
                     messageContaint(widget.chatMessage),
-                    if (widget.chat.listUser[1].compareTo(idUser) != 0)
+                    if (widget.chat.listUser[1].compareTo(idUser) == 0)
                       if (widget.chatMessage.messageStatus ==
                               MessageStatus.viewed ||
                           widget.chatMessage.messageStatus ==
@@ -227,12 +230,6 @@ class _MessageCardState extends State<MessageCard> {
                               ? widget.chatMessage.isSender!
                               : false,
                         ),
-                    if (widget.chat.listUser[1].compareTo(idUser) == 0)
-                      Container(
-                        margin: const EdgeInsets.only(left: 2),
-                        width: 16,
-                        height: 16,
-                      )
                   ],
                 ),
                 Visibility(
@@ -303,7 +300,6 @@ class _MessageStatusDotState extends State<MessageStatusDot> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 2),
       width: 16,
       height: 16,
       decoration: widget.messageStatus == MessageStatus.viewed
@@ -328,7 +324,7 @@ class _MessageStatusDotState extends State<MessageStatusDot> {
                   final userProfile = snapshot.data;
                   if (userProfile!.urlImage == null) {
                     return FittedBox(
-                      fit: BoxFit.fill,
+                      fit: BoxFit.cover,
                       child: CircleAvatar(
                         backgroundColor: Colors.cyan[100],
                         backgroundImage: const AssetImage(
@@ -340,12 +336,16 @@ class _MessageStatusDotState extends State<MessageStatusDot> {
                     return CircleAvatar(
                       backgroundColor: Colors.cyan[100],
                       child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: userProfile.urlImage!,
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
+                        child: SizedBox.fromSize(
+                          size: const Size.fromRadius(60),
+                          child: CachedNetworkImage(
+                            imageUrl: userProfile.urlImage!,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                          ),
                         ),
                       ),
                     );

@@ -112,13 +112,16 @@ class _ChatScreenState extends State<ChatScreen> {
               child: CircleAvatar(
                 backgroundColor: Colors.cyan[100],
                 child: ClipOval(
-                  child: CachedNetworkImage(
-                    fit: BoxFit.fill,
-                    imageUrl: urlImage,
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                  child: SizedBox.fromSize(
+                    size: const Size.fromRadius(60),
+                    child: CachedNetworkImage(
+                      imageUrl: urlImage,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    ),
                   ),
                 ),
               ),

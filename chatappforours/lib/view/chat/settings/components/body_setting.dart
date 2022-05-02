@@ -94,14 +94,17 @@ class _BodySettingState extends State<BodySetting> {
                                       backgroundColor: Colors.cyan[100],
                                       radius: 60,
                                       child: ClipOval(
-                                        child: CachedNetworkImage(
-                                          fit: BoxFit.fill,
-                                          imageUrl: userProfile.urlImage!,
-                                          placeholder: (context, url) =>
-                                              const CircularProgressIndicator(),
-                                          errorWidget: (context, url, error) =>
-                                              const Icon(Icons.error),
-                                          colorBlendMode: BlendMode.softLight,
+                                        child: SizedBox.fromSize(
+                                          size: const Size.fromRadius(60),
+                                          child: CachedNetworkImage(
+                                            imageUrl: userProfile.urlImage!,
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) =>
+                                                const CircularProgressIndicator(),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const Icon(Icons.error),
+                                          ),
                                         ),
                                       ),
                                     ),
