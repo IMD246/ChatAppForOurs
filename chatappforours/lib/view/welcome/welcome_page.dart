@@ -6,7 +6,9 @@ import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/utilities/loading/loading_screen.dart';
 import 'package:chatappforours/view/ForgotPassword/forgot_password.dart';
+import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/chat_screen.dart';
+import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:chatappforours/view/chat/settings/setting_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
@@ -53,8 +55,28 @@ class _WelcomePageState extends State<WelcomePage> {
       builder: (context, state) {
         if (state is AuthStateLoggedOut) {
           return const SignIn();
+        } else if (state is AuthStateGetInChatFromBodyChatScreen) {
+          return MesssageScreen(
+            chat: state.chat,
+            currentIndex: 0,
+          );
+        } else if (state is AuthStateGetInChatFromBodyContactScreen) {
+          return MesssageScreen(
+            chat: state.chat,
+            currentIndex: 1,
+          );
+        } else if (state is AuthStateGetOutChatFromBodyChatScreen) {
+          return const ChatScreen(
+            currentIndex: 0,
+          );
+        } else if (state is AuthStateGetOutChatFromBodyContactScreen) {
+          return const ChatScreen(
+            currentIndex: 1,
+          );
         } else if (state is AuthStateLoggedIn) {
-          return const ChatScreen();
+          return const ChatScreen(
+            currentIndex: 0,
+          );
         } else if (state is AuthStateRegistering ||
             state is AuthStateRegiseringWithFacebook ||
             state is AuthStateRegiseringWithGoogle) {

@@ -7,22 +7,25 @@ import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
-
+  const ChatScreen({Key? key, required this.currentIndex}) : super(key: key);
+  final int currentIndex;
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  int currentIndex = 0;
+  late int currentIndex;
   late final FirebaseUserProfile firebaseUserProfile;
+  String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
     firebaseUserProfile = FirebaseUserProfile();
+    currentIndex = widget.currentIndex;
     super.initState();
   }
 
@@ -36,9 +39,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         return FutureBuilder<UserProfile?>(
-          future: (state is AuthStateLoggedIn)
-              ? firebaseUserProfile.getUserProfile(userID: state.authUser.id!)
-              : firebaseUserProfile.getUserProfile(userID: null),
+          future: firebaseUserProfile.getUserProfile(userID: ownerUserID),
           builder: (context, snapshot) {
             final userProfile = snapshot.data;
             if (snapshot.hasData) {
@@ -50,8 +51,16 @@ class _ChatScreenState extends State<ChatScreen> {
                   userProfile?.urlImage,
                 ),
                 body: currentIndex == 0
-                    ? const BodyChatScreen()
-                    : const BodyContactScreen(),
+                    ? BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          return const BodyChatScreen();
+                        },
+                      )
+                    : BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          return const BodyContactScreen();
+                        },
+                      ),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {},
                   child: const Icon(

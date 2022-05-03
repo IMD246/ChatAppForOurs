@@ -1,4 +1,5 @@
 import 'package:chatappforours/services/auth/models/auth_user.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
@@ -66,11 +67,15 @@ class AuthStateSetting extends AuthState {
 }
 
 class AuthStateUploadingImage extends AuthState {
-  const AuthStateUploadingImage({required bool isLoading}) : super(isLoading: isLoading);
+  const AuthStateUploadingImage({required bool isLoading})
+      : super(isLoading: isLoading);
 }
+
 class AuthStateUploadingTheme extends AuthState {
-  const AuthStateUploadingTheme({required bool isLoading}) : super(isLoading: isLoading);
+  const AuthStateUploadingTheme({required bool isLoading})
+      : super(isLoading: isLoading);
 }
+
 class AuthStateRegiseringWithFacebook extends AuthState {
   final Exception? exception;
   const AuthStateRegiseringWithFacebook(
@@ -83,4 +88,31 @@ class AuthStateRegiseringWithGoogle extends AuthState {
   const AuthStateRegiseringWithGoogle(
       {required this.exception, required bool isLoading})
       : super(isLoading: isLoading);
+}
+
+class AuthStateGetInChatFromBodyChatScreen extends AuthState {
+  final Chat chat;
+  final int currentIndex;
+  const AuthStateGetInChatFromBodyChatScreen({required this.currentIndex,
+    required this.chat,
+  }) : super(isLoading: false);
+}
+
+class AuthStateGetInChatFromBodyContactScreen extends AuthState {
+  final Chat chat;
+  final int currentIndex;
+  const AuthStateGetInChatFromBodyContactScreen({required this.currentIndex,
+    required this.chat,
+  }) : super(isLoading: false);
+}
+
+class AuthStateGetOutChatFromBodyChatScreen extends AuthState {
+  
+  const AuthStateGetOutChatFromBodyChatScreen()
+      : super(isLoading: false);
+}
+
+class AuthStateGetOutChatFromBodyContactScreen extends AuthState {
+  const AuthStateGetOutChatFromBodyContactScreen()
+      : super(isLoading: false);
 }

@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
+import 'package:chatappforours/services/auth/bloc/auth_event.dart';
+import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
@@ -9,10 +12,10 @@ import 'package:chatappforours/services/auth/models/friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
-import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ContactCard extends StatefulWidget {
   const ContactCard({
@@ -42,6 +45,9 @@ class _ContactCardState extends State<ContactCard> {
     firebaseUserProfile = FirebaseUserProfile();
     firebaseChat = FirebaseChat();
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
+    setState(() {
+      firebaseUserProfile.updateUserPresence(uid: id, bool: true);
+    });
     userPresenceDatabaseReference.child(widget.friend.userID).once().then(
       (event) {
         final data = Map<String, dynamic>.from(event.snapshot.value as Map);
@@ -60,169 +66,178 @@ class _ContactCardState extends State<ContactCard> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        if (!widget.requestFriend) {
-          final chat = await firebaseChat.getChatByListIDUser(
-            listUserID: [id, widget.friend.userID],
-          );
-          if (chat != null) {
-            chat.presence = widget.friend.presence;
-            chat.stampTimeUserFormated = widget.friend.stampTimeUser;
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MesssageScreen(chat: chat),
-              ),
-            );
-          }
-        }
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: kDefaultPadding * 0.5,
-          vertical: kDefaultPadding * 0.75,
-        ),
-        child: FutureBuilder<UserProfile?>(
-          future:
-              firebaseUserProfile.getUserProfile(userID: widget.friend.userID),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.done:
-                if (snapshot.hasData) {
-                  final userProfile = snapshot.data;
-                  return Row(
-                    children: [
-                      Stack(
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return GestureDetector(
+          onTap: () async {
+            if (!widget.requestFriend) {
+              final chat = await firebaseChat.getChatByListIDUser(
+                listUserID: [id, widget.friend.userID],
+              );
+              if (chat != null) {
+                chat.presence = widget.friend.presence;
+                chat.stampTimeUserFormated = widget.friend.stampTimeUser;
+                context.read<AuthBloc>().add(
+                      AuthEventGetInChatFromBodyContactScreen(
+                          chat: chat, currentIndex: 1),
+                    );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => MesssageScreen(chat: chat),
+                //   ),
+                // );
+              }
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: kDefaultPadding * 0.5,
+              vertical: kDefaultPadding * 0.75,
+            ),
+            child: FutureBuilder<UserProfile?>(
+              future: firebaseUserProfile.getUserProfile(
+                  userID: widget.friend.userID),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.done:
+                    if (snapshot.hasData) {
+                      final userProfile = snapshot.data;
+                      return Row(
                         children: [
-                          if (userProfile!.urlImage != null)
-                            CircleAvatar(
-                              backgroundColor: Colors.cyan[100],
-                              child: ClipOval(
-                                child: SizedBox.fromSize(
-                                  size: const Size.fromRadius(60),
-                                  child: CachedNetworkImage(
-                                    imageUrl: userProfile.urlImage!,
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) =>
-                                        const CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(Icons.error),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          if (userProfile.urlImage == null)
-                            CircleAvatar(
-                              backgroundColor: Colors.cyan[100],
-                              backgroundImage: const AssetImage(
-                                "assets/images/defaultImage.png",
-                              ),
-                            ),
-                          widget.friend.presence
-                              ? Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Container(
-                                    width: 16,
-                                    height: 16,
-                                    decoration: BoxDecoration(
-                                      color: kPrimaryColor,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        width: 3,
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
+                          Stack(
+                            children: [
+                              if (userProfile!.urlImage != null)
+                                CircleAvatar(
+                                  backgroundColor: Colors.cyan[100],
+                                  child: ClipOval(
+                                    child: SizedBox.fromSize(
+                                      size: const Size.fromRadius(60),
+                                      child: CachedNetworkImage(
+                                        imageUrl: userProfile.urlImage!,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) =>
+                                            const CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
                                       ),
                                     ),
                                   ),
-                                )
-                              : Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Text(
-                                    stampTime != null
-                                        ? differenceInCalendarPresence(
-                                            stampTime!,
-                                          )
-                                        : "",
+                                ),
+                              if (userProfile.urlImage == null)
+                                CircleAvatar(
+                                  backgroundColor: Colors.cyan[100],
+                                  backgroundImage: const AssetImage(
+                                    "assets/images/defaultImage.png",
                                   ),
                                 ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: kDefaultPadding),
-                        child: Text(
-                          userProfile.fullName,
-                          overflow: widget.requestFriend
-                              ? TextOverflow.ellipsis
-                              : null,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
+                              widget.friend.presence
+                                  ? Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Container(
+                                        width: 16,
+                                        height: 16,
+                                        decoration: BoxDecoration(
+                                          color: kPrimaryColor,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            width: 3,
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Text(
+                                        stampTime != null
+                                            ? differenceInCalendarPresence(
+                                                stampTime!,
+                                              )
+                                            : "",
+                                      ),
+                                    ),
+                            ],
                           ),
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: kDefaultPadding),
+                            child: Text(
+                              userProfile.fullName,
+                              overflow: widget.requestFriend
+                                  ? TextOverflow.ellipsis
+                                  : null,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+                          Visibility(
+                            visible: widget.requestFriend == true,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                FillOutlineButton(
+                                  press: () async {
+                                    await firebaseFriendList
+                                        .updateRequestFriend(
+                                      ownerUserID: id,
+                                      userID: widget.friend.userID,
+                                    );
+                                    await firebaseChat.createChat(
+                                      typeChat: TypeChat.normal,
+                                      listUserID: [id, widget.friend.userID],
+                                    );
+                                  },
+                                  text: 'Accept',
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                FillOutlineButton(
+                                  press: () async {
+                                    await firebaseFriendList.deleteFriend(
+                                      ownerUserID: id,
+                                      userID: widget.friend.userID,
+                                    );
+                                  },
+                                  text: 'Cancel',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return const Text('No Data Available');
+                    }
+                  case ConnectionState.waiting:
+                    return const Center(
+                      child: SizedBox(
+                        height: 25,
+                        width: 20,
+                        child: CircularProgressIndicator(),
                       ),
-                      const Spacer(),
-                      Visibility(
-                        visible: widget.requestFriend == true,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            FillOutlineButton(
-                              press: () async {
-                                await firebaseFriendList.updateRequestFriend(
-                                  ownerUserID: id,
-                                  userID: widget.friend.userID,
-                                );
-                                await firebaseChat.createChat(
-                                  typeChat: TypeChat.normal,
-                                  listUserID: [id, widget.friend.userID],
-                                );
-                              },
-                              text: 'Accept',
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            FillOutlineButton(
-                              press: () async {
-                                await firebaseFriendList.deleteFriend(
-                                  ownerUserID: id,
-                                  userID: widget.friend.userID,
-                                );
-                              },
-                              text: 'Cancel',
-                            ),
-                          ],
-                        ),
+                    );
+                  default:
+                    return const Center(
+                      child: SizedBox(
+                        height: 25,
+                        width: 20,
+                        child: CircularProgressIndicator(),
                       ),
-                    ],
-                  );
-                } else {
-                  return const Text('No Data Available');
+                    );
                 }
-              case ConnectionState.waiting:
-                return const Center(
-                  child: SizedBox(
-                    height: 25,
-                    width: 20,
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              default:
-                return const Center(
-                  child: SizedBox(
-                    height: 25,
-                    width: 20,
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-            }
-          },
-        ),
-      ),
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

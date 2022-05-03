@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
+import 'package:chatappforours/services/auth/bloc/auth_event.dart';
+import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
@@ -9,10 +12,10 @@ import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart'
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/chat_card.dart';
-import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../utilities/handle/handle_value.dart';
 
@@ -51,88 +54,92 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          color: kPrimaryColor,
-          padding: const EdgeInsets.fromLTRB(
-            kDefaultPadding,
-            0,
-            kDefaultPadding,
-            kDefaultPadding,
-          ),
-          child: Row(
-            children: [
-              FillOutlineButton(
-                isFilled: isFilledRecent,
-                press: () {
-                  if (isFilledActive == true) {
-                    setState(
-                      () {
-                        isFilledRecent = true;
-                        isFilledActive = false;
-                      },
-                    );
-                  }
-                },
-                text: "Recent Message",
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return Column(
+          children: [
+            Container(
+              color: kPrimaryColor,
+              padding: const EdgeInsets.fromLTRB(
+                kDefaultPadding,
+                0,
+                kDefaultPadding,
+                kDefaultPadding,
               ),
-              const SizedBox(width: kDefaultPadding),
-              FillOutlineButton(
-                press: () {
-                  if (isFilledActive == false) {
-                    setState(() {
-                      isFilledRecent = false;
-                      isFilledActive = true;
-                    });
-                  }
-                },
-                text: "Active",
-                isFilled: isFilledActive,
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Center(
-            child: RefreshIndicator(
-              strokeWidth: 1,
-              onRefresh: () async {
-                setState(() {
-                  stream = firebaseChat.getAllChat(ownerUserID: userID);
-                });
-              },
-              child: StreamBuilder(
-                  stream: stream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      final allChat = snapshot.data as Iterable<Chat>;
-                      if (allChat.isNotEmpty) {
-                        return ChatListView(
-                          allChat: allChat,
-                          isFilledActive: isFilledActive,
-                        );
-                      } else {
-                        return const Center(
-                          child: Text(
-                            "Don't have any chat",
-                            style: TextStyle(fontSize: 20),
-                          ),
+              child: Row(
+                children: [
+                  FillOutlineButton(
+                    isFilled: isFilledRecent,
+                    press: () {
+                      if (isFilledActive == true) {
+                        setState(
+                          () {
+                            isFilledRecent = true;
+                            isFilledActive = false;
+                          },
                         );
                       }
-                    } else {
-                      return const Center(
-                        child: Text(
-                          "Don't have any chat",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      );
-                    }
-                  }),
+                    },
+                    text: "Recent Message",
+                  ),
+                  const SizedBox(width: kDefaultPadding),
+                  FillOutlineButton(
+                    press: () {
+                      if (isFilledActive == false) {
+                        setState(() {
+                          isFilledRecent = false;
+                          isFilledActive = true;
+                        });
+                      }
+                    },
+                    text: "Active",
+                    isFilled: isFilledActive,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
-      ],
+            Expanded(
+              child: Center(
+                child: RefreshIndicator(
+                  strokeWidth: 1,
+                  onRefresh: () async {
+                    setState(() {
+                      stream = firebaseChat.getAllChat(ownerUserID: userID);
+                    });
+                  },
+                  child: StreamBuilder(
+                      stream: stream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          final allChat = snapshot.data as Iterable<Chat>;
+                          if (allChat.isNotEmpty) {
+                            return ChatListView(
+                              allChat: allChat,
+                              isFilledActive: isFilledActive,
+                            );
+                          } else {
+                            return const Center(
+                              child: Text(
+                                "Don't have any chat",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            );
+                          }
+                        } else {
+                          return const Center(
+                            child: Text(
+                              "Don't have any chat",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          );
+                        }
+                      }),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -272,33 +279,41 @@ class _ChatListViewState extends State<ChatListView> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: _streamController.stream,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final allChatCard = snapshot.data as Iterable<Chat>;
-          return ListView.builder(
-            itemCount: allChatCard.length,
-            itemBuilder: (context, index) {
-              return ChatCard(
-                chat: allChatCard.elementAt(index),
-                press: () {
-                  final chatData = allChatCard.elementAt(index);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return MesssageScreen(chat: chatData);
-                      },
-                    ),
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return StreamBuilder(
+          stream: _streamController.stream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final allChatCard = snapshot.data as Iterable<Chat>;
+              return ListView.builder(
+                itemCount: allChatCard.length,
+                itemBuilder: (context, index) {
+                  return ChatCard(
+                    chat: allChatCard.elementAt(index),
+                    press: () {
+                      final chatData = allChatCard.elementAt(index);
+                      context.read<AuthBloc>().add(
+                            AuthEventGetInChatFromBodyChatScreen(
+                                chat: chatData, currentIndex: 0),
+                          );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) {
+                      //       return MesssageScreen(chat: chatData);
+                      //     },
+                      //   ),
+                      // );
+                    },
                   );
                 },
               );
-            },
-          );
-        } else {
-          return const CircularProgressIndicator();
-        }
+            } else {
+              return const CircularProgressIndicator();
+            }
+          },
+        );
       },
     );
   }

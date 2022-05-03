@@ -1,4 +1,7 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+
+import 'package:chatappforours/services/auth/models/chat.dart';
 
 @immutable
 abstract class AuthEvent {
@@ -32,12 +35,15 @@ class AuthEventUploadImage extends AuthEvent {
   final String path;
   final String fileName;
   final BuildContext context;
-  const AuthEventUploadImage({required this.context, required this.path, required this.fileName});
+  const AuthEventUploadImage(
+      {required this.context, required this.path, required this.fileName});
 }
+
 class AuthEventUploadStateTheme extends AuthEvent {
   final bool isDarkTheme;
   const AuthEventUploadStateTheme({required this.isDarkTheme});
 }
+
 class AuthEventForgetPassword extends AuthEvent {
   final String? email;
   const AuthEventForgetPassword({required this.email});
@@ -60,4 +66,28 @@ class AuthEventRegisterWithFacebook extends AuthEvent {
 
 class AuthEventRegisterWithGoogle extends AuthEvent {
   const AuthEventRegisterWithGoogle();
+}
+
+class AuthEventGetInChatFromBodyChatScreen extends AuthEvent {
+  final Chat chat;
+  final int currentIndex;
+  const AuthEventGetInChatFromBodyChatScreen({required this.currentIndex,
+    required this.chat,
+  });
+}
+
+class AuthEventGetInChatFromBodyContactScreen extends AuthEvent {
+  final Chat chat;
+  final int currentIndex;
+  const AuthEventGetInChatFromBodyContactScreen({required this.currentIndex,
+    required this.chat,
+  });
+}
+
+class AuthEventGetOutChatFromBodyChatScreen extends AuthEvent {
+  const AuthEventGetOutChatFromBodyChatScreen();
+}
+
+class AuthEventGetOutChatFromBodyContactScreen extends AuthEvent {
+  const AuthEventGetOutChatFromBodyContactScreen();
 }

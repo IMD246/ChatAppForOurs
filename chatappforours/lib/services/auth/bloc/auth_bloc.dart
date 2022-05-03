@@ -409,5 +409,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
       },
     );
+    on<AuthEventGetInChatFromBodyChatScreen>(
+      (event, emit) {
+        emit(
+          AuthStateGetInChatFromBodyChatScreen(
+              chat: event.chat, currentIndex: 0),
+        );
+      },
+    );
+    on<AuthEventGetInChatFromBodyContactScreen>(
+      (event, emit) {
+        emit(AuthStateGetInChatFromBodyContactScreen(
+            chat: event.chat, currentIndex: 1));
+      },
+    );
+    on<AuthEventGetOutChatFromBodyChatScreen>(
+      (event, emit) {
+        emit(const AuthStateGetOutChatFromBodyChatScreen());
+      },
+    );
+    on<AuthEventGetOutChatFromBodyContactScreen>(
+      (event, emit) {
+        emit(const AuthStateGetOutChatFromBodyContactScreen());
+      },
+    );
   }
 }

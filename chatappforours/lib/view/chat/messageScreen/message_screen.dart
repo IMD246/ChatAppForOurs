@@ -1,11 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
+import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
+import 'package:chatappforours/services/auth/bloc/auth_event.dart';
+import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/body_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants/constants.dart';
@@ -14,9 +18,10 @@ class MesssageScreen extends StatefulWidget {
   const MesssageScreen({
     Key? key,
     required this.chat,
+    required this.currentIndex,
   }) : super(key: key);
   final Chat chat;
-
+  final int currentIndex;
   @override
   State<MesssageScreen> createState() => _MesssageScreenState();
 }
@@ -25,12 +30,16 @@ class _MesssageScreenState extends State<MesssageScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkTheme = Provider.of<ThemeChanger>(context).getTheme();
-    return Scaffold(
-      appBar: buildAppbar(
-          widget.chat, isDarkTheme ? ThemeMode.dark : ThemeMode.light, context),
-      body: BodyMessage(
-        chat: widget.chat,
-      ),
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: buildAppbar(widget.chat,
+              isDarkTheme ? ThemeMode.dark : ThemeMode.light, context),
+          body: BodyMessage(
+            chat: widget.chat,
+          ),
+        );
+      },
     );
   }
 
@@ -45,7 +54,7 @@ class _MesssageScreenState extends State<MesssageScreen> {
           (chat.listUser.where((element) => element != ownerUserID)).first;
     }
     return AppBar(
-      automaticallyImplyLeading: true,
+      automaticallyImplyLeading: false,
       title: FutureBuilder<UserProfile?>(
         future: firebaseUserProfile.getUserProfile(userID: userIDFriend),
         builder: (context, snapshot) {
@@ -55,6 +64,17 @@ class _MesssageScreenState extends State<MesssageScreen> {
                 final userProfile = snapshot.data;
                 return Row(
                   children: [
+                    BackButton(
+                      onPressed: () {
+                        widget.currentIndex == 0
+                            ? context.read<AuthBloc>().add(
+                                  const AuthEventGetOutChatFromBodyChatScreen(),
+                                )
+                            : context.read<AuthBloc>().add(
+                                  const AuthEventGetOutChatFromBodyContactScreen(),
+                                );
+                      },
+                    ),
                     Stack(
                       children: [
                         if (userProfile!.urlImage != null)
