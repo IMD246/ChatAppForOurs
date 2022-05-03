@@ -56,15 +56,23 @@ class _MessageCardState extends State<MessageCard> {
             widget.listChatMesage.elementAt(widget.beforeIndex).stampTime,
             widget.chatMessage.stampTime,
           );
-    setState(() {
-      if (widget.chatMessage.isSender == false &&
-          widget.chatMessage.messageStatus == MessageStatus.sent) {
-        firebaseChatMessage.updateTextMessageFriendToViewed(
+    if (idUser != widget.chat.userID) {
+      if (widget.chatMessage.messageStatus == MessageStatus.sent &&
+          widget.chatMessage.isSender == false) {
+        firebaseChatMessage.updateMessageFriendToViewed(
           chatID: widget.chat.idChat,
           messageID: widget.chatMessage.idMessage,
         );
       }
-    });
+    } else {
+      if (widget.chatMessage.messageStatus == MessageStatus.sent &&
+          widget.chatMessage.isSender == false) {
+        firebaseChatMessage.updateMessageFriendToViewed(
+          chatID: widget.chat.idChat,
+          messageID: widget.chatMessage.idMessage,
+        );
+      }
+    }
     super.initState();
   }
 
@@ -300,66 +308,66 @@ class _MessageStatusDotState extends State<MessageStatusDot> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 16,
-      height: 16,
-      decoration: widget.messageStatus == MessageStatus.viewed
-          ? null
-          : BoxDecoration(
-              color: (widget.messageStatus == MessageStatus.sent)
-                  ? kPrimaryColor
-                  : null,
-              shape: BoxShape.circle,
-            ),
-      child: widget.messageStatus == MessageStatus.viewed &&
-              widget.isSender == true
-          ? FutureBuilder<UserProfile?>(
-              future: firebaseChatMessage
-                  .checkLastMessageOfChatRoomForUploadStatusMessage(
-                chatID: widget.chatID,
-                idMessage: widget.idMessage,
-                userIDFriend: widget.idUserFriend,
+        width: 16,
+        height: 16,
+        decoration: widget.messageStatus == MessageStatus.viewed
+            ? null
+            : BoxDecoration(
+                color: (widget.messageStatus == MessageStatus.sent &&
+                        widget.isSender == true)
+                    ? kPrimaryColor
+                    : null,
+                shape: BoxShape.circle,
               ),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final userProfile = snapshot.data;
-                  if (userProfile!.urlImage == null) {
-                    return FittedBox(
-                      fit: BoxFit.cover,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.cyan[100],
-                        backgroundImage: const AssetImage(
-                          "assets/images/defaultImage.png",
-                        ),
-                      ),
-                    );
-                  } else {
-                    return CircleAvatar(
-                      backgroundColor: Colors.cyan[100],
-                      child: ClipOval(
-                        child: SizedBox.fromSize(
-                          size: const Size.fromRadius(60),
-                          child: CachedNetworkImage(
-                            imageUrl: userProfile.urlImage!,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) =>
-                                const CircularProgressIndicator(),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
+        child: widget.messageStatus != MessageStatus.notSent &&
+                widget.isSender == true
+            ? FutureBuilder<UserProfile?>(
+                future: firebaseChatMessage
+                    .checkLastMessageOfChatRoomForUploadStatusMessageViewed(
+                  chatID: widget.chatID,
+                  idMessage: widget.idMessage,
+                  userIDFriend: widget.idUserFriend,
+                ),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final userProfile = snapshot.data;
+                    if (userProfile!.urlImage == null) {
+                      return FittedBox(
+                        fit: BoxFit.cover,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.cyan[100],
+                          backgroundImage: const AssetImage(
+                            "assets/images/defaultImage.png",
                           ),
                         ),
-                      ),
+                      );
+                    } else {
+                      return CircleAvatar(
+                        backgroundColor: Colors.cyan[100],
+                        child: ClipOval(
+                          child: SizedBox.fromSize(
+                            size: const Size.fromRadius(60),
+                            child: CachedNetworkImage(
+                              imageUrl: userProfile.urlImage!,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) =>
+                                  const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  } else {
+                    return Icon(
+                      Icons.done,
+                      size: 8,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                     );
                   }
-                } else {
-                  return const Text('');
-                }
-              },
-            )
-          : Icon(
-              Icons.done,
-              size: 8,
-              color: Theme.of(context).scaffoldBackgroundColor,
-            ),
-    );
+                },
+              )
+            : const Text(''));
   }
 }

@@ -74,15 +74,14 @@ class _BodyMessageState extends State<BodyMessage> {
                             ),
                           );
                         } else {
-                           return MessageCard(
-                                      chatMessage:
-                                          allChatMessage.elementAt(index),
-                                      listChatMesage: allChatMessage,
-                                      index: index,
-                                      beforeIndex: index - 1,
-                                      chat: widget.chat,
-                                      scrollController: scrollController,
-                                    );
+                          return MessageCard(
+                            chatMessage: allChatMessage.elementAt(index),
+                            listChatMesage: allChatMessage,
+                            index: index,
+                            beforeIndex: index - 1,
+                            chat: widget.chat,
+                            scrollController: scrollController,
+                          );
                         }
                       } else {
                         return Container(

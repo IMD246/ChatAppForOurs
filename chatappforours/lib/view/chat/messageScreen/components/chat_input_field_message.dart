@@ -187,11 +187,10 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                         ownerUserID: id,
                         chatID: widget.idChat,
                       );
-                      firebaseChatMessage.updateTextMessageSent(
+                      firebaseChatMessage.updateTextMessageNotSent(
                         chatID: widget.idChat,
                         text: textController.text,
                         ownerUserID: id,
-                        userIDFriend: widget.userIDFriend,
                       );
                       textController.clear();
                       if (widget.scroll.isAttached) {

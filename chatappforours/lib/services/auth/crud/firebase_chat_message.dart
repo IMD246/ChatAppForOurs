@@ -175,7 +175,7 @@ class FirebaseChatMessage {
     }
   }
 
-  Future<void> updateTextMessageFriendToViewed({
+  Future<void> updateMessageFriendToViewed({
     required chatID,
     required messageID,
   }) async {
@@ -189,9 +189,8 @@ class FirebaseChatMessage {
         .update(mapUpdate);
   }
 
-  Future<void> updateTextMessageSent({
+  Future<void> updateTextMessageNotSent({
     required String ownerUserID,
-    required String userIDFriend,
     required String chatID,
     required String text,
   }) async {
@@ -201,9 +200,7 @@ class FirebaseChatMessage {
       hasSenderField: true,
       messageField: text,
       typeMessageField: TypeMessage.text.toString(),
-      messageStatusField: userIDFriend.compareTo(ownerUserID) == 0
-          ? MessageStatus.viewed.toString()
-          : MessageStatus.sent.toString(),
+      messageStatusField: MessageStatus.sent.toString(),
       stampTimeField: DateTime.now(),
     };
     await firebaseChatMessageDocument
@@ -217,7 +214,7 @@ class FirebaseChatMessage {
     );
   }
 
-  Future<UserProfile?> checkLastMessageOfChatRoomForUploadStatusMessage(
+  Future<UserProfile?> checkLastMessageOfChatRoomForUploadStatusMessageViewed(
       {required String chatID,
       required String idMessage,
       required String userIDFriend}) async {
@@ -225,11 +222,11 @@ class FirebaseChatMessage {
     final bool lastMessage = await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
-        .where(messageStatusField, isEqualTo: MessageStatus.viewed.toString())
-        .orderBy(
-          stampTimeField,
-          descending: true,
+        .where(
+          messageStatusField,
+          isEqualTo: MessageStatus.viewed.toString(),
         )
+        .orderBy(stampTimeField, descending: true)
         .limit(1)
         .get()
         .then(
@@ -255,7 +252,7 @@ class FirebaseChatMessage {
     final bool lastMessage = await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
-        .where(messageStatusField, isEqualTo: MessageStatus.viewed.toString())
+        .where(messageStatusField, isEqualTo: MessageStatus.sent.toString())
         .orderBy(
           stampTimeField,
           descending: true,
