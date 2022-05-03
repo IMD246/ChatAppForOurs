@@ -1,5 +1,6 @@
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,11 +12,11 @@ import '../../../../constants/constants.dart';
 class ChatInputFieldMessage extends StatefulWidget {
   const ChatInputFieldMessage({
     Key? key,
-    required this.idChat,
+    required this.chat,
     required this.scroll,
     required this.userIDFriend,
   }) : super(key: key);
-  final String idChat;
+  final Chat chat;
   final String userIDFriend;
   final ItemScrollController scroll;
   @override
@@ -71,16 +72,16 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                 } else {
                   await firebaseChatMessage.createImageMessage(
                     userID: id,
-                    chatID: widget.idChat,
+                    chatID: widget.chat.idChat,
                   );
                   final lastMessageUserOwner =
                       await firebaseChatMessage.getImageMessageNotSentOwnerUser(
                     userID: id,
-                    chatID: widget.idChat,
+                    chatID: widget.chat.idChat,
                   );
                   await storage.uploadMultipleFile(
                     listFile: results.files,
-                    idChat: widget.idChat,
+                    idChat: widget.chat.idChat,
                     firebaseChatMessage: firebaseChatMessage,
                     firebaseUserProfile: firebaseUserProfile,
                     lastMessageUserOwner: lastMessageUserOwner,
@@ -119,7 +120,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                         onTap: () async {
                           await firebaseChatMessage.createTextMessageNotSent(
                             userID: id,
-                            chatID: widget.idChat,
+                            chatID: widget.chat.idChat,
                           );
                           if (widget.scroll.isAttached) {
                             widget.scroll.scrollTo(
@@ -133,7 +134,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                           if (textController.text.isNotEmpty) {
                             await firebaseChatMessage.createTextMessageNotSent(
                               userID: id,
-                              chatID: widget.idChat,
+                              chatID: widget.chat.idChat,
                             );
                             if (widget.scroll.isAttached) {
                               widget.scroll.scrollTo(
@@ -146,7 +147,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                           setState(() {
                             if (textController.text.isEmpty) {
                               firebaseChatMessage.deleteMessageNotSent(
-                                  ownerUserID: id, chatID: widget.idChat);
+                                  ownerUserID: id, chatID: widget.chat.idChat);
                             }
                           });
                         },
@@ -185,10 +186,10 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                     () {
                       firebaseChatMessage.deleteMessageNotSent(
                         ownerUserID: id,
-                        chatID: widget.idChat,
+                        chatID: widget.chat.idChat,
                       );
                       firebaseChatMessage.updateTextMessageNotSent(
-                        chatID: widget.idChat,
+                        chat: widget.chat,
                         text: textController.text,
                         ownerUserID: id,
                       );

@@ -45,10 +45,14 @@ class _MessageCardState extends State<MessageCard> {
   bool isSelected = false;
   bool isCheckLastMessage = false;
   late bool checkCurrentAndIndexTimeGreater10Minute;
+  late final String userIDFriend;
   @override
   void initState() {
     firebaseUserProfile = FirebaseUserProfile();
     firebaseChatMessage = FirebaseChatMessage();
+    userIDFriend = widget.chat.listUser[0] == widget.chat.listUser[1]
+        ? idUser
+        : widget.chat.listUser[1];
     widget.index <= 0
         ? checkCurrentAndIndexTimeGreater10Minute = true
         : checkCurrentAndIndexTimeGreater10Minute =
@@ -56,7 +60,7 @@ class _MessageCardState extends State<MessageCard> {
             widget.listChatMesage.elementAt(widget.beforeIndex).stampTime,
             widget.chatMessage.stampTime,
           );
-    if (idUser != widget.chat.userID) {
+    if (idUser != userIDFriend) {
       if (widget.chatMessage.messageStatus == MessageStatus.sent &&
           widget.chatMessage.isSender == false) {
         firebaseChatMessage.updateMessageFriendToViewed(

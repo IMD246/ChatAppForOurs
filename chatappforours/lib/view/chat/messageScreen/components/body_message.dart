@@ -107,7 +107,7 @@ class _BodyMessageState extends State<BodyMessage> {
           },
         ),
         ChatInputFieldMessage(
-          idChat: widget.chat.idChat,
+          chat: widget.chat,
           scroll: scrollController,
           userIDFriend: widget.chat.listUser.elementAt(1),
         ),

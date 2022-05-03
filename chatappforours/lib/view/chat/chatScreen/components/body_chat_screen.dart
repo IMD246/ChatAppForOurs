@@ -7,7 +7,6 @@ import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
-import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/chat_card.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
@@ -33,7 +32,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
   bool isFilledActive = false;
   late final StreamController streamController;
   late final bool isActive;
-  late Stream<Iterable<Chat>> stream;
+  late Stream<Iterable<Chat?>> stream;
   @override
   void initState() {
     streamController = StreamController();
@@ -104,12 +103,11 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                 });
               },
               child: StreamBuilder(
-                stream: stream,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.active:
-                      if (snapshot.hasData) {
-                        final allChat = snapshot.data as Iterable<Chat>;
+                  stream: stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final allChat = snapshot.data as Iterable<Chat>;
+                      if (allChat.isNotEmpty) {
                         return ChatListView(
                           allChat: allChat,
                           isFilledActive: isFilledActive,
@@ -122,17 +120,15 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                           ),
                         );
                       }
-                    default:
+                    } else {
                       return const Center(
-                        child: SizedBox(
-                          height: 200,
-                          width: 200,
-                          child: CircularProgressIndicator(),
+                        child: Text(
+                          "Don't have any chat",
+                          style: TextStyle(fontSize: 20),
                         ),
                       );
-                  }
-                },
-              ),
+                    }
+                  }),
             ),
           ),
         ),
@@ -173,25 +169,24 @@ class _ChatListViewState extends State<ChatListView> {
         idChat: chat.idChat,
         ownerUserID: ownerUserID,
       );
-      userPresenceDatabaseReference
-          .child(list.elementAt(i).listUser.elementAt(1))
-          .once()
-          .then(
+      final String userIDFriend;
+      if (chat.listUser[0] == chat.listUser[1]) {
+        userIDFriend = chat.listUser.elementAt(0);
+      } else {
+        userIDFriend =
+            chat.listUser.where((element) => element != ownerUserID).first;
+      }
+      userPresenceDatabaseReference.child(userIDFriend).once().then(
         (event) async {
+          final userProfile = await firebaseUserProfile.getUserProfile(
+            userID: userIDFriend,
+          );
           if (chat.typeChat == TypeChat.normal) {
+            chat.urlUserFriend = userProfile?.urlImage;
             if (chat.listUser.length <= 1) {
               chat.nameChat = 'Only You';
-              final userProfile = await firebaseUserProfile.getUserProfile(
-                userID: list.first.userID,
-              );
-              chat.urlUserFriend = userProfile!.urlImage;
             } else {
-              final userFriend = chat.listUser.elementAt(1);
-              final userProfile = await firebaseUserProfile.getUserProfile(
-                userID: userFriend,
-              );
-              chat.urlUserFriend = userProfile!.urlImage;
-              chat.nameChat = userProfile.fullName;
+              chat.nameChat = userProfile!.fullName;
             }
           }
           chat.rule = userJoinChat!.ruleChat;
@@ -218,16 +213,23 @@ class _ChatListViewState extends State<ChatListView> {
         idChat: list.elementAt(i).idChat,
         ownerUserID: ownerUserID,
       );
-      userPresenceDatabaseReference.child(chat.listUser[1]).once().then(
+      final String userIDFriend;
+      if (chat.listUser[0] == chat.listUser[1]) {
+        userIDFriend = chat.listUser.elementAt(0);
+      } else {
+        userIDFriend =
+            chat.listUser.where((element) => element != ownerUserID).first;
+      }
+      userPresenceDatabaseReference.child(userIDFriend).once().then(
         (event) async {
+          final userProfile = await firebaseUserProfile.getUserProfile(
+            userID: userIDFriend,
+          );
           if (chat.typeChat == TypeChat.normal) {
+            chat.urlUserFriend = userProfile?.urlImage;
             if (chat.listUser.length <= 1) {
               chat.nameChat = 'Only You';
             } else {
-              final userFriend = chat.listUser.elementAt(1);
-              final userProfile = await firebaseUserProfile.getUserProfile(
-                userID: userFriend,
-              );
               chat.nameChat = userProfile!.fullName;
             }
           }

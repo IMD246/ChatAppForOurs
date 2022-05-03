@@ -66,19 +66,16 @@ class _ContactCardState extends State<ContactCard> {
           final chat = await firebaseChat.getChatByListIDUser(
             listUserID: [id, widget.friend.userID],
           );
-          if (chat!.isActive == false) {
-            await firebaseChat.updateChatToActive(
-              listUserID: [id, widget.friend.userID],
+          if (chat != null) {
+            chat.presence = widget.friend.presence;
+            chat.stampTimeUserFormated = widget.friend.stampTimeUser;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MesssageScreen(chat: chat),
+              ),
             );
           }
-          chat.presence = widget.friend.presence;
-          chat.stampTimeUserFormated = widget.friend.stampTimeUser;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MesssageScreen(chat: chat),
-            ),
-          );
         }
       },
       child: Padding(
@@ -182,7 +179,6 @@ class _ContactCardState extends State<ContactCard> {
                                 await firebaseChat.createChat(
                                   typeChat: TypeChat.normal,
                                   listUserID: [id, widget.friend.userID],
-                                  idFriendList: widget.friend.idFriendList,
                                 );
                               },
                               text: 'Accept',

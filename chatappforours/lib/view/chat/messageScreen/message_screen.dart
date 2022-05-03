@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
-import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
-import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/body_message.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -37,10 +36,18 @@ class _MesssageScreenState extends State<MesssageScreen> {
 
   AppBar buildAppbar(Chat chat, ThemeMode themeMode, BuildContext context) {
     final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+    final String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
+    final String userIDFriend;
+    if (chat.listUser[0] == ownerUserID) {
+      userIDFriend = ownerUserID;
+    } else {
+      userIDFriend =
+          (chat.listUser.where((element) => element != ownerUserID)).first;
+    }
     return AppBar(
       automaticallyImplyLeading: true,
       title: FutureBuilder<UserProfile?>(
-        future: firebaseUserProfile.getUserProfile(userID: chat.userID),
+        future: firebaseUserProfile.getUserProfile(userID: userIDFriend),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:

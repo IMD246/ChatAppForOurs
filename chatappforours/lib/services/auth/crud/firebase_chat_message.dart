@@ -3,6 +3,7 @@ import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -191,7 +192,7 @@ class FirebaseChatMessage {
 
   Future<void> updateTextMessageNotSent({
     required String ownerUserID,
-    required String chatID,
+    required Chat chat,
     required String text,
   }) async {
     final firebaseChat = FirebaseChat();
@@ -204,13 +205,19 @@ class FirebaseChatMessage {
       stampTimeField: DateTime.now(),
     };
     await firebaseChatMessageDocument
-        .doc(chatID)
+        .doc(chat.idChat)
         .collection('message')
         .doc()
         .set(mapCreate);
+    if (chat.isActive == false) {
+      await firebaseChat.updateChatToActive(
+        idChat: chat.idChat,
+        ownerUserID: ownerUserID,
+      );
+    }
     await firebaseChat.updateChatLastText(
       text: text,
-      chatID: chatID,
+      chatID: chat.idChat,
     );
   }
 
