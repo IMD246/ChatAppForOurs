@@ -1,4 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
@@ -21,8 +23,12 @@ class ChatCard extends StatefulWidget {
 }
 
 class _ChatCardState extends State<ChatCard> {
+  late final FirebaseChat firebaseChat;
+  late final FirebaseChatMessage firebaseChatMessage;
   @override
   void initState() {
+    firebaseChat = FirebaseChat();
+    firebaseChatMessage = FirebaseChatMessage();
     super.initState();
   }
 
@@ -134,7 +140,12 @@ class _ChatCardState extends State<ChatCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.chat.nameChat ?? "a",
+                      widget.chat.listUser[0].compareTo(
+                                widget.chat.listUser[1],
+                              ) ==
+                              0
+                          ? "Only You"
+                          : widget.chat.nameChat!,
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 16,

@@ -65,8 +65,7 @@ class _MessageCardState extends State<MessageCard> {
         );
       }
     } else {
-      if (widget.chatMessage.messageStatus == MessageStatus.sent &&
-          widget.chatMessage.isSender == false) {
+      if (widget.chatMessage.messageStatus == MessageStatus.sent) {
         firebaseChatMessage.updateMessageFriendToViewed(
           chatID: widget.chat.idChat,
           messageID: widget.chatMessage.idMessage,

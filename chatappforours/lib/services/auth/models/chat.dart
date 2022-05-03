@@ -9,7 +9,7 @@ class Chat {
   final String idChat;
   final String stampTime;
   final DateTime stampTimeChat;
-  final String lastText;
+  String lastText;
   final TypeChat typeChat;
   final String userID;
   String? nameChat;

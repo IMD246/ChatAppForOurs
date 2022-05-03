@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
+import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/chat_card.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
@@ -29,11 +31,17 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
   final String userID = FirebaseAuth.instance.currentUser!.uid;
   bool isFilledRecent = true;
   bool isFilledActive = false;
+  late final StreamController streamController;
   late final bool isActive;
+  late Stream<Iterable<Chat>> stream;
   @override
   void initState() {
-    firebaseChat = FirebaseChat();
+    streamController = StreamController();
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
+    setState(() {
+      firebaseChat = FirebaseChat();
+      stream = firebaseChat.getAllChat(ownerUserID: userID);
+    });
     super.initState();
   }
 
@@ -87,24 +95,46 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
           ),
         ),
         Expanded(
-          child: StreamBuilder(
-              stream: firebaseChat.getAllChat(ownerUserID: userID),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final allChat = snapshot.data as Iterable<Chat>;
-                  return ChatListView(
-                    allChat: allChat,
-                    isFilledActive: isFilledActive,
-                  );
-                } else {
-                  return const Center(
-                    child: Text(
-                      "Don't have any chat",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  );
-                }
-              }),
+          child: Center(
+            child: RefreshIndicator(
+              strokeWidth: 1,
+              onRefresh: () async {
+                setState(() {
+                  stream = firebaseChat.getAllChat(ownerUserID: userID);
+                });
+              },
+              child: StreamBuilder(
+                stream: stream,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.active:
+                      if (snapshot.hasData) {
+                        final allChat = snapshot.data as Iterable<Chat>;
+                        return ChatListView(
+                          allChat: allChat,
+                          isFilledActive: isFilledActive,
+                        );
+                      } else {
+                        return const Center(
+                          child: Text(
+                            "Don't have any chat",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        );
+                      }
+                    default:
+                      return const Center(
+                        child: SizedBox(
+                          height: 200,
+                          width: 200,
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                  }
+                },
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -129,6 +159,7 @@ class _ChatListViewState extends State<ChatListView> {
   late final FirebaseUsersJoinChat firebaseUsersJoinChat;
   late final FirebaseUserProfile firebaseUserProfile;
   late final FirebaseChat firebaseChat;
+  late final FirebaseChatMessage firebaseChatMessage;
   String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
@@ -220,6 +251,7 @@ class _ChatListViewState extends State<ChatListView> {
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
     firebaseUserProfile = FirebaseUserProfile();
     firebaseChat = FirebaseChat();
+    firebaseChatMessage = FirebaseChatMessage();
     setState(() {
       if (widget.isFilledActive == false) {
         getAllDataChat(list: widget.allChat);
@@ -254,9 +286,7 @@ class _ChatListViewState extends State<ChatListView> {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return MesssageScreen(
-                          chat: chatData,
-                        );
+                        return MesssageScreen(chat: chatData);
                       },
                     ),
                   );
@@ -265,13 +295,7 @@ class _ChatListViewState extends State<ChatListView> {
             },
           );
         } else {
-          return const Center(
-            child: SizedBox(
-              height: 200,
-              width: 200,
-              child: CircularProgressIndicator(),
-            ),
-          );
+          return const CircularProgressIndicator();
         }
       },
     );

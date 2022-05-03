@@ -325,6 +325,30 @@ class FirebaseChatMessage {
     );
   }
 
+  Future<ChatMessage?> getLastMessageOfAChat({
+    required String chatID,
+    required String ownerUserID,
+  }) async {
+    return await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .orderBy(stampTimeField, descending: true)
+        .limit(1)
+        .get()
+        .then(
+      (value) {
+        if (value.docs.isNotEmpty) {
+          return ChatMessage.fromSnapshot(
+            docs: value.docs.first,
+            ownerUserID: ownerUserID,
+          );
+        } else {
+          return null;
+        }
+      },
+    );
+  }
+
   Stream<Iterable<ChatMessage>> getAllMessage(
       {required String chatID, required String ownerUserID}) {
     final allMessage = firebaseChatMessageDocument
