@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,9 +24,7 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
   void initState() {
     textController = TextEditingController();
     firebaseUserProfile = FirebaseUserProfile();
-    setState(() {
-      isAdded = textController.text.isNotEmpty ? true : false;
-    });
+    isAdded = textController.text.isNotEmpty ? true : false;
     super.initState();
   }
 
@@ -55,19 +55,36 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
             ),
           ),
         ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: 50,
-            itemBuilder: (context, index) {
-              return AddFriendCard(index: index);
-            },
-          ),
-        )
+        StreamBuilder(
+          stream: firebaseUserProfile.getAllUserProfile(
+              searchText: textController.text),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final listUserProfile = snapshot.data as Iterable<UserProfile>;
+              return Expanded(``
+                child: ListView.builder(
+                  itemCount: listUserProfile.length,
+                  itemBuilder: (context, index) {
+                    return AddFriendCard(
+                      userProfile: listUserProfile.elementAt(index),
+                      isAdded: isAdded,
+                    );
+                  },
+                ),
+              );
+            } else {
+              return const Text("Dont Have Any User");
+            }
+          },
+        ),
       ],
     );
   }
 
-  TextField buildSearchText(BuildContext context, bool isDarkTheme) {
+  TextField buildSearchText(
+    BuildContext context,
+    bool isDarkTheme,
+  ) {
     return TextField(
       controller: textController,
       onChanged: (value) {
@@ -133,40 +150,72 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
 class AddFriendCard extends StatefulWidget {
   const AddFriendCard({
     Key? key,
-    required this.index,
+    required this.userProfile,
+    required this.isAdded,
   }) : super(key: key);
-  final int index;
-
+  final UserProfile userProfile;
+  final bool isAdded;
   @override
   State<AddFriendCard> createState() => _AddFriendCardState();
 }
 
 class _AddFriendCardState extends State<AddFriendCard> {
-  bool isCheck = false;
+  late bool isAdded;
+  @override
+  void initState() {
+    setState(() {
+      isAdded = widget.isAdded;
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const CircleAvatar(
-        radius: 20,
-        backgroundImage: AssetImage(
-          "assets/images/defaultImage.png",
-        ),
-      ),
+      leading: widget.userProfile.urlImage != null
+          ? CircleAvatar(
+              backgroundColor: Colors.cyan[100],
+              child: ClipOval(
+                child: SizedBox.fromSize(
+                  size: const Size.fromRadius(60),
+                  child: CachedNetworkImage(
+                    imageUrl: widget.userProfile.urlImage!,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
+                ),
+              ),
+            )
+          : const CircleAvatar(
+              backgroundImage: AssetImage(
+                "assets/images/defaultImage.png",
+              ),
+            ),
       title: Text(
-        "Me ${widget.index}",
+        widget.userProfile.fullName,
         overflow: TextOverflow.ellipsis,
       ),
       trailing: FillOutlineButton(
         press: () {
           setState(() {
-            if (isCheck == false) {
-              isCheck = true;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(
+                isAdded.toString(),
+                textAlign: TextAlign.center,
+              )),
+            );
+            if (widget.isAdded == false) {
+              isAdded = true;
             }
           });
         },
-        text: isCheck ? "Added" : "Add",
-        isFilled: !isCheck,
-        isCheckAdded: isCheck,
+        text: isAdded ? "Added" : "Add",
+        isFilled: !isAdded,
+        isCheckAdded: isAdded,
       ),
     );
   }

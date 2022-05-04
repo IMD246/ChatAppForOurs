@@ -88,6 +88,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             await firebaseUserProfile.updateUserPresenceDisconnect(
               uid: user.id!,
             );
+            await firebaseUserProfile.upDateUserIsEmailVerified(
+              userID: user.id!,
+            );
             emit(
               AuthStateLoggedIn(authUser: user, isLoading: false),
             );
@@ -397,6 +400,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               email: user.email!,
               fullName: user.displayName!,
               urlImage: user.photoURL,
+              isEmailVerified: true,
               isDarkMode: false,
             );
             await userProfileFirebase.createUserProfile(
@@ -415,6 +419,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           } else {
             await userProfileFirebase.updateUserPresenceDisconnect(
               uid: user.id!,
+            );
+            await userProfileFirebase.upDateUserIsEmailVerified(
+              userID: user.id!,
             );
             emit(
               AuthStateLoggedIn(

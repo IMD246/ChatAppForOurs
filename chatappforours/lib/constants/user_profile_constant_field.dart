@@ -4,3 +4,4 @@ const emailField = 'email';
 const urlImageField = 'url_image';
 const fullNameField = 'full_name';
 const isDarkModeField = 'is_dark_mode';
+const isEmailVerifiedField = 'is_email_verified';

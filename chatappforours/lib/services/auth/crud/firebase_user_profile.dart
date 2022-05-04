@@ -15,10 +15,12 @@ class FirebaseUserProfile {
   }) async {
     await userProfilePath.doc(userID).set(
       {
-        fullNameField: userProfile.fullName,
         emailField: userProfile.email,
+        userIDField: userID,
+        fullNameField: userProfile.fullName,
         urlImageField: userProfile.urlImage,
         isDarkModeField: userProfile.isDarkMode,
+        isEmailVerifiedField: false,
       },
     );
   }
@@ -40,6 +42,22 @@ class FirebaseUserProfile {
     }
   }
 
+  Stream<Iterable<UserProfile?>> getAllUserProfile({
+    required String searchText,
+  }) {
+    final userProfile = userProfilePath
+        .where(isEmailVerifiedField, isEqualTo: true)
+        .where(fullNameField, isGreaterThanOrEqualTo: searchText)
+        .limit(30)
+        .snapshots()
+        .map(
+          (event) => event.docs.map(
+            (e) => UserProfile.fromSnapshot(e),
+          ),
+        );
+    return userProfile;
+  }
+
   Future<void> uploadUserImage({
     required String? userID,
     required String? urlImage,
@@ -47,6 +65,16 @@ class FirebaseUserProfile {
     if (userID != null) {
       Map<String, dynamic> mapUser = <String, dynamic>{};
       mapUser.addAll({urlImageField: urlImage});
+      await userProfilePath.doc(userID).update(mapUser);
+    }
+  }
+
+  Future<void> upDateUserIsEmailVerified({
+    required String? userID,
+  }) async {
+    if (userID != null) {
+      Map<String, dynamic> mapUser = <String, dynamic>{};
+      mapUser.addAll({isEmailVerifiedField: true});
       await userProfilePath.doc(userID).update(mapUser);
     }
   }
