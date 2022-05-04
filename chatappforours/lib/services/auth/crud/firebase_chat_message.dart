@@ -259,7 +259,7 @@ class FirebaseChatMessage {
     final bool lastMessage = await firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')
-        .where(messageStatusField, isEqualTo: MessageStatus.sent.toString())
+        .where(messageStatusField, isEqualTo: MessageStatus.viewed.toString())
         .orderBy(
           stampTimeField,
           descending: true,

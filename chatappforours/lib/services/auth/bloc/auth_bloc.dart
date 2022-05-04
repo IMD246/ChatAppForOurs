@@ -347,10 +347,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
       },
     );
-    on<AuthEventRegisterWithFacebook>(
+    on<AuthEventSignInWithFacebook>(
       (event, emit) async {
         emit(
-          const AuthStateRegiseringWithFacebook(
+          const AuthStateSignInWithFacebook(
             isLoading: true,
             exception: null,
           ),
@@ -360,7 +360,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await authProvider.createUserWithFacebook();
           exception = null;
           emit(
-            const AuthStateRegiseringWithFacebook(
+            const AuthStateSignInWithFacebook(
               isLoading: false,
               exception: null,
             ),
@@ -368,45 +368,65 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         } on Exception catch (e) {
           exception = e;
         }
-        emit(AuthStateRegiseringWithFacebook(
+        emit(AuthStateSignInWithFacebook(
           isLoading: false,
           exception: exception,
         ));
       },
     );
-    on<AuthEventRegisterWithGoogle>(
+    on<AuthEventSignInWithGoogle>(
       (event, emit) async {
+        final FirebaseFriendList friendListFirebase = FirebaseFriendList();
+        final userProfileFirebase = FirebaseUserProfile();
         emit(
-          const AuthStateRegiseringWithGoogle(
+          const AuthStateSignInWithGoogle(
             isLoading: true,
             exception: null,
           ),
         );
         Exception? exception;
         try {
-          await authProvider.createUserWithGoogle();
-          exception = null;
-          emit(
-            const AuthStateRegiseringWithGoogle(
-              isLoading: false,
-              exception: null,
-            ),
-          );
+          final user = await authProvider.createUserWithGoogle();
+          final getUserProfile =
+              await userProfileFirebase.getUserProfile(userID: user.id);
+          if (getUserProfile == null) {
+            await friendListFirebase.createNewFriendDefault(
+              userIDFriend: user.id!,
+              ownerUserID: user.id!,
+            );
+            final userProfile = UserProfile(
+              email: user.email!,
+              fullName: user.displayName!,
+              urlImage: user.photoURL,
+              isDarkMode: false,
+            );
+            await userProfileFirebase.createUserProfile(
+              userID: user.id!,
+              userProfile: userProfile,
+            );
+            emit(
+              AuthStateLoggedIn(
+                authUser: authProvider.currentUser!,
+                isLoading: false,
+              ),
+            );
+          } else {
+            emit(
+              AuthStateLoggedIn(
+                authUser: authProvider.currentUser!,
+                isLoading: false,
+              ),
+            );
+          }
         } on Exception catch (e) {
           exception = e;
           emit(
-            AuthStateRegiseringWithGoogle(
+            AuthStateSignInWithGoogle(
               isLoading: false,
               exception: exception,
             ),
           );
         }
-        emit(
-          AuthStateRegiseringWithGoogle(
-            isLoading: false,
-            exception: exception,
-          ),
-        );
       },
     );
     on<AuthEventGetInChatFromBodyChatScreen>(

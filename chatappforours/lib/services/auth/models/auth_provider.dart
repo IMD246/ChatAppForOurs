@@ -9,7 +9,7 @@ abstract class AuthProvider {
   });
   Future<void> createUserWithFacebook();
   
-  Future<void> createUserWithGoogle();
+  Future<AuthUser> createUserWithGoogle();
 
   Future<void> sendEmailVerification();
   Future<void> logOut();

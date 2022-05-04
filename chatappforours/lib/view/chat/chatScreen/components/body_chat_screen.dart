@@ -297,14 +297,6 @@ class _ChatListViewState extends State<ChatListView> {
                             AuthEventGetInChatFromBodyChatScreen(
                                 chat: chatData, currentIndex: 0),
                           );
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) {
-                      //       return MesssageScreen(chat: chatData);
-                      //     },
-                      //   ),
-                      // );
                     },
                   );
                 },

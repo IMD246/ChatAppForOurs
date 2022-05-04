@@ -18,7 +18,8 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
-        if (state is AuthStateRegistering) {
+        if (state is AuthStateRegistering
+           ) {
           if (state.exception is EmailAlreadyInUseAuthException) {
             await showErrorDialog(
               context: context,
@@ -33,34 +34,6 @@ class _SignUpState extends State<SignUp> {
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(
                 context: context, title: 'Generic error', text: "Auth Error");
-          }
-        } else if (state is AuthStateRegiseringWithFacebook) {
-          if (state.exception is EmailAlreadyInUseAuthException) {
-            await showErrorDialog(
-              context: context,
-              title: 'Email Already In Use Error',
-              text: "Email Already In Use",
-            );
-          } else if (state.exception is GenericAuthException) {
-            await showErrorDialog(
-              context: context,
-              title: 'Generic error',
-              text: "Register facebook failed",
-            );
-          }
-        } else if (state is AuthStateRegiseringWithGoogle) {
-          if (state.exception is EmailAlreadyInUseAuthException) {
-            await showErrorDialog(
-              context: context,
-              title: 'Email Already In Use Error',
-              text: "Email Already In Use",
-            );
-          } else if (state.exception is GenericAuthException) {
-            await showErrorDialog(
-              context: context,
-              title: 'Generic error',
-              text: "Register google failed",
-            );
           }
         }
       },

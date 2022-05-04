@@ -123,13 +123,9 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<void> createUserWithGoogle() async {
+  Future<AuthUser> createUserWithGoogle() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        scopes: ['email'],
-        hostedDomain: "",
-        clientId: "",
-      );
+      final GoogleSignIn googleSignIn = GoogleSignIn();
       final GoogleSignInAccount? googleSignInAccount =
           await googleSignIn.signIn();
       final GoogleSignInAuthentication? googleSignAuth =
@@ -139,14 +135,14 @@ class FirebaseAuthProvider implements AuthProvider {
         idToken: googleSignAuth.idToken,
       );
       await FirebaseAuth.instance.signInWithCredential(authCredential);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        throw EmailAlreadyInUseAuthException();
+      final user = currentUser;
+      if (user != null) {
+        return user;
       } else {
-        throw GenericAuthException();
+        throw UserNotLoggedInAuthException();
       }
     } catch (_) {
-      rethrow;
+      throw UserNotLoggedInAuthException();
     }
   }
 }

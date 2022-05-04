@@ -3,6 +3,8 @@ import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
 import 'package:chatappforours/utilities/validator/check_format_field.dart';
+import 'package:chatappforours/view/signInOrSignUp/signUp/components/or_divider.dart';
+import 'package:chatappforours/view/signInOrSignUp/signUp/components/social_icon.dart';
 import 'package:chatappforours/view/signInOrSignUp/text_field_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -192,7 +194,30 @@ class _BodySignInState extends State<BodySignIn> {
                     );
               },
               child: const Text('Forgot Password'),
-            )
+            ),
+            const OrDivider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SocialIcon(
+                  urlImage: "assets/icons/facebook-white.svg",
+                  press: () {
+                    context.read<AuthBloc>().add(
+                          const AuthEventSignInWithFacebook(),
+                        );
+                  },
+                ),
+                const SizedBox(width: kDefaultPadding),
+                SocialIcon(
+                  urlImage: "assets/icons/google-light.svg",
+                  press: () async {
+                    context.read<AuthBloc>().add(
+                          const AuthEventSignInWithGoogle(),
+                        );
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),

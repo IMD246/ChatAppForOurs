@@ -46,6 +46,15 @@ class _SignInState extends State<SignIn> {
                 text: "Check your gmail ${[state.email]} to verification");
           }
         }
+        if (state is AuthStateSignInWithGoogle) {
+          if (state.exception is UserNotLoggedInAuthException) {
+            await showErrorDialog(
+              context: context,
+              title: "User doesn't logged in error",
+              text: "User doesn't Logged in",
+            );
+          }
+        }
       },
       child: const Scaffold(
         backgroundColor: Colors.white,

@@ -6,7 +6,6 @@ import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/utilities/loading/loading_screen.dart';
 import 'package:chatappforours/view/ForgotPassword/forgot_password.dart';
-import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/chat_screen.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:chatappforours/view/chat/settings/setting_screen.dart';
@@ -35,8 +34,8 @@ class _WelcomePageState extends State<WelcomePage> {
     final ThemeChanger themeChanger = Provider.of<ThemeChanger>(context);
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) async {
+        final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
         if (state is AuthStateLoggedIn) {
-          final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
           final userProfile = await firebaseUserProfile.getUserProfile(
               userID: state.authUser.id);
           themeChanger.setTheme(
@@ -53,7 +52,7 @@ class _WelcomePageState extends State<WelcomePage> {
         }
       },
       builder: (context, state) {
-        if (state is AuthStateLoggedOut) {
+        if (state is AuthStateLoggedOut || state is AuthStateSignInWithGoogle) {
           return const SignIn();
         } else if (state is AuthStateGetInChatFromBodyChatScreen) {
           return MesssageScreen(
@@ -77,9 +76,7 @@ class _WelcomePageState extends State<WelcomePage> {
           return const ChatScreen(
             currentIndex: 0,
           );
-        } else if (state is AuthStateRegistering ||
-            state is AuthStateRegiseringWithFacebook ||
-            state is AuthStateRegiseringWithGoogle) {
+        } else if (state is AuthStateRegistering) {
           return const SignUp();
         } else if (state is AuthStateSetting) {
           return const SettingScreen();

@@ -60,12 +60,12 @@ class AuthEventShouldRegister extends AuthEvent {
   const AuthEventShouldRegister();
 }
 
-class AuthEventRegisterWithFacebook extends AuthEvent {
-  const AuthEventRegisterWithFacebook();
+class AuthEventSignInWithFacebook extends AuthEvent {
+  const AuthEventSignInWithFacebook();
 }
 
-class AuthEventRegisterWithGoogle extends AuthEvent {
-  const AuthEventRegisterWithGoogle();
+class AuthEventSignInWithGoogle extends AuthEvent {
+  const AuthEventSignInWithGoogle();
 }
 
 class AuthEventGetInChatFromBodyChatScreen extends AuthEvent {

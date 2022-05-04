@@ -76,16 +76,16 @@ class AuthStateUploadingTheme extends AuthState {
       : super(isLoading: isLoading);
 }
 
-class AuthStateRegiseringWithFacebook extends AuthState {
+class AuthStateSignInWithFacebook extends AuthState {
   final Exception? exception;
-  const AuthStateRegiseringWithFacebook(
+  const AuthStateSignInWithFacebook(
       {required this.exception, required bool isLoading})
       : super(isLoading: isLoading);
 }
 
-class AuthStateRegiseringWithGoogle extends AuthState {
+class AuthStateSignInWithGoogle extends AuthState {
   final Exception? exception;
-  const AuthStateRegiseringWithGoogle(
+  const AuthStateSignInWithGoogle(
       {required this.exception, required bool isLoading})
       : super(isLoading: isLoading);
 }
@@ -93,7 +93,8 @@ class AuthStateRegiseringWithGoogle extends AuthState {
 class AuthStateGetInChatFromBodyChatScreen extends AuthState {
   final Chat chat;
   final int currentIndex;
-  const AuthStateGetInChatFromBodyChatScreen({required this.currentIndex,
+  const AuthStateGetInChatFromBodyChatScreen({
+    required this.currentIndex,
     required this.chat,
   }) : super(isLoading: false);
 }
@@ -101,18 +102,16 @@ class AuthStateGetInChatFromBodyChatScreen extends AuthState {
 class AuthStateGetInChatFromBodyContactScreen extends AuthState {
   final Chat chat;
   final int currentIndex;
-  const AuthStateGetInChatFromBodyContactScreen({required this.currentIndex,
+  const AuthStateGetInChatFromBodyContactScreen({
+    required this.currentIndex,
     required this.chat,
   }) : super(isLoading: false);
 }
 
 class AuthStateGetOutChatFromBodyChatScreen extends AuthState {
-  
-  const AuthStateGetOutChatFromBodyChatScreen()
-      : super(isLoading: false);
+  const AuthStateGetOutChatFromBodyChatScreen() : super(isLoading: false);
 }
 
 class AuthStateGetOutChatFromBodyContactScreen extends AuthState {
-  const AuthStateGetOutChatFromBodyContactScreen()
-      : super(isLoading: false);
+  const AuthStateGetOutChatFromBodyContactScreen() : super(isLoading: false);
 }

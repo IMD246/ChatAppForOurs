@@ -33,7 +33,7 @@ class FirebaseUserProfile {
       if (e.code == 'user-not-found') {
         throw UserNotFoundAuthException();
       } else {
-        throw GenericAuthException();
+        return null;
       }
     } catch (_) {
       return null;
@@ -50,6 +50,7 @@ class FirebaseUserProfile {
       await userProfilePath.doc(userID).update(mapUser);
     }
   }
+
   Future<void> uploadDarkTheme({
     required String? userID,
     required bool isDarkTheme,
@@ -60,17 +61,18 @@ class FirebaseUserProfile {
       await userProfilePath.doc(userID).update(mapUser);
     }
   }
+
   Future<void> updateUserPresenceDisconnect({required String uid}) async {
     Map<String, dynamic> presenceStatusTrue = {
       'presence': true,
-      stampTimeField : DateTime.now().toString(),
+      stampTimeField: DateTime.now().toString(),
     };
     await userPresenceDatabaseReference.child(uid).update(
           presenceStatusTrue,
         );
     Map<String, dynamic> presenceStatusFalse = {
       'presence': false,
-      stampTimeField : DateTime.now().toString(),
+      stampTimeField: DateTime.now().toString(),
     };
     await userPresenceDatabaseReference
         .child(uid)
@@ -82,7 +84,7 @@ class FirebaseUserProfile {
       {required String? uid, required bool bool}) async {
     Map<String, dynamic> presenceStatusFalse = {
       'presence': bool,
-      stampTimeField : DateTime.now().toString(),
+      stampTimeField: DateTime.now().toString(),
     };
     try {
       await userPresenceDatabaseReference

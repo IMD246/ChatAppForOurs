@@ -4,7 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 class SocialIcon extends StatelessWidget {
   const SocialIcon({
     Key? key,
-    required this.urlImage,required this.press,
+    required this.urlImage,
+    required this.press,
   }) : super(key: key);
   final String urlImage;
   final VoidCallback press;
