@@ -34,15 +34,21 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
   bool isFilledRecent = true;
   bool isFilledActive = false;
   late final StreamController streamController;
+  late final FirebaseUserProfile firebaseUserProfile;
   late final bool isActive;
   late Stream<Iterable<Chat?>> stream;
   @override
   void initState() {
     streamController = StreamController();
+    firebaseUserProfile = FirebaseUserProfile();
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
+    firebaseChat = FirebaseChat();
     setState(() {
-      firebaseChat = FirebaseChat();
       stream = firebaseChat.getAllChat(ownerUserID: userID);
+      firebaseUserProfile.updateUserPresence(
+        uid: userID,
+        bool: true,
+      );
     });
     super.initState();
   }
@@ -86,10 +92,12 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                   FillOutlineButton(
                     press: () {
                       if (isFilledActive == false) {
-                        setState(() {
-                          isFilledRecent = false;
-                          isFilledActive = true;
-                        });
+                        setState(
+                          () {
+                            isFilledRecent = false;
+                            isFilledActive = true;
+                          },
+                        );
                       }
                     },
                     text: "Active",
@@ -103,28 +111,24 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                 child: RefreshIndicator(
                   strokeWidth: 1,
                   onRefresh: () async {
-                    setState(() {
+                    setState(() async {
+                      await firebaseUserProfile.updateUserPresence(
+                        uid: userID,
+                        bool: true,
+                      );
                       stream = firebaseChat.getAllChat(ownerUserID: userID);
                     });
                   },
                   child: StreamBuilder(
-                      stream: stream,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          final allChat = snapshot.data as Iterable<Chat>;
-                          if (allChat.isNotEmpty) {
-                            return ChatListView(
-                              allChat: allChat,
-                              isFilledActive: isFilledActive,
-                            );
-                          } else {
-                            return const Center(
-                              child: Text(
-                                "Don't have any chat",
-                                style: TextStyle(fontSize: 20),
-                              ),
-                            );
-                          }
+                    stream: stream,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final allChat = snapshot.data as Iterable<Chat>;
+                        if (allChat.isNotEmpty) {
+                          return ChatListView(
+                            allChat: allChat,
+                            isFilledActive: isFilledActive,
+                          );
                         } else {
                           return const Center(
                             child: Text(
@@ -133,7 +137,16 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                             ),
                           );
                         }
-                      }),
+                      } else {
+                        return const Center(
+                          child: Text(
+                            "Don't have any chat",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        );
+                      }
+                    },
+                  ),
                 ),
               ),
             ),

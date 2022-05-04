@@ -52,7 +52,7 @@ class _WelcomePageState extends State<WelcomePage> {
         }
       },
       builder: (context, state) {
-        if (state is AuthStateLoggedOut || state is AuthStateSignInWithGoogle) {
+        if (state is AuthStateLoggedOut) {
           return const SignIn();
         } else if (state is AuthStateGetInChatFromBodyChatScreen) {
           return MesssageScreen(

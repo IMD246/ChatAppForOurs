@@ -379,12 +379,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final FirebaseFriendList friendListFirebase = FirebaseFriendList();
         final userProfileFirebase = FirebaseUserProfile();
         emit(
-          const AuthStateSignInWithGoogle(
+          const AuthStateLoggedOut(
             isLoading: true,
             exception: null,
           ),
         );
-        Exception? exception;
         try {
           final user = await authProvider.createUserWithGoogle();
           final getUserProfile =
@@ -404,6 +403,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               userID: user.id!,
               userProfile: userProfile,
             );
+            await userProfileFirebase.updateUserPresenceDisconnect(
+              uid: user.id!,
+            );
             emit(
               AuthStateLoggedIn(
                 authUser: authProvider.currentUser!,
@@ -411,6 +413,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               ),
             );
           } else {
+            await userProfileFirebase.updateUserPresenceDisconnect(
+              uid: user.id!,
+            );
             emit(
               AuthStateLoggedIn(
                 authUser: authProvider.currentUser!,
@@ -419,11 +424,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             );
           }
         } on Exception catch (e) {
-          exception = e;
           emit(
-            AuthStateSignInWithGoogle(
+            AuthStateLoggedOut(
               isLoading: false,
-              exception: exception,
+              exception: e,
             ),
           );
         }

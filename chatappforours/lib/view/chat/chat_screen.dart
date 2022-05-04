@@ -24,8 +24,14 @@ class _ChatScreenState extends State<ChatScreen> {
   String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
-    firebaseUserProfile = FirebaseUserProfile();
     currentIndex = widget.currentIndex;
+    firebaseUserProfile = FirebaseUserProfile();
+      setState(() {
+        firebaseUserProfile.updateUserPresence(
+              uid: ownerUserID, bool: true,
+            );
+      });
+            
     super.initState();
   }
 
