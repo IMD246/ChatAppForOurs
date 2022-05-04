@@ -14,7 +14,7 @@ class TextFieldContainer extends StatelessWidget {
       ),
       margin: const EdgeInsets.symmetric(
         horizontal: kDefaultPadding,
-        vertical: kDefaultPadding / 2,
+        vertical: kDefaultPadding * 0.25,
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor.withOpacity(0.5),

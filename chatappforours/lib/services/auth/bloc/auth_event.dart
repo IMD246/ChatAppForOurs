@@ -71,7 +71,8 @@ class AuthEventSignInWithGoogle extends AuthEvent {
 class AuthEventGetInChatFromBodyChatScreen extends AuthEvent {
   final Chat chat;
   final int currentIndex;
-  const AuthEventGetInChatFromBodyChatScreen({required this.currentIndex,
+  const AuthEventGetInChatFromBodyChatScreen({
+    required this.currentIndex,
     required this.chat,
   });
 }
@@ -79,7 +80,8 @@ class AuthEventGetInChatFromBodyChatScreen extends AuthEvent {
 class AuthEventGetInChatFromBodyContactScreen extends AuthEvent {
   final Chat chat;
   final int currentIndex;
-  const AuthEventGetInChatFromBodyContactScreen({required this.currentIndex,
+  const AuthEventGetInChatFromBodyContactScreen({
+    required this.currentIndex,
     required this.chat,
   });
 }

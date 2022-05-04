@@ -4,11 +4,13 @@ import 'package:flutter/foundation.dart';
 
 @immutable
 class UserProfile {
+  final String? idUser;
   final String email;
   final String fullName;
   final String? urlImage;
   final bool isDarkMode;
   const UserProfile({
+    this.idUser,
     required this.email,
     required this.fullName,
     required this.urlImage,
@@ -23,5 +25,6 @@ class UserProfile {
             ? null
             : snapshot.get(urlImageField),
         isDarkMode: snapshot.get(isDarkModeField),
+        idUser: snapshot.id,
       );
 }

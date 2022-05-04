@@ -7,10 +7,12 @@ class FillOutlineButton extends StatelessWidget {
     Key? key,
     this.isFilled = true,
     required this.press,
+    this.isCheckAdded = false,
     required this.text,
   }) : super(key: key);
 
   final bool isFilled;
+  final bool isCheckAdded;
   final VoidCallback press;
   final String text;
 
@@ -22,7 +24,7 @@ class FillOutlineButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         side: const BorderSide(color: Colors.white),
       ),
-      elevation: isFilled ? 2 : 0,
+      elevation: !isCheckAdded ? isFilled ? 2 : 0 : 0.5,
       color: isFilled ? Colors.white : Colors.transparent,
       onPressed: press,
       child: Text(

@@ -82,14 +82,6 @@ class AuthStateSignInWithFacebook extends AuthState {
       {required this.exception, required bool isLoading})
       : super(isLoading: isLoading);
 }
-
-class AuthStateSignInWithGoogle extends AuthState {
-  final Exception? exception;
-  const AuthStateSignInWithGoogle(
-      {required this.exception, required bool isLoading})
-      : super(isLoading: isLoading);
-}
-
 class AuthStateGetInChatFromBodyChatScreen extends AuthState {
   final Chat chat;
   final int currentIndex;

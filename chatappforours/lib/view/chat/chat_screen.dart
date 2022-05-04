@@ -5,6 +5,7 @@ import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
+import 'package:chatappforours/view/chat/addFriend/add_friend_screen.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,12 +27,13 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     currentIndex = widget.currentIndex;
     firebaseUserProfile = FirebaseUserProfile();
-      setState(() {
-        firebaseUserProfile.updateUserPresence(
-              uid: ownerUserID, bool: true,
-            );
-      });
-            
+    setState(() {
+      firebaseUserProfile.updateUserPresence(
+        uid: ownerUserID,
+        bool: true,
+      );
+    });
+
     super.initState();
   }
 
@@ -68,7 +70,15 @@ class _ChatScreenState extends State<ChatScreen> {
                         },
                       ),
                 floatingActionButton: FloatingActionButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const AddFriendScreen();
+                        },
+                      ),
+                    );
+                  },
                   child: const Icon(
                     Icons.person_add_alt_1,
                     color: Colors.white,
