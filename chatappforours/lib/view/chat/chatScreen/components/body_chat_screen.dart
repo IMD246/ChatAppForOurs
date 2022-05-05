@@ -180,6 +180,7 @@ class _ChatListViewState extends State<ChatListView> {
 
   getAllDataChat({required Iterable<Chat> list}) async {
     listChatData.clear();
+    _streamController.onPause;
     for (var i = 0; i < list.length; i++) {
       final chat = await firebaseChat.getChatByID(
           idChat: list.elementAt(i).idChat, userChatID: ownerUserID);
@@ -217,6 +218,7 @@ class _ChatListViewState extends State<ChatListView> {
           chat.presence = isOnline;
           listChatData.add(chat);
           _streamController.sink.add(listChatData);
+          _streamController.onResume;
         },
       );
     }
@@ -224,6 +226,7 @@ class _ChatListViewState extends State<ChatListView> {
 
   getAllDataChatOnline({required Iterable<Chat> list}) async {
     listChatData.clear();
+    _streamController.onPause;
     for (var i = 0; i < list.length; i++) {
       final chat = await firebaseChat.getChatByID(
           idChat: list.elementAt(i).idChat, userChatID: ownerUserID);
@@ -262,6 +265,7 @@ class _ChatListViewState extends State<ChatListView> {
           if (isOnline == true) {
             listChatData.add(chat);
             _streamController.sink.add(listChatData);
+            _streamController.onResume;
           }
         },
       );
@@ -289,38 +293,39 @@ class _ChatListViewState extends State<ChatListView> {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         return FutureBuilder(
-            future: !widget.isFilledActive
-                ? getAllDataChat(list: widget.allChat)
-                : getAllDataChatOnline(list: widget.allChat),
-            builder: (context, snapshot) {
-              return StreamBuilder(
-                stream: _streamController.stream,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final allChatCard = snapshot.data as Iterable<Chat>;
-                    return ListView.builder(
-                      itemCount: allChatCard.length,
-                      itemBuilder: (context, index) {
-                        return ChatCard(
-                          chat: allChatCard.elementAt(index),
-                          press: () {
-                            final chatData = allChatCard.elementAt(index);
-                            context.read<AuthBloc>().add(
-                                  AuthEventGetInChatFromBodyChatScreen(
-                                    chat: chatData,
-                                    currentIndex: 0,
-                                  ),
-                                );
-                          },
-                        );
-                      },
-                    );
-                  } else {
-                    return const CircularProgressIndicator();
-                  }
-                },
-              );
-            });
+          future: !widget.isFilledActive
+              ? getAllDataChat(list: widget.allChat)
+              : getAllDataChatOnline(list: widget.allChat),
+          builder: (context, snapshot) {
+            return StreamBuilder(
+              stream: _streamController.stream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final allChatCard = snapshot.data as Iterable<Chat>;
+                  return ListView.builder(
+                    itemCount: allChatCard.length,
+                    itemBuilder: (context, index) {
+                      return ChatCard(
+                        chat: allChatCard.elementAt(index),
+                        press: () {
+                          final chatData = allChatCard.elementAt(index);
+                          context.read<AuthBloc>().add(
+                                AuthEventGetInChatFromBodyChatScreen(
+                                  chat: chatData,
+                                  currentIndex: 0,
+                                ),
+                              );
+                        },
+                      );
+                    },
+                  );
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
+            );
+          },
+        );
       },
     );
   }
