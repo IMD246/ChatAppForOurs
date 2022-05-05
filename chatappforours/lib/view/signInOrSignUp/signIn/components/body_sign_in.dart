@@ -5,7 +5,7 @@ import 'package:chatappforours/utilities/textField/text_field.dart';
 import 'package:chatappforours/utilities/validator/check_format_field.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/components/or_divider.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/components/social_icon.dart';
-import 'package:chatappforours/view/signInOrSignUp/text_field_container.dart';
+import 'package:chatappforours/utilities/textField/text_field_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
