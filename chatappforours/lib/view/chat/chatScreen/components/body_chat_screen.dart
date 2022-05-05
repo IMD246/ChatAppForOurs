@@ -201,7 +201,7 @@ class _ChatListViewState extends State<ChatListView> {
           );
           if (chat.typeChat == TypeChat.normal) {
             chat.urlUserFriend = userProfile?.urlImage;
-            if (chat.listUser.length <= 1) {
+            if (chat.listUser.length <= 1 && chat.listUser[0] == ownerUserID) {
               chat.nameChat = 'Only You';
             } else {
               chat.nameChat = userProfile!.fullName;
@@ -245,7 +245,7 @@ class _ChatListViewState extends State<ChatListView> {
           );
           if (chat.typeChat == TypeChat.normal) {
             chat.urlUserFriend = userProfile?.urlImage;
-            if (chat.listUser.length <= 1) {
+            if (chat.listUser.length <= 1 && chat.listUser[0] == ownerUserID) {
               chat.nameChat = 'Only You';
             } else {
               chat.nameChat = userProfile!.fullName;
