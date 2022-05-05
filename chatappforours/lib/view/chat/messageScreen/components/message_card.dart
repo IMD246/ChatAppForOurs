@@ -68,7 +68,8 @@ class _MessageCardState extends State<MessageCard> {
         );
       }
     } else {
-      if (widget.chatMessage.messageStatus == MessageStatus.sent) {
+      if (widget.chatMessage.messageStatus == MessageStatus.sent &&
+          widget.chatMessage.isSender == true) {
         firebaseChatMessage.updateMessageFriendToViewed(
           chatID: widget.chat.idChat,
           messageID: widget.chatMessage.idMessage,
@@ -225,21 +226,19 @@ class _MessageCardState extends State<MessageCard> {
                         ),
                     const SizedBox(width: kDefaultPadding * 0.5),
                     messageContaint(widget.chatMessage),
-                    if (widget.chat.listUser[0].compareTo(idUser) == 0)
-                      if (widget.chatMessage.messageStatus ==
-                              MessageStatus.viewed ||
-                          widget.chatMessage.messageStatus ==
-                              MessageStatus.sent)
-                        MessageStatusDot(
-                          messageStatus: widget.chatMessage.messageStatus,
-                          urlStringImage: urlStringImage,
-                          chatID: widget.chat.idChat,
-                          idMessage: widget.chatMessage.idMessage,
-                          idUserFriend: widget.chat.listUser[0],
-                          isSender: widget.chatMessage.hasSender
-                              ? widget.chatMessage.isSender!
-                              : false,
-                        ),
+                    if (widget.chatMessage.messageStatus ==
+                            MessageStatus.viewed ||
+                        widget.chatMessage.messageStatus == MessageStatus.sent)
+                      MessageStatusDot(
+                        messageStatus: widget.chatMessage.messageStatus,
+                        urlStringImage: urlStringImage,
+                        chatID: widget.chat.idChat,
+                        idMessage: widget.chatMessage.idMessage,
+                        idUserFriend: widget.chat.listUser[0],
+                        isSender: widget.chatMessage.hasSender
+                            ? widget.chatMessage.isSender!
+                            : false,
+                      ),
                   ],
                 ),
                 Visibility(
