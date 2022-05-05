@@ -79,6 +79,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
             children: [
               if (widget.userProfile.urlImage != null)
                 CircleAvatar(
+                  radius: 20,
                   child: ClipOval(
                     child: SizedBox.fromSize(
                       size: const Size.fromRadius(60),
@@ -118,10 +119,11 @@ class _AddFriendCardState extends State<AddFriendCard> {
                 ),
               if (isUserPresence == false)
                 Positioned(
-                  bottom: 0,
+                  bottom: -2,
                   right: 0,
                   child: Text(
                     stampTimeUserFormated != null ? stampTimeUserFormated! : "",
+                    style: const TextStyle(fontSize: 11),
                   ),
                 ),
             ],

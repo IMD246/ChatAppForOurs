@@ -38,6 +38,7 @@ class Material extends StatelessWidget {
     return BlocProvider<AuthBloc>(
       create: (context) => AuthBloc(FirebaseAuthProvider()),
       child: MaterialApp(
+          // supportedLocales: Applocalization.supportedLocales,
           debugShowCheckedModeBanner: false,
           theme: lightThemeData(context),
           darkTheme: darkThemeData(context),
