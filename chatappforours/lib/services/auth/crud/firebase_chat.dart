@@ -72,22 +72,34 @@ class FirebaseChat {
   Future<Chat?> getChatByListIDUser({
     required List<String> listUserID,
   }) async {
-    final id = await firebaseChat.doc(listUserID[0] + listUserID[1]).get().then(
+    return await firebaseChat.doc(listUserID[0] + listUserID[1]).get().then(
       (value) async {
-        if (value.id.isNotEmpty) {
-          return value.id;
-        } else {
-          await firebaseChat.doc(listUserID[1] + listUserID[0]).get().then(
+        if (value.exists) {
+          return await firebaseChat.doc(value.id).get().then(
             (value) {
-              return value.id;
+              return Chat.fromSnapshot(docs: value);
+            },
+          );
+        } else {
+          return await firebaseChat
+              .doc(listUserID[1] + listUserID[0])
+              .get()
+              .then(
+            (value) async {
+              if (value.exists) {
+                return await firebaseChat.doc(value.id).get().then(
+                  (value) {
+                    return Chat.fromSnapshot(docs: value);
+                  },
+                );
+              } else {
+                return await null;
+              }
             },
           );
         }
       },
     );
-    return await firebaseChat.doc(id).get().then(
-          (value) => Chat.fromSnapshot(docs: value),
-        );
   }
 
   Stream<Iterable<Chat>> getAllChat({
