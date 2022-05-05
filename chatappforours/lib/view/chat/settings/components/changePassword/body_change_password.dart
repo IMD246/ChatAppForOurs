@@ -105,6 +105,11 @@ class _BodyChangePasswordState extends State<BodyChangePassword> {
                     {
                       await FirebaseAuth.instance.currentUser!
                           .updatePassword(password.text);
+                      await showErrorDialog(
+                        context: context,
+                        text: "Update password successfully!",
+                        title: "Update Password Notification",
+                      );
                       password.clear();
                       verifyPassword.clear();
                     }

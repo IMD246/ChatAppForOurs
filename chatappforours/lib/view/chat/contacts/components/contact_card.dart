@@ -155,7 +155,7 @@ class _ContactCardState extends State<ContactCard> {
                                                 stampTime!,
                                               )
                                             : "",
-                                        style: const TextStyle(fontSize: 10),
+                                        style: const TextStyle(fontSize: 13),
                                       ),
                                     ),
                             ],

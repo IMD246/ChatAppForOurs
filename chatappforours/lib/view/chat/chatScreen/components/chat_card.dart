@@ -110,6 +110,7 @@ class _ChatCardState extends State<ChatCard> {
                                   child: Text(
                                     differenceInCalendarPresence(
                                         widget.chat.stampTimeUser!),
+                                    style: const TextStyle(fontSize: 13),
                                   ),
                                 ),
                             ],
