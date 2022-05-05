@@ -66,6 +66,7 @@ class _ContactCardState extends State<ContactCard> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         return GestureDetector(
@@ -79,14 +80,10 @@ class _ContactCardState extends State<ContactCard> {
                 chat.stampTimeUserFormated = widget.friend.stampTimeUser;
                 context.read<AuthBloc>().add(
                       AuthEventGetInChatFromBodyContactScreen(
-                          chat: chat, currentIndex: 1),
+                        chat: chat,
+                        currentIndex: 1,
+                      ),
                     );
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => MesssageScreen(chat: chat),
-                //   ),
-                // );
               }
             }
           },
@@ -158,6 +155,7 @@ class _ContactCardState extends State<ContactCard> {
                                                 stampTime!,
                                               )
                                             : "",
+                                        style: const TextStyle(fontSize: 10),
                                       ),
                                     ),
                             ],
@@ -196,8 +194,8 @@ class _ContactCardState extends State<ContactCard> {
                                   },
                                   text: 'Accept',
                                 ),
-                                const SizedBox(
-                                  width: 5,
+                                SizedBox(
+                                  width: size.width * 0.01,
                                 ),
                                 FillOutlineButton(
                                   press: () async {

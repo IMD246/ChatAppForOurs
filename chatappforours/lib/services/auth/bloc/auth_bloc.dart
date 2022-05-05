@@ -389,8 +389,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         try {
           final user = await authProvider.createUserWithGoogle();
-          final getUserProfile =
-              await userProfileFirebase.getUserProfile(userID: user.id);
+          final getUserProfile = await userProfileFirebase
+              .geetUserProfileByEmail(email: user.email);
           if (getUserProfile == null) {
             await friendListFirebase.createNewFriendDefault(
               userIDFriend: user.id!,

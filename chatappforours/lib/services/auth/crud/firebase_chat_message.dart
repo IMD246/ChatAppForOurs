@@ -145,34 +145,37 @@ class FirebaseChatMessage {
   }
 
   Future<void> deleteMessageNotSent({
-    required ownerUserID,
-    required chatID,
+    required String ownerUserID,
+    required String chatID,
   }) async {
     String? id;
-    final bool isCheck = await firebaseChatMessageDocument
-        .doc(chatID)
-        .collection('message')
-        .where(idSenderField, isEqualTo: ownerUserID)
-        .where(messageStatusField, isEqualTo: MessageStatus.notSent.toString())
-        .orderBy(stampTimeField, descending: true)
-        .limit(1)
-        .get()
-        .then(
-      (value) {
-        if (value.size > 0 && value.docs.first.exists) {
-          id = value.docs.first.id;
-          return true;
-        } else {
-          return false;
-        }
-      },
-    );
-    if (isCheck == true) {
-      await firebaseChatMessageDocument
+    if (id != null) {
+      final bool isCheck = await firebaseChatMessageDocument
           .doc(chatID)
           .collection('message')
-          .doc(id)
-          .delete();
+          .where(idSenderField, isEqualTo: ownerUserID)
+          .where(messageStatusField,
+              isEqualTo: MessageStatus.notSent.toString())
+          .orderBy(stampTimeField, descending: true)
+          .limit(1)
+          .get()
+          .then(
+        (value) {
+          if (value.size > 0 && value.docs.first.exists) {
+            id = value.docs.first.id;
+            return true;
+          } else {
+            return false;
+          }
+        },
+      );
+      if (isCheck == true) {
+        await firebaseChatMessageDocument
+            .doc(chatID)
+            .collection('message')
+            .doc(id)
+            .delete();
+      }
     }
   }
 

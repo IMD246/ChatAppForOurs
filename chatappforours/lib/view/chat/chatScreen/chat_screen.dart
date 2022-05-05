@@ -174,12 +174,6 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.search),
-        ),
-      ],
     );
   }
 }

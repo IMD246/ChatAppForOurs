@@ -13,7 +13,6 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
   void initState() {
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     return const Scaffold(

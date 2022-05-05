@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
+import 'package:chatappforours/view/chat/messageScreen/components/image_message_card.dart';
 import 'package:flutter/material.dart';
 
 class ImageMessage extends StatefulWidget {
@@ -49,24 +49,9 @@ class _ImageMessageState extends State<ImageMessage> {
               crossAxisSpacing: 2,
             ),
             itemBuilder: (BuildContext context, int index) {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: list.elementAt(index).isNotEmpty
-                    ? CachedNetworkImage(
-                        fit: BoxFit.fill,
-                        imageUrl: list.elementAt(index),
-                        placeholder: (context, url) =>
-                            const CircularProgressIndicator(),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                        colorBlendMode: BlendMode.softLight,
-                      )
-                    : const Image(
-                        image: AssetImage(
-                          "assets/images/defaultImage.png",
-                        ),
-                        fit: BoxFit.fill,
-                      ),
+              return ImageMessageCard(
+                urlImage: list.elementAt(index),
+                chatMessage: widget.chatMessage,
               );
             },
           ),

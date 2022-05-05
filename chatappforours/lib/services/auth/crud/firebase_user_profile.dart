@@ -42,6 +42,32 @@ class FirebaseUserProfile {
     }
   }
 
+  Future<UserProfile?> geetUserProfileByEmail({
+    required String? email,
+  }) async {
+    try {
+      return await userProfilePath
+          .where(emailField, isEqualTo: email)
+          .get()
+          .then((value) {
+        if (value.docs.isNotEmpty) {
+          return UserProfile.fromSnapshot(value.docs.first);
+        } else {
+          return null;
+        }
+      },);
+
+    } on FirebaseException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw UserNotFoundAuthException();
+      } else {
+        return null;
+      }
+    } catch (_) {
+      return null;
+    }
+  }
+
   Stream<Iterable<UserProfile?>> getAllUserProfile() {
     final userProfile = userProfilePath
         .where(isEmailVerifiedField, isEqualTo: true)
