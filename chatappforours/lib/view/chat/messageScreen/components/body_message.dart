@@ -1,3 +1,4 @@
+import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
@@ -51,6 +52,13 @@ class _BodyMessageState extends State<BodyMessage> {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.active:
+                if (scrollController.isAttached) {
+                  scrollController.scrollTo(
+                    index: intMaxValue,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeIn,
+                  );
+                }
                 final allChatMessage = snapshot.data as Iterable<ChatMessage>;
                 return Expanded(
                   child: ScrollablePositionedList.builder(
@@ -109,7 +117,7 @@ class _BodyMessageState extends State<BodyMessage> {
         ChatInputFieldMessage(
           chat: widget.chat,
           scroll: scrollController,
-          userIDFriend: widget.chat.listUser.elementAt(1),
+          userIDFriend: widget.chat.listUser[0],
         ),
       ],
     );

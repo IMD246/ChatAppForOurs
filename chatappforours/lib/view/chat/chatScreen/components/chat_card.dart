@@ -7,6 +7,7 @@ import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,6 +29,7 @@ class ChatCard extends StatefulWidget {
 class _ChatCardState extends State<ChatCard> {
   late final FirebaseChat firebaseChat;
   late final FirebaseChatMessage firebaseChatMessage;
+  String userOwnerID = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
     firebaseChat = FirebaseChat();
@@ -51,7 +53,7 @@ class _ChatCardState extends State<ChatCard> {
               children: [
                 FutureBuilder<UserProfile?>(
                   future: firebaseUserProfile.getUserProfile(
-                      userID: widget.chat.listUser[1]),
+                      userID: widget.chat.listUser.first),
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.done:
@@ -145,10 +147,7 @@ class _ChatCardState extends State<ChatCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.chat.listUser[0].compareTo(
-                                    widget.chat.listUser[1],
-                                  ) ==
-                                  0
+                          widget.chat.listUser[0].compareTo(userOwnerID) == 0
                               ? "Only You"
                               : widget.chat.nameChat!,
                           style: const TextStyle(

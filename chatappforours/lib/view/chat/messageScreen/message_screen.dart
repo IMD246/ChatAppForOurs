@@ -27,6 +27,17 @@ class MesssageScreen extends StatefulWidget {
 }
 
 class _MesssageScreenState extends State<MesssageScreen> {
+  final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+  String userOwnerID = FirebaseAuth.instance.currentUser!.uid;
+  @override
+  void initState() {
+    firebaseUserProfile.updateUserPresence(
+      uid: userOwnerID,
+      bool: true,
+    );
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkTheme = Provider.of<ThemeChanger>(context).getTheme();

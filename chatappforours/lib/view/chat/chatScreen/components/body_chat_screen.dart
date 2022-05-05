@@ -191,8 +191,8 @@ class _ChatListViewState extends State<ChatListView> {
       if (chat.listUser[0] == chat.listUser[1]) {
         userIDFriend = chat.listUser.elementAt(0);
       } else {
-        userIDFriend =
-            chat.listUser.where((element) => element != ownerUserID).first;
+        chat.listUser.remove(ownerUserID);
+        userIDFriend = chat.listUser.first;
       }
       userPresenceDatabaseReference.child(userIDFriend).once().then(
         (event) async {
@@ -235,8 +235,8 @@ class _ChatListViewState extends State<ChatListView> {
       if (chat.listUser[0] == chat.listUser[1]) {
         userIDFriend = chat.listUser.elementAt(0);
       } else {
-        userIDFriend =
-            chat.listUser.where((element) => element != ownerUserID).first;
+        chat.listUser.remove(ownerUserID);
+        userIDFriend = chat.listUser.first;
       }
       userPresenceDatabaseReference.child(userIDFriend).once().then(
         (event) async {

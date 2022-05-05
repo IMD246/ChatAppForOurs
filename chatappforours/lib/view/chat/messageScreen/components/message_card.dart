@@ -50,9 +50,8 @@ class _MessageCardState extends State<MessageCard> {
   void initState() {
     firebaseUserProfile = FirebaseUserProfile();
     firebaseChatMessage = FirebaseChatMessage();
-    userIDFriend = widget.chat.listUser[0] == widget.chat.listUser[1]
-        ? idUser
-        : widget.chat.listUser[1];
+    userIDFriend =
+        widget.chat.listUser[0] == idUser ? idUser : widget.chat.listUser[0];
     widget.index <= 0
         ? checkCurrentAndIndexTimeGreater10Minute = true
         : checkCurrentAndIndexTimeGreater10Minute =
@@ -226,7 +225,7 @@ class _MessageCardState extends State<MessageCard> {
                         ),
                     const SizedBox(width: kDefaultPadding * 0.5),
                     messageContaint(widget.chatMessage),
-                    if (widget.chat.listUser[1].compareTo(idUser) == 0)
+                    if (widget.chat.listUser[0].compareTo(idUser) == 0)
                       if (widget.chatMessage.messageStatus ==
                               MessageStatus.viewed ||
                           widget.chatMessage.messageStatus ==
@@ -236,7 +235,7 @@ class _MessageCardState extends State<MessageCard> {
                           urlStringImage: urlStringImage,
                           chatID: widget.chat.idChat,
                           idMessage: widget.chatMessage.idMessage,
-                          idUserFriend: widget.chat.listUser[1],
+                          idUserFriend: widget.chat.listUser[0],
                           isSender: widget.chatMessage.hasSender
                               ? widget.chatMessage.isSender!
                               : false,
@@ -335,13 +334,10 @@ class _MessageStatusDotState extends State<MessageStatusDot> {
                   if (snapshot.hasData) {
                     final userProfile = snapshot.data;
                     if (userProfile!.urlImage == null) {
-                      return FittedBox(
-                        fit: BoxFit.cover,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.cyan[100],
-                          backgroundImage: const AssetImage(
-                            "assets/images/defaultImage.png",
-                          ),
+                      return CircleAvatar(
+                        backgroundColor: Colors.cyan[100],
+                        backgroundImage: const AssetImage(
+                          "assets/images/defaultImage.png",
                         ),
                       );
                     } else {
