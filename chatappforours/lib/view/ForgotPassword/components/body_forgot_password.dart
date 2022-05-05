@@ -56,8 +56,8 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                 padding: const EdgeInsets.symmetric(vertical: kDefaultPadding),
                 child: Center(
                   child: Image.asset(
-                    "assets/images/reset-password.png",
-                    height: 246,
+                    "assets/images/reset_password.png",
+                    height: 200,
                   ),
                 ),
               ),
