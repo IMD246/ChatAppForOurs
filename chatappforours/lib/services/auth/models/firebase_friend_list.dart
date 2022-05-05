@@ -40,7 +40,7 @@ class FirebaseFriendList {
         .set(map);
   }
 
-  Future<String> getIDFriendListDocument(
+  Future<String?> getIDFriendListDocument(
       {required String ownerUserID,
       required String userID,
       bool? isRequest}) async {
@@ -49,7 +49,13 @@ class FirebaseFriendList {
         .collection('friend')
         .where(userIDField, isEqualTo: userID)
         .get()
-        .then((value) => value.docs.first.id);
+        .then((value) {
+      if (value.docs.isNotEmpty) {
+        return value.docs.first.id;
+      } else {
+        return null;
+      }
+    });
     return id;
   }
 
@@ -71,7 +77,7 @@ class FirebaseFriendList {
 
   Future<void> deleteFriend(
       {required String ownerUserID, required String userID}) async {
-    String id = await getIDFriendListDocument(
+    String? id = await getIDFriendListDocument(
       ownerUserID: ownerUserID,
       userID: userID,
     );

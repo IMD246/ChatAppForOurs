@@ -42,12 +42,9 @@ class FirebaseUserProfile {
     }
   }
 
-  Stream<Iterable<UserProfile?>> getAllUserProfile({
-    required String searchText,
-  }) {
+  Stream<Iterable<UserProfile?>> getAllUserProfile() {
     final userProfile = userProfilePath
         .where(isEmailVerifiedField, isEqualTo: true)
-        .where(fullNameField, isGreaterThanOrEqualTo: searchText)
         .limit(30)
         .snapshots()
         .map(

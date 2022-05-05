@@ -308,7 +308,9 @@ class _ChatListViewState extends State<ChatListView> {
                       final chatData = allChatCard.elementAt(index);
                       context.read<AuthBloc>().add(
                             AuthEventGetInChatFromBodyChatScreen(
-                                chat: chatData, currentIndex: 0),
+                              chat: chatData,
+                              currentIndex: 0,
+                            ),
                           );
                     },
                   );
