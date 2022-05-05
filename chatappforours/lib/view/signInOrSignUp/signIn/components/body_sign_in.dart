@@ -41,6 +41,7 @@ class _BodySignInState extends State<BodySignIn> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -94,6 +95,16 @@ class _BodySignInState extends State<BodySignIn> {
                   child: Column(
                     children: [
                       TextField(
+                        onSubmitted: (_) {
+                          if (errorStringEmail.isEmpty &&
+                              errorStringPassWord.isEmpty) {
+                            {
+                              context.read<AuthBloc>().add(
+                                    AuthEventLogIn(email.text, password.text),
+                                  );
+                            }
+                          }
+                        },
                         textInputAction: TextInputAction.done,
                         style: TextStyle(color: textColorMode(ThemeMode.light)),
                         onTap: () {

@@ -49,14 +49,15 @@ class FirebaseUserProfile {
       return await userProfilePath
           .where(emailField, isEqualTo: email)
           .get()
-          .then((value) {
-        if (value.docs.isNotEmpty) {
-          return UserProfile.fromSnapshot(value.docs.first);
-        } else {
-          return null;
-        }
-      },);
-
+          .then(
+        (value) {
+          if (value.docs.isNotEmpty) {
+            return UserProfile.fromSnapshot(value.docs.first);
+          } else {
+            return null;
+          }
+        },
+      );
     } on FirebaseException catch (e) {
       if (e.code == 'user-not-found') {
         throw UserNotFoundAuthException();
@@ -111,6 +112,17 @@ class FirebaseUserProfile {
       mapUser.addAll({isDarkModeField: isDarkTheme});
       await userProfilePath.doc(userID).update(mapUser);
     }
+  }
+
+  Future<void> upLoadUserProfile({
+    required String userID,
+    required String fullName,
+  }) async {
+    Map<String, dynamic> mapUser = <String, dynamic>{
+      fullNameField: fullName,
+    };
+
+    await userProfilePath.doc(userID).update(mapUser);
   }
 
   Future<void> updateUserPresenceDisconnect({required String uid}) async {

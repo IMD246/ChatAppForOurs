@@ -27,6 +27,7 @@ class _BodySignUpState extends State<BodySignUp> {
   String errorStringFirstName = '';
   String errorStringLastName = '';
   bool isVisiblePassWord = false;
+  final FocusNode focusNode = FocusNode(canRequestFocus: true);
   @override
   void initState() {
     email = TextEditingController();
@@ -48,6 +49,8 @@ class _BodySignUpState extends State<BodySignUp> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateRegistering) {
@@ -63,16 +66,17 @@ class _BodySignUpState extends State<BodySignUp> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
-                child: Center(
-                  child: Image.asset(
-                    "assets/images/Register_Image.png",
-                    height: 185,
+              if (!isKeyboard)
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+                  child: Center(
+                    child: Image.asset(
+                      "assets/images/Register_Image.png",
+                      height: 185,
+                    ),
                   ),
                 ),
-              ),
               Column(
                 children: [
                   TextFieldContainer(
@@ -197,6 +201,20 @@ class _BodySignUpState extends State<BodySignUp> {
                     child: Column(
                       children: [
                         TextField(
+                          onSubmitted: (_) {
+                            if (errorStringEmail.isEmpty &&
+                                errorStringFirstName.isEmpty &&
+                                errorStringLastName.isEmpty &&
+                                errorStringPassWord.isEmpty) {
+                              context.read<AuthBloc>().add(
+                                    AuthEventRegister(
+                                      email.text,
+                                      password.text,
+                                      "${firstName.text} ${lastName.text}",
+                                    ),
+                                  );
+                            }
+                          },
                           style:
                               TextStyle(color: textColorMode(ThemeMode.light)),
                           textInputAction: TextInputAction.done,
@@ -262,8 +280,11 @@ class _BodySignUpState extends State<BodySignUp> {
                         errorStringLastName.isEmpty &&
                         errorStringPassWord.isEmpty) {
                       context.read<AuthBloc>().add(
-                            AuthEventRegister(email.text, password.text,
-                                "${firstName.text} ${lastName.text}"),
+                            AuthEventRegister(
+                              email.text,
+                              password.text,
+                              "${firstName.text} ${lastName.text}",
+                            ),
                           );
                     }
                   },

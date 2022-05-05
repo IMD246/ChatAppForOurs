@@ -13,7 +13,11 @@ String checkPassword(String val) {
       ? "Enter Your Password"
       : (val.length < 6 ? "Weak Password" : "");
 }
-
+String checkDuplicatePassword(String val,String val2) {
+  return val != val2
+      ? "Your password is not duplicate , Check Again!"
+      : "";
+}
 String checkFirstName(String val) {
   return val.isEmpty
       ? "Enter Your First Name"

@@ -67,9 +67,21 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                     child: Column(
                       children: [
                         TextField(
-                          style:
-                              TextStyle(color: textColorMode(ThemeMode.light)),
-                          textInputAction: TextInputAction.next,
+                          style: TextStyle(
+                            color: textColorMode(ThemeMode.light),
+                          ),
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) {
+                            if (errorStringEmail.isEmpty) {
+                              {
+                                context.read<AuthBloc>().add(
+                                      AuthEventForgetPassword(
+                                        email: email.text,
+                                      ),
+                                    );
+                              }
+                            }
+                          },
                           onTap: () {
                             setState(() {
                               errorStringEmail = checkFormatEmail(email.text);

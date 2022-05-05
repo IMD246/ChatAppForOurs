@@ -7,6 +7,8 @@ import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
+import 'package:chatappforours/view/chat/settings/components/changePassword/change_password_screen.dart';
+import 'package:chatappforours/view/chat/settings/components/changeUserProfile/change_user_profile_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
@@ -213,13 +215,49 @@ class _BodySettingState extends State<BodySetting> {
                       ),
                     ),
                     const SizedBox(
-                      height: kDefaultPadding,
+                      height: kDefaultPadding / 2.5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: kDefaultPadding,
+                      ),
+                      child: PrimaryButton(
+                          text: 'Change User Profile',
+                          color: Colors.white,
+                          press: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (context) {
+                                return const ChangeUserProfileScreen();
+                              }),
+                            );
+                          },
+                          context: context),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: kDefaultPadding,
+                          vertical: kDefaultPadding / 2),
+                      child: PrimaryButton(
+                          text: 'Change password',
+                          color: Colors.white,
+                          press: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (context) {
+                                return const ChangePasswordScreen();
+                              }),
+                            );
+                          },
+                          context: context),
+                    ),
+                    const SizedBox(
+                      height: kDefaultPadding / 2.5,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: kDefaultPadding),
                       child: PrimaryButton(
                           text: 'Sign Out',
+                          color: Colors.white,
                           press: () {
                             context
                                 .read<AuthBloc>()
