@@ -75,12 +75,11 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
               child: Row(
                 children: [
                   FillOutlineButton(
-                    isFilled: isFilledRecent,
+                    isFilled: !isFilledActive,
                     press: () {
                       if (isFilledActive == true) {
                         setState(
                           () {
-                            isFilledRecent = true;
                             isFilledActive = false;
                           },
                         );
@@ -94,7 +93,6 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                       if (isFilledActive == false) {
                         setState(
                           () {
-                            isFilledRecent = false;
                             isFilledActive = true;
                           },
                         );
@@ -261,10 +259,12 @@ class _ChatListViewState extends State<ChatListView> {
           chat.stampTimeUser = stampTimeUser;
           chat.stampTimeUserFormated = date;
           chat.presence = isOnline;
-          listChatData.add(list.elementAt(i));
+          if (isOnline == true) {
+            listChatData.add(chat);
+            _streamController.sink.add(listChatData);
+          }
         },
       );
-      _streamController.sink.add(listChatData);
     }
   }
 
@@ -274,13 +274,7 @@ class _ChatListViewState extends State<ChatListView> {
     firebaseUserProfile = FirebaseUserProfile();
     firebaseChat = FirebaseChat();
     firebaseChatMessage = FirebaseChatMessage();
-    setState(() {
-      if (widget.isFilledActive == false) {
-        getAllDataChat(list: widget.allChat);
-      } else {
-        getAllDataChatOnline(list: widget.allChat);
-      }
-    });
+
     super.initState();
   }
 
@@ -294,33 +288,39 @@ class _ChatListViewState extends State<ChatListView> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        return StreamBuilder(
-          stream: _streamController.stream,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final allChatCard = snapshot.data as Iterable<Chat>;
-              return ListView.builder(
-                itemCount: allChatCard.length,
-                itemBuilder: (context, index) {
-                  return ChatCard(
-                    chat: allChatCard.elementAt(index),
-                    press: () {
-                      final chatData = allChatCard.elementAt(index);
-                      context.read<AuthBloc>().add(
-                            AuthEventGetInChatFromBodyChatScreen(
-                              chat: chatData,
-                              currentIndex: 0,
-                            ),
-                          );
-                    },
-                  );
+        return FutureBuilder(
+            future: !widget.isFilledActive
+                ? getAllDataChat(list: widget.allChat)
+                : getAllDataChatOnline(list: widget.allChat),
+            builder: (context, snapshot) {
+              return StreamBuilder(
+                stream: _streamController.stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final allChatCard = snapshot.data as Iterable<Chat>;
+                    return ListView.builder(
+                      itemCount: allChatCard.length,
+                      itemBuilder: (context, index) {
+                        return ChatCard(
+                          chat: allChatCard.elementAt(index),
+                          press: () {
+                            final chatData = allChatCard.elementAt(index);
+                            context.read<AuthBloc>().add(
+                                  AuthEventGetInChatFromBodyChatScreen(
+                                    chat: chatData,
+                                    currentIndex: 0,
+                                  ),
+                                );
+                          },
+                        );
+                      },
+                    );
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
                 },
               );
-            } else {
-              return const CircularProgressIndicator();
-            }
-          },
-        );
+            });
       },
     );
   }
