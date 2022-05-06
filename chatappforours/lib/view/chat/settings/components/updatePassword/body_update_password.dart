@@ -45,9 +45,10 @@ class _BodyUpdatePasswordState extends State<BodyUpdatePassword> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
     return Column(
       children: [
-        const SizedBox(height: 100),
+        if (!isKeyboard) const SizedBox(height: 100),
         TextFieldContainer(
           child: Column(
             children: [

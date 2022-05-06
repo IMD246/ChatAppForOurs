@@ -163,7 +163,7 @@ class _ContactCardState extends State<ContactCard> {
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: kDefaultPadding),
+                                horizontal: kDefaultPadding / 2),
                             child: Text(
                               userProfile.fullName,
                               overflow: widget.requestFriend

@@ -62,6 +62,8 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
 
   @override
   void dispose() {
+    listUserProfile = [];
+    resultListUserProfile = [];
     super.dispose();
   }
 
