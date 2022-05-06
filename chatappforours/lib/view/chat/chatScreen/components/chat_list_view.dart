@@ -109,6 +109,7 @@ class _ChatListViewState extends State<ChatListView> {
           );
           if (chat.typeChat == TypeChat.normal) {
             chat.urlUserFriend = userProfile?.urlImage;
+
             if (chat.listUser.length <= 1 && chat.listUser[0] == ownerUserID) {
               chat.nameChat = 'Only You';
             } else {

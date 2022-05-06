@@ -93,21 +93,6 @@ class FirebaseUserProfile {
     }
   }
 
-  Future<void> uploadIsSignInWithFacebookOrGoogle({
-    required String? userID,
-    required bool isSignInWithFacebookOrGoogle,
-  }) async {
-    if (userID != null) {
-      Map<String, dynamic> mapUser = <String, dynamic>{};
-      mapUser.addAll(
-        {
-          isSignInWithFacebookOrGoogleField: isSignInWithFacebookOrGoogle,
-        },
-      );
-      await userProfilePath.doc(userID).update(mapUser);
-    }
-  }
-
   Future<void> upDateUserIsEmailVerified({
     required String? userID,
   }) async {

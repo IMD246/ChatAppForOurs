@@ -1,3 +1,5 @@
+import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/dialogs/error_dialog.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
@@ -22,6 +24,9 @@ class _BodyChangePasswordState extends State<BodyChangePassword> {
   String errorStringVerifyPassWord = '';
   bool isVisiblePassWord = false;
   bool isVisibleVerifyPassWord = false;
+  final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+  final authUser = FirebaseAuth.instance.currentUser;
+  late final UserProfile? userProfile;
   @override
   void initState() {
     password = TextEditingController();
@@ -178,13 +183,26 @@ class _BodyChangePasswordState extends State<BodyChangePassword> {
               if (errorStringVerifyPassWord.isEmpty &&
                   errorStringPassWord.isEmpty) {
                 {
-                  FirebaseAuth.instance.currentUser!
-                      .updatePassword(password.text);
-                  await showErrorDialog(
-                    context: context,
-                    text: "Update password successfully!",
-                    title: "Update Password Notification",
-                  );
+                  try {
+                    await authUser!.updatePassword(password.text);
+                    await showErrorDialog(
+                      context: context,
+                      text: "Update password successfully!",
+                      title: "Update Password Notification",
+                    );
+                  } catch (_) {
+                    setState(() {
+                      final credential = EmailAuthProvider.credentialWithLink(
+                          email: authUser!.email!, emailLink: authUser!.email!);
+                      authUser!.linkWithCredential(credential);
+                      authUser!.updatePassword(password.text);
+                      showErrorDialog(
+                        context: context,
+                        text: "Update password successfully!",
+                        title: "Update Password Notification",
+                      );
+                    });
+                  }
                   password.clear();
                   verifyPassword.clear();
                 }

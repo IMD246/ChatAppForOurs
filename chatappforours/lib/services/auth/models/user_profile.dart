@@ -8,8 +8,7 @@ class UserProfile {
   final String? urlImage;
   bool? isEmailVerified = false;
   bool isDarkMode = false;
-  UserProfile(
-    {
+  UserProfile({
     this.idUser,
     required this.email,
     required this.fullName,
@@ -27,6 +26,6 @@ class UserProfile {
             ? null
             : snapshot.get(urlImageField),
         isDarkMode: snapshot.get(isDarkModeField),
-        idUser: snapshot.id, 
+        idUser: snapshot.id,
       );
 }

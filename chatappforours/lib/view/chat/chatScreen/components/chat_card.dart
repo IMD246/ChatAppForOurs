@@ -150,7 +150,7 @@ class _ChatCardState extends State<ChatCard> {
                         Text(
                           widget.chat.listUser[0].compareTo(userOwnerID) == 0
                               ? "Only You"
-                              : widget.chat.nameChat!,
+                              : widget.chat.nameChat ?? "",
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
