@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
@@ -7,8 +8,8 @@ import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
-import 'package:chatappforours/view/chat/settings/components/changePassword/change_password_screen.dart';
-import 'package:chatappforours/view/chat/settings/components/changeUserProfile/change_user_profile_screen.dart';
+import 'package:chatappforours/view/chat/settings/components/updatePassword/update_password_screen.dart';
+import 'package:chatappforours/view/chat/settings/components/updateUserProfile/update_user_profile_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
@@ -62,9 +63,9 @@ class _BodySettingState extends State<BodySetting> {
                                 );
                                 if (results == null) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       content: Text(
-                                        'No file selected',
+                                        context.loc.no_file_selected,
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
@@ -187,7 +188,7 @@ class _BodySettingState extends State<BodySetting> {
                           ),
                           const SizedBox(width: kDefaultPadding * 0.5),
                           Text(
-                            "Chế độ tối",
+                            context.loc.dark_mode,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -222,12 +223,12 @@ class _BodySettingState extends State<BodySetting> {
                         horizontal: kDefaultPadding,
                       ),
                       child: PrimaryButton(
-                          text: 'Change User Profile',
+                          text: context.loc.update_user_profile,
                           color: Colors.white,
                           press: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) {
-                                return const ChangeUserProfileScreen();
+                                return const UpdateUserProfileScreen();
                               }),
                             );
                           },
@@ -238,12 +239,12 @@ class _BodySettingState extends State<BodySetting> {
                           horizontal: kDefaultPadding,
                           vertical: kDefaultPadding / 2),
                       child: PrimaryButton(
-                          text: 'Change password',
+                          text: context.loc.update_password,
                           color: Colors.white,
                           press: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) {
-                                return const ChangePasswordScreen();
+                                return const UpdatePasswordScreen();
                               }),
                             );
                           },
@@ -256,7 +257,7 @@ class _BodySettingState extends State<BodySetting> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: kDefaultPadding),
                       child: PrimaryButton(
-                          text: 'Sign Out',
+                          text: context.loc.sign_out,
                           color: Colors.white,
                           press: () {
                             context

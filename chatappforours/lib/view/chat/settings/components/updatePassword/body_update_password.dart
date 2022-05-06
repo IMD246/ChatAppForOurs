@@ -1,3 +1,4 @@
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
@@ -10,14 +11,14 @@ import 'package:flutter/material.dart';
 
 import '../../../../../constants/constants.dart';
 
-class BodyChangePassword extends StatefulWidget {
-  const BodyChangePassword({Key? key}) : super(key: key);
+class BodyUpdatePassword extends StatefulWidget {
+  const BodyUpdatePassword({Key? key}) : super(key: key);
 
   @override
-  State<BodyChangePassword> createState() => _BodyChangePasswordState();
+  State<BodyUpdatePassword> createState() => _BodyUpdatePasswordState();
 }
 
-class _BodyChangePasswordState extends State<BodyChangePassword> {
+class _BodyUpdatePasswordState extends State<BodyUpdatePassword> {
   late final TextEditingController password;
   late final TextEditingController verifyPassword;
   String errorStringPassWord = '';
@@ -55,17 +56,17 @@ class _BodyChangePasswordState extends State<BodyChangePassword> {
                 style: TextStyle(color: textColorMode(ThemeMode.light)),
                 onTap: () {
                   setState(() {
-                    errorStringPassWord = checkPassword(password.text);
+                    errorStringPassWord = checkPassword(password.text, context);
                   });
                 },
                 onChanged: (val) {
                   setState(() {
-                    errorStringPassWord = checkPassword(val);
+                    errorStringPassWord = checkPassword(val, context);
                   });
                 },
                 decoration: inputDecoration(
                   context: context,
-                  textHint: 'Type Your Password',
+                  textHint: context.loc.type_your_password,
                   icon: Icons.lock,
                   color: textColorMode(ThemeMode.light),
                 ).copyWith(
@@ -125,7 +126,7 @@ class _BodyChangePasswordState extends State<BodyChangePassword> {
                 onTap: () {
                   setState(() {
                     errorStringVerifyPassWord = checkDuplicatePassword(
-                        password.text, verifyPassword.text);
+                        password.text, verifyPassword.text, context);
                   });
                 },
                 onChanged: (val) {
@@ -133,12 +134,13 @@ class _BodyChangePasswordState extends State<BodyChangePassword> {
                     errorStringVerifyPassWord = checkDuplicatePassword(
                       password.text,
                       val.toString(),
+                      context,
                     );
                   });
                 },
                 decoration: inputDecoration(
                   context: context,
-                  textHint: 'Type Verify Password',
+                  textHint: context.loc.type_verify_password,
                   icon: Icons.lock,
                   color: textColorMode(ThemeMode.light),
                 ).copyWith(
@@ -178,7 +180,7 @@ class _BodyChangePasswordState extends State<BodyChangePassword> {
           padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
           child: PrimaryButton(
             context: context,
-            text: 'Change Password',
+            text: context.loc.update_password,
             press: () async {
               if (errorStringVerifyPassWord.isEmpty &&
                   errorStringPassWord.isEmpty) {
@@ -187,8 +189,8 @@ class _BodyChangePasswordState extends State<BodyChangePassword> {
                     await authUser!.updatePassword(password.text);
                     await showErrorDialog(
                       context: context,
-                      text: "Update password successfully!",
-                      title: "Update Password Notification",
+                      text: context.loc.update_password_successfully,
+                      title: context.loc.update_password_notification,
                     );
                   } catch (_) {
                     setState(() {
@@ -198,8 +200,8 @@ class _BodyChangePasswordState extends State<BodyChangePassword> {
                       authUser!.updatePassword(password.text);
                       showErrorDialog(
                         context: context,
-                        text: "Update password successfully!",
-                        title: "Update Password Notification",
+                        text: context.loc.update_password_successfully,
+                        title: context.loc.update_password_notification,
                       );
                     });
                   }

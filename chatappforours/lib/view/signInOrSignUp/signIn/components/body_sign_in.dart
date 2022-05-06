@@ -1,3 +1,4 @@
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
@@ -62,17 +63,17 @@ class _BodySignInState extends State<BodySignIn> {
                         style: TextStyle(color: textColorMode(ThemeMode.light)),
                         onTap: () {
                           setState(() {
-                            errorStringEmail = checkFormatEmail(email.text);
+                            errorStringEmail = checkFormatEmail(email.text,context);
                           });
                         },
                         onChanged: (val) {
                           setState(() {
-                            errorStringEmail = checkFormatEmail(val);
+                            errorStringEmail = checkFormatEmail(val,context);
                           });
                         },
                         decoration: inputDecoration(
                           context: context,
-                          textHint: 'Type Your Email',
+                          textHint: context.loc.type_your_email,
                           icon: Icons.email,
                           color: textColorMode(ThemeMode.light),
                         ),
@@ -109,17 +110,17 @@ class _BodySignInState extends State<BodySignIn> {
                         style: TextStyle(color: textColorMode(ThemeMode.light)),
                         onTap: () {
                           setState(() {
-                            errorStringPassWord = checkPassword(password.text);
+                            errorStringPassWord = checkPassword(password.text,context);
                           });
                         },
                         onChanged: (val) {
                           setState(() {
-                            errorStringPassWord = checkPassword(val);
+                            errorStringPassWord = checkPassword(val,context);
                           });
                         },
                         decoration: inputDecoration(
                           context: context,
-                          textHint: 'Type Your Password',
+                          textHint: context.loc.type_your_password,
                           icon: Icons.lock,
                           color: textColorMode(ThemeMode.light),
                         ).copyWith(
@@ -161,7 +162,7 @@ class _BodySignInState extends State<BodySignIn> {
               padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
               child: PrimaryButton(
                 context: context,
-                text: 'Sign In',
+                text: context.loc.sign_in,
                 press: () {
                   if (errorStringEmail.isEmpty && errorStringPassWord.isEmpty) {
                     {
@@ -177,7 +178,7 @@ class _BodySignInState extends State<BodySignIn> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Don't have account!",
+                  context.loc.dont_have_account,
                   style: TextStyle(
                     color: textColorMode(ThemeMode.light),
                   ),
@@ -188,9 +189,9 @@ class _BodySignInState extends State<BodySignIn> {
                           const AuthEventShouldRegister(),
                         );
                   },
-                  child: const Text(
-                    "Sign Up",
-                    style: TextStyle(
+                  child: Text(
+                    context.loc.sign_up,
+                    style:const TextStyle(
                       color: kPrimaryColor,
                       fontWeight: FontWeight.bold,
                     ),
@@ -204,7 +205,7 @@ class _BodySignInState extends State<BodySignIn> {
                       const AuthEventForgetPassword(email: null),
                     );
               },
-              child: const Text('Forgot Password'),
+              child: Text(context.loc.forgot_password),
             ),
             const OrDivider(),
             Row(

@@ -1,3 +1,4 @@
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/models/auth_exception.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
@@ -89,17 +90,17 @@ class _BodySignUpState extends State<BodySignUp> {
                           onTap: () {
                             setState(() {
                               errorStringFirstName =
-                                  checkFirstName(firstName.text);
+                                  checkFirstName(firstName.text,context);
                             });
                           },
                           onChanged: (val) {
                             setState(() {
-                              errorStringFirstName = checkFirstName(val);
+                              errorStringFirstName = checkFirstName(val,context);
                             });
                           },
                           decoration: inputDecoration(
                             context: context,
-                            textHint: 'Type Your First Name',
+                            textHint: context.loc.type_your_first_name,
                             icon: Icons.account_circle,
                             color: textColorMode(ThemeMode.light),
                           ),
@@ -128,19 +129,19 @@ class _BodySignUpState extends State<BodySignUp> {
                           onTap: () {
                             setState(() {
                               errorStringLastName =
-                                  checkFirstName(lastName.text);
+                                  checkFirstName(lastName.text,context);
                             });
                           },
                           onChanged: (val) {
                             setState(
                               () {
-                                errorStringLastName = checkFirstName(val);
+                                errorStringLastName = checkFirstName(val,context);
                               },
                             );
                           },
                           decoration: inputDecoration(
                             context: context,
-                            textHint: 'Type Your Last Name',
+                            textHint: context.loc.type_your_last_name,
                             icon: Icons.account_circle,
                             color: textColorMode(ThemeMode.light),
                           ),
@@ -168,17 +169,17 @@ class _BodySignUpState extends State<BodySignUp> {
                           textInputAction: TextInputAction.next,
                           onTap: () {
                             setState(() {
-                              errorStringEmail = checkFormatEmail(email.text);
+                              errorStringEmail = checkFormatEmail(email.text,context);
                             });
                           },
                           onChanged: (val) {
                             setState(() {
-                              errorStringEmail = checkFormatEmail(val);
+                              errorStringEmail = checkFormatEmail(val,context);
                             });
                           },
                           decoration: inputDecoration(
                             context: context,
-                            textHint: 'Type Your Email',
+                            textHint: context.loc.type_your_email,
                             icon: Icons.email,
                             color: textColorMode(ThemeMode.light),
                           ),
@@ -221,17 +222,17 @@ class _BodySignUpState extends State<BodySignUp> {
                           onTap: () {
                             setState(() {
                               errorStringPassWord =
-                                  checkPassword(password.text);
+                                  checkPassword(password.text,context);
                             });
                           },
                           onChanged: (val) {
                             setState(() {
-                              errorStringPassWord = checkPassword(val);
+                              errorStringPassWord = checkPassword(val,context);
                             });
                           },
                           decoration: inputDecoration(
                             context: context,
-                            textHint: 'Type Your Password',
+                            textHint: context.loc.type_your_password,
                             icon: Icons.lock,
                             color: textColorMode(ThemeMode.light),
                           ).copyWith(
@@ -295,7 +296,7 @@ class _BodySignUpState extends State<BodySignUp> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Already have an account!",
+                    context.loc.already_have_an_account,
                     style: TextStyle(
                       color: textColorMode(ThemeMode.light),
                     ),
@@ -306,9 +307,9 @@ class _BodySignUpState extends State<BodySignUp> {
                             const AuthEventLogOut(),
                           );
                     },
-                    child: const Text(
-                      "Sign In",
-                      style: TextStyle(
+                    child: Text(
+                      context.loc.sign_in,
+                      style:const TextStyle(
                         color: kPrimaryColor,
                         fontWeight: FontWeight.bold,
                       ),

@@ -1,3 +1,4 @@
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/models/auth_exception.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -18,22 +19,26 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
-        if (state is AuthStateRegistering
-           ) {
+        if (state is AuthStateRegistering) {
           if (state.exception is EmailAlreadyInUseAuthException) {
             await showErrorDialog(
               context: context,
-              title: 'Email Already In Use Error',
-              text: "Email Already In Use",
+              title: context.loc.email_already_in_use_error,
+              text: context.loc.email_already_in_use,
             );
           } else if (state.exception is AuthEmailNeedsVefiricationException) {
             await showErrorDialog(
                 context: context,
-                title: 'Verification Error Dialog',
-                text: "Check gmail ${[state.email]} to verification");
+                title: context.loc.verification_email_error,
+                text: "${context.loc.check_your_email} ${[
+                  state.email
+                ]} ${context.loc.to_verification}");
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(
-                context: context, title: 'Generic error', text: "Auth Error");
+              context: context,
+              title: context.loc.generic_error,
+              text: context.loc.auth_error,
+            );
           }
         }
       },

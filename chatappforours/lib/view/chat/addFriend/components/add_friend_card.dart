@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
@@ -146,7 +147,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
                   );
                 }
               },
-              text: isAdded ? "Added" : "Add",
+              text: isAdded ? context.loc.added : context.loc.add,
               isFilled: !isAdded,
               isCheckAdded: isAdded,
             ),

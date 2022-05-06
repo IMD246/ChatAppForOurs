@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -95,14 +96,14 @@ class _ChatScreenState extends State<ChatScreen> {
                       currentIndex = index;
                     });
                   },
-                  items: const [
+                  items: [
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.messenger),
-                      label: "Chat",
+                      icon:const Icon(Icons.messenger),
+                      label: context.loc.chat,
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.people),
-                      label: "People",
+                      icon:const Icon(Icons.people),
+                      label: context.loc.contacts,
                     ),
                   ],
                 ),
@@ -162,7 +163,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           const SizedBox(width: kDefaultPadding * 0.7),
           Text(
-            currentIndex == 0 ? 'Chat' : 'Contacts',
+            currentIndex == 0 ? context.loc.chat : context.loc.contacts,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: textColorMode(themeMode).withOpacity(

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -64,7 +65,7 @@ class _ChatListViewState extends State<ChatListView> {
           if (chat.typeChat == TypeChat.normal) {
             chat.urlUserFriend = userProfile?.urlImage;
             if (chat.listUser.length <= 1 && chat.listUser[0] == ownerUserID) {
-              chat.nameChat = 'Only You';
+              chat.nameChat = context.loc.only_you;
             } else {
               chat.nameChat = userProfile!.fullName;
             }

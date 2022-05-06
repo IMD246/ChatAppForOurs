@@ -1,3 +1,4 @@
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -42,7 +43,9 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
           if (state.hasSentEmail) {
             await showPasswordResetSentDialog(
               context: context,
-              text: "Check your gmail ${[email.text]} to reset password",
+              text: "${context.loc.check_your_email} ${[
+                email.text
+              ]} ${context.loc.to_reset_password}",
             );
             email.clear();
           }
@@ -84,12 +87,13 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                           },
                           onTap: () {
                             setState(() {
-                              errorStringEmail = checkFormatEmail(email.text);
+                              errorStringEmail =
+                                  checkFormatEmail(email.text, context);
                             });
                           },
                           onChanged: (val) {
                             setState(() {
-                              errorStringEmail = checkFormatEmail(val);
+                              errorStringEmail = checkFormatEmail(val, context);
                             });
                           },
                           decoration: inputDecoration(
@@ -121,7 +125,7 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                     const EdgeInsets.symmetric(horizontal: kDefaultPadding),
                 child: PrimaryButton(
                   context: context,
-                  text: 'Send Email',
+                  text: context.loc.send_email,
                   press: () {
                     if (errorStringEmail.isEmpty) {
                       {
@@ -139,7 +143,7 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Already remember password!",
+                    context.loc.already_remember_passsword,
                     style: TextStyle(
                       color: textColorMode(ThemeMode.light),
                     ),
@@ -150,9 +154,9 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                             const AuthEventLogOut(),
                           );
                     },
-                    child: const Text(
-                      "Sign In",
-                      style: TextStyle(
+                    child: Text(
+                      context.loc.sign_in,
+                      style: const TextStyle(
                         color: kPrimaryColor,
                         fontWeight: FontWeight.bold,
                       ),

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -192,7 +193,7 @@ class _ContactCardState extends State<ContactCard> {
                                       listUserID: [id, widget.friend.userID],
                                     );
                                   },
-                                  text: 'Accept',
+                                  text: context.loc.accept,
                                 ),
                                 SizedBox(
                                   width: size.width * 0.01,
@@ -204,7 +205,7 @@ class _ContactCardState extends State<ContactCard> {
                                       userID: widget.friend.userID,
                                     );
                                   },
-                                  text: 'Cancel',
+                                  text: context.loc.cancel,
                                 ),
                               ],
                             ),
@@ -212,7 +213,7 @@ class _ContactCardState extends State<ContactCard> {
                         ],
                       );
                     } else {
-                      return const Text('No Data Available');
+                      return Text(context.loc.no_friend_available);
                     }
                   case ConnectionState.waiting:
                     return const Center(

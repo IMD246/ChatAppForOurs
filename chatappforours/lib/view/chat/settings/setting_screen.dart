@@ -1,4 +1,5 @@
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/models/auth_user.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
@@ -49,7 +50,7 @@ class _SettingScreenState extends State<SettingScreen> {
             color: textColorMode(themeMode),
           ),
           Text(
-            'Me',
+            context.loc.me,
             style: TextStyle(
               color: textColorMode(themeMode),
             ),

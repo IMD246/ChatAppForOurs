@@ -1,4 +1,5 @@
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
@@ -42,7 +43,7 @@ class _WelcomePageState extends State<WelcomePage> {
         if (state.isLoading) {
           LoadingScreen().show(
             context: context,
-            text: state.loadingText ?? 'Please wait a moment',
+            text: state.loadingText ?? context.loc.please_wait_a_moment,
           );
         } else {
           LoadingScreen().hide();
@@ -91,7 +92,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   ),
                   const Spacer(flex: 2),
                   Text(
-                    "Welcome to chat app \nfor ours",
+                    context.loc.welcome,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: textColorMode(ThemeMode.light),
@@ -110,7 +111,7 @@ class _WelcomePageState extends State<WelcomePage> {
                       child: Row(
                         children: [
                           Text(
-                            'Skip',
+                            context.loc.skip,
                             style: TextStyle(
                               color: textColorMode(ThemeMode.light)
                                   .withOpacity(0.8),

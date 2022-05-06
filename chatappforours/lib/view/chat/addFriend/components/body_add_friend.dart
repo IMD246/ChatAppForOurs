@@ -1,6 +1,6 @@
-
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/constants/user_profile_constant_field.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
@@ -88,7 +88,7 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
           child: Align(
             alignment: Alignment.topLeft,
             child: Text(
-              "Recommened",
+              context.loc.recommended,
               style: Theme.of(context).textTheme.headline6!.copyWith(
                     fontSize: 18,
                     color: isDarkTheme
@@ -124,7 +124,7 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
         });
       },
       decoration: InputDecoration(
-        hintText: "Search",
+        hintText: context.loc.search,
         hintStyle: TextStyle(
           color: Theme.of(context).textTheme.headline5!.color,
           fontSize: 20,
@@ -177,5 +177,3 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
     );
   }
 }
-
-

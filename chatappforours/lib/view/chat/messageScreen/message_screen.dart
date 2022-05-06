@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
@@ -157,7 +158,7 @@ class _MesssageScreenState extends State<MesssageScreen> {
                   ],
                 );
               } else {
-                return const Text('Waiting...');
+                return Text(context.loc.waiting);
               }
             case ConnectionState.waiting:
               return const Center(

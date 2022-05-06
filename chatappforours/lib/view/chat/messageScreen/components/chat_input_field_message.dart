@@ -1,3 +1,4 @@
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
@@ -155,7 +156,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                         maxLines: 5,
                         keyboardType: TextInputType.multiline,
                         decoration: InputDecoration(
-                          hintText: 'Type Message',
+                          hintText: context.loc.type_message,
                           hintStyle: TextStyle(
                             color: Theme.of(context).primaryColor,
                           ),

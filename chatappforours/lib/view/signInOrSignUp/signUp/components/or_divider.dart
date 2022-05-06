@@ -1,4 +1,5 @@
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:flutter/material.dart';
 
 class OrDivider extends StatelessWidget {
@@ -15,11 +16,11 @@ class OrDivider extends StatelessWidget {
       child: Row(
         children: [
           buildDivider(),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: kDefaultPadding / 2),
+           Padding(
+            padding:const EdgeInsets.symmetric(horizontal: kDefaultPadding / 2),
             child: Text(
-              "Or Sign In",
-              style: TextStyle(
+              context.loc.or_sign_in,
+              style:const TextStyle(
                 color: kPrimaryColor,
                 fontWeight: FontWeight.w600,
               ),

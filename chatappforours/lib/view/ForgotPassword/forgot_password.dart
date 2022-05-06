@@ -1,3 +1,4 @@
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/models/auth_exception.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -23,8 +24,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               state.exception != null) {
             await showErrorDialog(
               context: context,
-              title: 'User not found in database error',
-              text: "User not found in database",
+              title: context.loc.user_not_found_in_database_error,
+              text: context.loc.user_not_found_in_database,
             );
           }
         }

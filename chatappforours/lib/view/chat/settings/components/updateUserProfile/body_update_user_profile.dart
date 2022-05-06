@@ -1,3 +1,4 @@
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/dialogs/error_dialog.dart';
@@ -9,14 +10,14 @@ import 'package:flutter/material.dart';
 
 import '../../../../../constants/constants.dart';
 
-class BodyChangeUserProfile extends StatefulWidget {
-  const BodyChangeUserProfile({Key? key}) : super(key: key);
+class BodyUpdateUserProfile extends StatefulWidget {
+  const BodyUpdateUserProfile({Key? key}) : super(key: key);
 
   @override
-  State<BodyChangeUserProfile> createState() => _BodyChangeUserProfileState();
+  State<BodyUpdateUserProfile> createState() => _BodyUpdateUserProfileState();
 }
 
-class _BodyChangeUserProfileState extends State<BodyChangeUserProfile> {
+class _BodyUpdateUserProfileState extends State<BodyUpdateUserProfile> {
   late final TextEditingController firstName;
   late final TextEditingController lastName;
   String errorStringFirstName = '';
@@ -51,17 +52,18 @@ class _BodyChangeUserProfileState extends State<BodyChangeUserProfile> {
                 style: TextStyle(color: textColorMode(ThemeMode.light)),
                 onTap: () {
                   setState(() {
-                    errorStringFirstName = checkFirstName(firstName.text);
+                    errorStringFirstName =
+                        checkFirstName(firstName.text, context);
                   });
                 },
                 onChanged: (val) {
                   setState(() {
-                    errorStringFirstName = checkFirstName(val);
+                    errorStringFirstName = checkFirstName(val, context);
                   });
                 },
                 decoration: inputDecoration(
                   context: context,
-                  textHint: 'Type Your First Name',
+                  textHint: context.loc.type_your_first_name,
                   icon: Icons.lock,
                   color: textColorMode(ThemeMode.light),
                 ),
@@ -93,8 +95,8 @@ class _BodyChangeUserProfileState extends State<BodyChangeUserProfile> {
                       );
                       await showErrorDialog(
                         context: context,
-                        text: "Update User Profile successfully!",
-                        title: "Update User Profile Notification",
+                        text: context.loc.update_user_profile_successfully,
+                        title: context.loc.update_user_profile_notification,
                       );
                       firstName.clear();
                       lastName.clear();
@@ -105,17 +107,17 @@ class _BodyChangeUserProfileState extends State<BodyChangeUserProfile> {
                 style: TextStyle(color: textColorMode(ThemeMode.light)),
                 onTap: () {
                   setState(() {
-                    errorStringLastName = checkLastName(lastName.text);
+                    errorStringLastName = checkLastName(lastName.text, context);
                   });
                 },
                 onChanged: (val) {
                   setState(() {
-                    errorStringLastName = checkLastName(val);
+                    errorStringLastName = checkLastName(val, context);
                   });
                 },
                 decoration: inputDecoration(
                   context: context,
-                  textHint: 'Type Your Last Name',
+                  textHint: context.loc.type_your_last_name,
                   icon: Icons.lock,
                   color: textColorMode(ThemeMode.light),
                 ),
@@ -138,7 +140,7 @@ class _BodyChangeUserProfileState extends State<BodyChangeUserProfile> {
           padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
           child: PrimaryButton(
             context: context,
-            text: 'Update Profile',
+            text: context.loc.update_user_profile,
             press: () async {
               if (errorStringLastName.isEmpty && errorStringFirstName.isEmpty) {
                 {
@@ -148,8 +150,8 @@ class _BodyChangeUserProfileState extends State<BodyChangeUserProfile> {
                   );
                   await showErrorDialog(
                     context: context,
-                    text: "Update User Profile successfully!",
-                    title: "Update User Profile Notification",
+                    text: context.loc.update_user_profile_successfully,
+                    title: context.loc.update_user_profile_notification,
                   );
                   firstName.clear();
                   lastName.clear();

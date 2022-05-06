@@ -1,3 +1,4 @@
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/models/auth_exception.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -32,23 +33,25 @@ class _SignInState extends State<SignIn> {
           if (state.exception is UserNotFoundAuthException) {
             await showErrorDialog(
                 context: context,
-                title: 'User not found error',
-                text: "User not found in Database");
+                title: context.loc.user_not_found_in_database_error,
+                text: context.loc.user_not_found_in_database);
           } else if (state.exception is WrongPasswordAuthException) {
             await showErrorDialog(
                 context: context,
-                title: 'Wrong password error',
-                text: "Wrong password");
+                title: context.loc.wrong_password_error,
+                text: context.loc.wrong_password);
           } else if (state.exception is AuthEmailNeedsVefiricationException) {
             await showErrorDialog(
                 context: context,
-                title: 'Verification Error Dialog',
-                text: "Check your gmail ${[state.email]} to verification");
+                title: context.loc.verification_email_error,
+                text: "${context.loc.check_your_email} ${[
+                  state.email
+                ]} ${context.loc.to_verification}");
           } else if (state.exception is UserNotLoggedInAuthException) {
             await showErrorDialog(
               context: context,
-              title: "User doesn't logged in error",
-              text: "User doesn't Logged in",
+              title: context.loc.user_doesnt_logged_in_error,
+              text: context.loc.user_doesnt_logged_in,
             );
           }
         }

@@ -1,4 +1,5 @@
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
@@ -66,7 +67,7 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                               });
                             }
                           },
-                          text: "Recent Friend $lengthText",
+                          text: "${context.loc.recent_friend} $lengthText",
                           isFilled: isFilledRecent,
                         );
                       } else {
@@ -79,7 +80,7 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                               });
                             }
                           },
-                          text: "Recent Friend",
+                          text: context.loc.recent_friend,
                           isFilled: isFilledRecent,
                         );
                       }
@@ -104,7 +105,7 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                               });
                             }
                           },
-                          text: "Request Friend $lengthText",
+                          text: "${context.loc.request_friend} $lengthText",
                           isFilled: isFilledRequestFriend,
                         );
                       } else {
@@ -117,7 +118,7 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
                               });
                             }
                           },
-                          text: "Request Friend",
+                          text: context.loc.request_friend,
                           isFilled: isFilledRequestFriend,
                         );
                       }
@@ -133,5 +134,3 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
     );
   }
 }
-
-

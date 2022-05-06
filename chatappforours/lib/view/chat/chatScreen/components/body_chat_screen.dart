@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
@@ -80,7 +81,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                         );
                       }
                     },
-                    text: "Recent Message",
+                    text: context.loc.recent_message,
                   ),
                   const SizedBox(width: kDefaultPadding),
                   FillOutlineButton(
@@ -93,7 +94,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                         );
                       }
                     },
-                    text: "Active",
+                    text: context.loc.active,
                     isFilled: isFilledActive,
                   ),
                 ],
@@ -123,18 +124,18 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
                             isFilledActive: isFilledActive,
                           );
                         } else {
-                          return const Center(
+                          return  Center(
                             child: Text(
-                              "Don't have any chat",
-                              style: TextStyle(fontSize: 20),
+                              context.loc.dont_have_any_chat,
+                              style:const TextStyle(fontSize: 20),
                             ),
                           );
                         }
                       } else {
-                        return const Center(
+                        return Center(
                           child: Text(
-                            "Don't have any chat",
-                            style: TextStyle(fontSize: 20),
+                            context.loc.dont_have_any_chat,
+                            style:const TextStyle(fontSize: 20),
                           ),
                         );
                       }

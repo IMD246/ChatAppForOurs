@@ -84,7 +84,7 @@ class Storage {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Upload Image Failed',
+              'context.loc.upload_image_failed',
               textAlign: TextAlign.center,
             ),
           ),
