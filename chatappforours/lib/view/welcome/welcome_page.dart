@@ -11,7 +11,6 @@ import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:chatappforours/view/chat/settings/setting_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -23,10 +22,10 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
+  final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
   @override
   void initState() {
     super.initState();
-    Firebase.initializeApp();
   }
 
   @override
@@ -34,12 +33,10 @@ class _WelcomePageState extends State<WelcomePage> {
     final ThemeChanger themeChanger = Provider.of<ThemeChanger>(context);
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) async {
-        final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
         if (state is AuthStateLoggedIn) {
-          final userProfile = await firebaseUserProfile.getUserProfile(
-              userID: state.authUser.id);
+          final userProfile = state.userProfile;
           themeChanger.setTheme(
-            userProfile!.isDarkMode,
+            userProfile.isDarkMode,
           );
         }
         if (state.isLoading) {

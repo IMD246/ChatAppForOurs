@@ -1,5 +1,6 @@
 import 'package:chatappforours/services/auth/models/auth_user.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
@@ -19,9 +20,9 @@ class AuthStateLoading extends AuthState {
 }
 
 class AuthStateLoggedIn extends AuthState {
-  final AuthUser authUser;
+  final UserProfile userProfile;
 
-  const AuthStateLoggedIn({required bool isLoading, required this.authUser})
+  const AuthStateLoggedIn({required bool isLoading, required this.userProfile})
       : super(isLoading: isLoading);
 }
 

@@ -39,7 +39,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                   uid: user.id!,
                 );
                 emit(
-                  AuthStateLoggedIn(authUser: user, isLoading: false),
+                  AuthStateLoggedIn(userProfile: userProfile, isLoading: false),
                 );
               } else {
                 await FirebaseAuth.instance.currentUser?.delete();
@@ -85,6 +85,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             );
           } else {
             FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+            final getUserProfile =
+                await firebaseUserProfile.getUserProfile(userID: user.id);
+            await firebaseUserProfile.uploadIsSignInWithFacebookOrGoogle(
+              userID: user.id,
+              isSignInWithFacebookOrGoogle: false,
+            );
             await firebaseUserProfile.updateUserPresenceDisconnect(
               uid: user.id!,
             );
@@ -92,7 +98,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               userID: user.id!,
             );
             emit(
-              AuthStateLoggedIn(authUser: user, isLoading: false),
+              AuthStateLoggedIn(userProfile: getUserProfile!, isLoading: false),
             );
           }
         } on Exception catch (e) {
@@ -258,11 +264,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       },
     );
     on<AuthEventSettingBack>(
-      (event, emit) => {
+      (event, emit) async {
+        final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+        final userProfile = await firebaseUserProfile.getUserProfile(
+            userID: authProvider.currentUser!.id);
         emit(
-          AuthStateLoggedIn(
-              isLoading: false, authUser: authProvider.currentUser!),
-        ),
+          AuthStateLoggedIn(isLoading: false, userProfile: userProfile!),
+        );
       },
     );
     on<AuthEventUploadImage>(
@@ -352,29 +360,78 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
     on<AuthEventSignInWithFacebook>(
       (event, emit) async {
+        final FirebaseFriendList friendListFirebase = FirebaseFriendList();
+        final userProfileFirebase = FirebaseUserProfile();
         emit(
-          const AuthStateSignInWithFacebook(
+          const AuthStateLoggedOut(
             isLoading: true,
             exception: null,
           ),
         );
-        Exception? exception;
         try {
-          await authProvider.createUserWithFacebook();
-          exception = null;
+          final user = await authProvider.createUserWithFacebook();
+          if (user.email != null) {
+            final getUserProfile = await userProfileFirebase
+                .getUserProfileByEmail(email: user.email);
+            if (getUserProfile == null) {
+              await friendListFirebase.createNewFriendDefault(
+                userIDFriend: user.id!,
+                ownerUserID: user.id!,
+              );
+              final userProfile = UserProfile(
+                email: user.email!,
+                fullName: user.displayName!,
+                urlImage: user.photoURL,
+                isEmailVerified: true,
+                isDarkMode: false,
+              );
+              await userProfileFirebase.createUserProfile(
+                userID: user.id!,
+                userProfile: userProfile,
+              );
+              await userProfileFirebase.updateUserPresenceDisconnect(
+                uid: user.id!,
+              );
+              emit(
+                AuthStateLoggedIn(
+                  userProfile: getUserProfile!,
+                  isLoading: false,
+                ),
+              );
+            } else {
+              await userProfileFirebase.uploadIsSignInWithFacebookOrGoogle(
+                userID: user.id!,
+                isSignInWithFacebookOrGoogle: true,
+              );
+              await userProfileFirebase.updateUserPresenceDisconnect(
+                uid: user.id!,
+              );
+              await userProfileFirebase.upDateUserIsEmailVerified(
+                userID: user.id!,
+              );
+              emit(
+                AuthStateLoggedIn(
+                  userProfile: getUserProfile,
+                  isLoading: false,
+                ),
+              );
+            }
+          } else {
+            emit(
+              AuthStateLoggedOut(
+                isLoading: false,
+                exception: UserNotFoundAuthException(),
+              ),
+            );
+          }
+        } on Exception catch (e) {
           emit(
-            const AuthStateSignInWithFacebook(
+            AuthStateLoggedOut(
               isLoading: false,
-              exception: null,
+              exception: e,
             ),
           );
-        } on Exception catch (e) {
-          exception = e;
         }
-        emit(AuthStateSignInWithFacebook(
-          isLoading: false,
-          exception: exception,
-        ));
       },
     );
     on<AuthEventSignInWithGoogle>(
@@ -389,44 +446,55 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         try {
           final user = await authProvider.createUserWithGoogle();
-          final getUserProfile = await userProfileFirebase
-              .geetUserProfileByEmail(email: user.email);
-          if (getUserProfile == null) {
-            await friendListFirebase.createNewFriendDefault(
-              userIDFriend: user.id!,
-              ownerUserID: user.id!,
-            );
-            final userProfile = UserProfile(
-              email: user.email!,
-              fullName: user.displayName!,
-              urlImage: user.photoURL,
-              isEmailVerified: true,
-              isDarkMode: false,
-            );
-            await userProfileFirebase.createUserProfile(
-              userID: user.id!,
-              userProfile: userProfile,
-            );
-            await userProfileFirebase.updateUserPresenceDisconnect(
-              uid: user.id!,
-            );
-            emit(
-              AuthStateLoggedIn(
-                authUser: authProvider.currentUser!,
-                isLoading: false,
-              ),
-            );
+          if (user.email != null) {
+            final getUserProfile = await userProfileFirebase
+                .getUserProfileByEmail(email: user.email);
+            if (getUserProfile == null) {
+              await friendListFirebase.createNewFriendDefault(
+                userIDFriend: user.id!,
+                ownerUserID: user.id!,
+              );
+              final userProfile = UserProfile(
+                email: user.email!,
+                fullName: user.displayName!,
+                urlImage: user.photoURL,
+                isEmailVerified: true,
+                isDarkMode: false,
+              );
+              await userProfileFirebase.createUserProfile(
+                userID: user.id!,
+                userProfile: userProfile,
+              );
+              await userProfileFirebase.updateUserPresenceDisconnect(
+                uid: user.id!,
+              );
+              emit(
+                AuthStateLoggedIn(
+                  userProfile: getUserProfile!,
+                  isLoading: false,
+                ),
+              );
+            } else {
+              await userProfileFirebase.uploadIsSignInWithFacebookOrGoogle(
+                  userID: user.id!, isSignInWithFacebookOrGoogle: true);
+              await userProfileFirebase.updateUserPresenceDisconnect(
+                uid: user.id!,
+              );
+              await userProfileFirebase.upDateUserIsEmailVerified(
+                userID: user.id!,
+              );
+              emit(
+                AuthStateLoggedIn(
+                  userProfile: getUserProfile,
+                  isLoading: false,
+                ),
+              );
+            }
           } else {
-            await userProfileFirebase.updateUserPresenceDisconnect(
-              uid: user.id!,
-            );
-            await userProfileFirebase.upDateUserIsEmailVerified(
-              userID: user.id!,
-            );
             emit(
-              AuthStateLoggedIn(
-                authUser: authProvider.currentUser!,
+              AuthStateLoggedOut(
                 isLoading: false,
+                exception: UserNotFoundAuthException(),
               ),
             );
           }

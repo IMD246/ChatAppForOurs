@@ -7,7 +7,7 @@ abstract class AuthProvider {
     required String email,
     required String password,
   });
-  Future<void> createUserWithFacebook();
+  Future<AuthUser> createUserWithFacebook();
   
   Future<AuthUser> createUserWithGoogle();
 

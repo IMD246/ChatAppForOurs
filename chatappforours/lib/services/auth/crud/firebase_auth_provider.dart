@@ -102,23 +102,30 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<void> createUserWithFacebook() async {
+  Future<AuthUser> createUserWithFacebook() async {
     var facebookLogin = FacebookLogin();
-    var result = await facebookLogin.logIn(permissions: [
-      FacebookPermission.publicProfile,
-      FacebookPermission.email,
-    ]);
     try {
+      var result = await facebookLogin.logIn(permissions: [
+        FacebookPermission.publicProfile,
+        FacebookPermission.email,
+      ]);
+
       final AuthCredential authCredential;
       if (result.status == FacebookLoginStatus.success) {
         authCredential =
             FacebookAuthProvider.credential(result.accessToken!.token);
         await FirebaseAuth.instance.signInWithCredential(authCredential);
+        final user = currentUser;
+        if (user != null) {
+          return user;
+        } else {
+          throw UserNotLoggedInAuthException();
+        }
       } else {
         throw UserNotLoggedInAuthException();
       }
-    } catch (e) {
-      throw GenericAuthException();
+    } catch (_) {
+      throw UserNotLoggedInAuthException();
     }
   }
 
