@@ -71,6 +71,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return FutureBuilder<void>(
       future: setUserProfile(userProfile: widget.userProfile),
       builder: (context, snapshot) {
@@ -135,6 +136,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
           trailing: Visibility(
             visible: isCheckPress != null,
             child: FillOutlineButton(
+              minWidth: size.width * 0.2,
               press: () async {
                 if (isAdded == false) {
                   setState(() {

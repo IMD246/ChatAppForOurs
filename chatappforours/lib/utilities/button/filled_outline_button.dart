@@ -8,6 +8,7 @@ class FillOutlineButton extends StatelessWidget {
     this.isFilled = true,
     required this.press,
     this.isCheckAdded = false,
+    this.minWidth =5,
     required this.text,
   }) : super(key: key);
 
@@ -15,16 +16,21 @@ class FillOutlineButton extends StatelessWidget {
   final bool isCheckAdded;
   final VoidCallback press;
   final String text;
+  final double minWidth;
 
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
-      minWidth: 5,
+      minWidth: minWidth,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(30),
         side: const BorderSide(color: Colors.white),
       ),
-      elevation: !isCheckAdded ? isFilled ? 2 : 0 : 0.5,
+      elevation: !isCheckAdded
+          ? isFilled
+              ? 2
+              : 0
+          : 0.5,
       color: isFilled ? Colors.white : Colors.transparent,
       onPressed: press,
       child: Text(

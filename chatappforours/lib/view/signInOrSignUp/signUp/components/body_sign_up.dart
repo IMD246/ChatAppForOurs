@@ -74,7 +74,7 @@ class _BodySignUpState extends State<BodySignUp> {
                   child: Center(
                     child: Image.asset(
                       "assets/images/Register_Image.png",
-                      height: 185,
+                      height: size.height * 0.22,
                     ),
                   ),
                 ),
@@ -130,14 +130,14 @@ class _BodySignUpState extends State<BodySignUp> {
                           onTap: () {
                             setState(() {
                               errorStringLastName =
-                                  checkFirstName(lastName.text, context);
+                                  checkFirstName(lastName.text.trim(), context);
                             });
                           },
                           onChanged: (val) {
                             setState(
                               () {
                                 errorStringLastName =
-                                    checkFirstName(val, context);
+                                    checkFirstName(val.trim(), context);
                               },
                             );
                           },
@@ -172,12 +172,13 @@ class _BodySignUpState extends State<BodySignUp> {
                           onTap: () {
                             setState(() {
                               errorStringEmail =
-                                  checkFormatEmail(email.text, context);
+                                  checkFormatEmail(email.text.trim(), context);
                             });
                           },
                           onChanged: (val) {
                             setState(() {
-                              errorStringEmail = checkFormatEmail(val, context);
+                              errorStringEmail =
+                                  checkFormatEmail(val.trim(), context);
                             });
                           },
                           decoration: inputDecoration(
@@ -212,9 +213,9 @@ class _BodySignUpState extends State<BodySignUp> {
                                 errorStringPassWord.isEmpty) {
                               context.read<AuthBloc>().add(
                                     AuthEventRegister(
-                                      email.text,
-                                      password.text,
-                                      "${firstName.text} ${lastName.text}",
+                                      email.text.trim(),
+                                      password.text.trim(),
+                                      "${firstName.text} ${lastName.text.trim()}",
                                     ),
                                   );
                             }
@@ -285,9 +286,9 @@ class _BodySignUpState extends State<BodySignUp> {
                         errorStringPassWord.isEmpty) {
                       context.read<AuthBloc>().add(
                             AuthEventRegister(
-                              email.text,
-                              password.text,
-                              "${firstName.text} ${lastName.text}",
+                              email.text.trim(),
+                              password.text.trim(),
+                              "${firstName.text} ${lastName.text.trim()}",
                             ),
                           );
                     }

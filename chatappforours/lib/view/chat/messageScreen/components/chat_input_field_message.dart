@@ -48,6 +48,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -213,7 +214,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                 child: Image.asset(
                   "assets/icons/like_white.png",
                   color: kPrimaryColor,
-                  height: 24,
+                  height: size.height * 0.030,
                 ),
               ),
           ],

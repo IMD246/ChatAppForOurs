@@ -52,10 +52,12 @@ class _BodyUpdateUserProfileState extends State<BodyUpdateUserProfile> {
                 textInputAction: TextInputAction.next,
                 style: TextStyle(color: textColorMode(ThemeMode.light)),
                 onTap: () {
-                  setState(() {
-                    errorStringFirstName =
-                        checkFirstName(firstName.text, context);
-                  });
+                  setState(
+                    () {
+                      errorStringFirstName =
+                          checkFirstName(firstName.text, context);
+                    },
+                  );
                 },
                 onChanged: (val) {
                   setState(() {
@@ -92,7 +94,7 @@ class _BodyUpdateUserProfileState extends State<BodyUpdateUserProfile> {
                     {
                       await firebaseUserProfile.upLoadUserProfile(
                         userID: userOwnerID,
-                        fullName: "${firstName.text} ${lastName.text}",
+                        fullName: "${firstName.text} ${lastName.text.trim()}",
                       );
                       await showErrorDialog(
                         context: context,
@@ -108,12 +110,13 @@ class _BodyUpdateUserProfileState extends State<BodyUpdateUserProfile> {
                 style: TextStyle(color: textColorMode(ThemeMode.light)),
                 onTap: () {
                   setState(() {
-                    errorStringLastName = checkLastName(lastName.text, context);
+                    errorStringLastName =
+                        checkLastName(lastName.text.trim(), context);
                   });
                 },
                 onChanged: (val) {
                   setState(() {
-                    errorStringLastName = checkLastName(val, context);
+                    errorStringLastName = checkLastName(val.trim(), context);
                   });
                 },
                 decoration: inputDecoration(
@@ -147,7 +150,7 @@ class _BodyUpdateUserProfileState extends State<BodyUpdateUserProfile> {
                 {
                   await firebaseUserProfile.upLoadUserProfile(
                     userID: userOwnerID,
-                    fullName: "${firstName.text} ${lastName.text}",
+                    fullName: "${firstName.text} ${lastName.text.trim()}",
                   );
                   await showErrorDialog(
                     context: context,

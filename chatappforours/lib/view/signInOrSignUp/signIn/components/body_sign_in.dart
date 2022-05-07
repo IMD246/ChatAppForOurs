@@ -50,7 +50,7 @@ class _BodySignInState extends State<BodySignIn> {
             Center(
               child: Image.asset(
                 "assets/images/chat_logo_white.png",
-                height: 246,
+                height: size.height * 0.3,
               ),
             ),
             Column(
@@ -63,12 +63,14 @@ class _BodySignInState extends State<BodySignIn> {
                         style: TextStyle(color: textColorMode(ThemeMode.light)),
                         onTap: () {
                           setState(() {
-                            errorStringEmail = checkFormatEmail(email.text,context);
+                            errorStringEmail =
+                                checkFormatEmail(email.text.trim(), context);
                           });
                         },
                         onChanged: (val) {
                           setState(() {
-                            errorStringEmail = checkFormatEmail(val,context);
+                            errorStringEmail =
+                                checkFormatEmail(val.trim(), context);
                           });
                         },
                         decoration: inputDecoration(
@@ -101,7 +103,8 @@ class _BodySignInState extends State<BodySignIn> {
                               errorStringPassWord.isEmpty) {
                             {
                               context.read<AuthBloc>().add(
-                                    AuthEventLogIn(email.text, password.text),
+                                    AuthEventLogIn(email.text.trim(),
+                                        password.text.trim()),
                                   );
                             }
                           }
@@ -110,12 +113,14 @@ class _BodySignInState extends State<BodySignIn> {
                         style: TextStyle(color: textColorMode(ThemeMode.light)),
                         onTap: () {
                           setState(() {
-                            errorStringPassWord = checkPassword(password.text,context);
+                            errorStringPassWord =
+                                checkPassword(password.text.trim(), context);
                           });
                         },
                         onChanged: (val) {
                           setState(() {
-                            errorStringPassWord = checkPassword(val,context);
+                            errorStringPassWord =
+                                checkPassword(val.trim(), context);
                           });
                         },
                         decoration: inputDecoration(
@@ -167,7 +172,8 @@ class _BodySignInState extends State<BodySignIn> {
                   if (errorStringEmail.isEmpty && errorStringPassWord.isEmpty) {
                     {
                       context.read<AuthBloc>().add(
-                            AuthEventLogIn(email.text, password.text),
+                            AuthEventLogIn(
+                                email.text.trim(), password.text.trim()),
                           );
                     }
                   }
@@ -191,7 +197,7 @@ class _BodySignInState extends State<BodySignIn> {
                   },
                   child: Text(
                     context.loc.sign_up,
-                    style:const TextStyle(
+                    style: const TextStyle(
                       color: kPrimaryColor,
                       fontWeight: FontWeight.bold,
                     ),

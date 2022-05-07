@@ -1,3 +1,4 @@
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
@@ -19,6 +20,7 @@ class ContactListView extends StatelessWidget {
   String id = FirebaseAuth.instance.currentUser!.uid;
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         return Expanded(
@@ -41,27 +43,16 @@ class ContactListView extends StatelessWidget {
                       },
                     );
                   } else {
-                    return const Text("Let add some friend");
+                    return Text(context.loc.no_friend_available);
                   }
-                case ConnectionState.waiting:
-                  return Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    child: const Center(
-                      child: SizedBox(
-                        height: 200,
-                        width: 200,
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  );
                 default:
                   return Container(
                     color: Theme.of(context).scaffoldBackgroundColor,
-                    child: const Center(
+                    child: Center(
                       child: SizedBox(
-                        height: 200,
-                        width: 200,
-                        child: CircularProgressIndicator(),
+                        height: size.height * 0.4,
+                        width: size.width * 0.4,
+                        child: const CircularProgressIndicator(),
                       ),
                     ),
                   );

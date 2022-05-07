@@ -60,7 +60,7 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                 child: Center(
                   child: Image.asset(
                     "assets/images/reset_password.png",
-                    height: 200,
+                    height: size.height * 0.32,
                   ),
                 ),
               ),

@@ -214,16 +214,8 @@ class _ContactCardState extends State<ContactCard> {
                         ],
                       );
                     } else {
-                      return Text(context.loc.no_friend_available);
+                      return Container();
                     }
-                  case ConnectionState.waiting:
-                    return const Center(
-                      child: SizedBox(
-                        height: 25,
-                        width: 20,
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
                   default:
                     return const Center(
                       child: SizedBox(

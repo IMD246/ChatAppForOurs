@@ -32,6 +32,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     final ThemeChanger themeChanger = Provider.of<ThemeChanger>(context);
+    Size size = MediaQuery.of(context).size;
     themeChanger.setContext(context: context);
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) async {
@@ -91,6 +92,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   const Spacer(flex: 1),
                   Image.asset(
                     "assets/images/welcome_image.png",
+                    height: size.height * 0.45,
                   ),
                   const Spacer(flex: 2),
                   Text(
