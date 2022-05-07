@@ -48,7 +48,7 @@ class _BodyUpdatePasswordState extends State<BodyUpdatePassword> {
     final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
     return Column(
       children: [
-        if (!isKeyboard) const SizedBox(height: 100),
+        if (!isKeyboard) SizedBox(height: size.height * 0.115),
         TextFieldContainer(
           child: Column(
             children: [

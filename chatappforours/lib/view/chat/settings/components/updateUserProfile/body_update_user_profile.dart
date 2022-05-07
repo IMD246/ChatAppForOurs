@@ -44,7 +44,7 @@ class _BodyUpdateUserProfileState extends State<BodyUpdateUserProfile> {
     final userOwnerID = FirebaseAuth.instance.currentUser!.uid;
     return Column(
       children: [
-        if (!isKeyboard) const SizedBox(height: 100),
+        if (!isKeyboard) SizedBox(height: size.height * 0.115),
         TextFieldContainer(
           child: Column(
             children: [
