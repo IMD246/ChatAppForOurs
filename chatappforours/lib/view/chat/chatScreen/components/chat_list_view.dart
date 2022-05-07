@@ -50,23 +50,32 @@ class _ChatListViewState extends State<ChatListView> {
         idChat: chat.idChat,
         ownerUserID: ownerUserID,
       );
-      final String userIDFriend;
+      late final String userIDFriend;
       if (chat.listUser[0] == chat.listUser[1]) {
         userIDFriend = chat.listUser.elementAt(0);
+        chat.listUser.removeAt(1);
+        chat.nameChat = context.loc.only_you;
       } else {
         chat.listUser.remove(ownerUserID);
         userIDFriend = chat.listUser.first;
       }
-      userPresenceDatabaseReference.child(userIDFriend).once().then(
+      final userProfile = await firebaseUserProfile.getUserProfile(
+        userID: userIDFriend,
+      );
+      if (chat.typeChat == TypeChat.normal) {
+        chat.urlUserFriend = userProfile?.urlImage;
+        if (chat.listUser.first != ownerUserID) {
+          chat.nameChat = userProfile!.fullName;
+        }
+      }
+      await userPresenceDatabaseReference.child(userIDFriend).once().then(
         (event) async {
           final userProfile = await firebaseUserProfile.getUserProfile(
             userID: userIDFriend,
           );
           if (chat.typeChat == TypeChat.normal) {
             chat.urlUserFriend = userProfile?.urlImage;
-            if (chat.listUser.length <= 1 && chat.listUser[0] == ownerUserID) {
-              chat.nameChat = context.loc.only_you;
-            } else {
+            if (chat.listUser.length > 1) {
               chat.nameChat = userProfile!.fullName;
             }
           }
@@ -74,15 +83,15 @@ class _ChatListViewState extends State<ChatListView> {
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           final isOnline = data['presence'];
           final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
-          final date = differenceInCalendarDays(stampTimeUser);
+          final date = differenceInCalendarDays(stampTimeUser, context);
           chat.stampTimeUser = stampTimeUser;
           chat.stampTimeUserFormated = date;
           chat.presence = isOnline;
-          listChatData.add(chat);
-          _streamController.sink.add(listChatData);
-          _streamController.onResume;
         },
       );
+      listChatData.add(chat);
+      _streamController.sink.add(listChatData);
+      _streamController.onResume;
     }
   }
 
@@ -96,42 +105,41 @@ class _ChatListViewState extends State<ChatListView> {
         idChat: list.elementAt(i).idChat,
         ownerUserID: ownerUserID,
       );
-      final String userIDFriend;
+      late final String userIDFriend;
       if (chat.listUser[0] == chat.listUser[1]) {
         userIDFriend = chat.listUser.elementAt(0);
+        chat.listUser.removeAt(1);
+        chat.nameChat = context.loc.only_you;
       } else {
         chat.listUser.remove(ownerUserID);
         userIDFriend = chat.listUser.first;
       }
-      userPresenceDatabaseReference.child(userIDFriend).once().then(
+      final userProfile = await firebaseUserProfile.getUserProfile(
+        userID: userIDFriend,
+      );
+      if (chat.typeChat == TypeChat.normal) {
+        chat.urlUserFriend = userProfile?.urlImage;
+        if (chat.listUser.first != ownerUserID) {
+          chat.nameChat = userProfile!.fullName;
+        }
+      }
+      await userPresenceDatabaseReference.child(userIDFriend).once().then(
         (event) async {
-          final userProfile = await firebaseUserProfile.getUserProfile(
-            userID: userIDFriend,
-          );
-          if (chat.typeChat == TypeChat.normal) {
-            chat.urlUserFriend = userProfile?.urlImage;
-
-            if (chat.listUser.length <= 1 && chat.listUser[0] == ownerUserID) {
-              chat.nameChat = 'Only You';
-            } else {
-              chat.nameChat = userProfile!.fullName;
-            }
-          }
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           chat.rule = userJoinChat!.ruleChat;
           final isOnline = data['presence'];
           final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
-          final date = differenceInCalendarDays(stampTimeUser);
+          final date = differenceInCalendarDays(stampTimeUser, context);
           chat.stampTimeUser = stampTimeUser;
           chat.stampTimeUserFormated = date;
           chat.presence = isOnline;
           if (isOnline == true) {
             listChatData.add(chat);
-            _streamController.sink.add(listChatData);
-            _streamController.onResume;
           }
         },
       );
+      _streamController.sink.add(listChatData);
+      _streamController.onResume;
     }
   }
 

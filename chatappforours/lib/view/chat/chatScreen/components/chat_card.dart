@@ -168,7 +168,8 @@ class _ChatCardState extends State<ChatCard> {
                 ),
                 Opacity(
                   opacity: 0.64,
-                  child: Text(widget.chat.stampTime),
+                  child: Text(
+                      differenceInCalendarDays(widget.chat.stampTime, context),),
                 ),
               ],
             ),

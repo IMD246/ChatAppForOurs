@@ -48,7 +48,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                       () {
                         themeChanger.setLanguge(val.toString());
                         firebaseUserProfile.updateUserLanguage(
-                          userID: userID,``
+                          userID: userID,
                           language: themeChanger.langugage,
                         );
                       },

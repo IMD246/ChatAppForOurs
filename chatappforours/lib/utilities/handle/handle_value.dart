@@ -1,27 +1,32 @@
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/extensions/locallization.dart';
+import 'package:flutter/material.dart';
 
-String differenceInCalendarDays(DateTime earlier) {
-  DateTime later = DateTime.now();
-  if (later.difference(earlier).inHours >= 0 &&
-      later.difference(earlier).inHours < 24) {
-    if (later.difference(earlier).inMinutes >= 0 &&
-        later.difference(earlier).inMinutes < 1) {
-      return "${later.difference(earlier).inSeconds} s ago";
-    } else if (later.difference(earlier).inMinutes >= 1 &&
-        later.difference(earlier).inMinutes < 60) {
-      return "${later.difference(earlier).inMinutes} min ago";
-    } else if (later.difference(earlier).inMinutes >= 60) {
-      return "${later.difference(earlier).inHours} h ago";
+String differenceInCalendarDays(DateTime earlier, BuildContext? context) {
+  if (context != null) {
+    DateTime later = DateTime.now();
+    if (later.difference(earlier).inHours >= 0 &&
+        later.difference(earlier).inHours < 24) {
+      if (later.difference(earlier).inMinutes >= 0 &&
+          later.difference(earlier).inMinutes < 1) {
+        return "${later.difference(earlier).inSeconds} s ${context.loc.ago}";
+      } else if (later.difference(earlier).inMinutes >= 1 &&
+          later.difference(earlier).inMinutes < 60) {
+        return "${later.difference(earlier).inMinutes} min ${context.loc.ago}";
+      } else if (later.difference(earlier).inMinutes >= 60) {
+        return "${later.difference(earlier).inHours} h ${context.loc.ago}";
+      }
+    } else if (later.difference(earlier).inHours >= 24 &&
+        later.difference(earlier).inHours < 720) {
+      return "${later.difference(earlier).inDays} d ${context.loc.ago}";
+    } else {
+      int month = 1;
+      month = (month * later.difference(earlier).inDays / 30).round();
+      return "$month m ${context.loc.ago}";
     }
-  } else if (later.difference(earlier).inHours >= 24 &&
-      later.difference(earlier).inHours < 720) {
-    return "${later.difference(earlier).inDays} d ago";
-  } else {
-    int month = 1;
-    month = (month * later.difference(earlier).inDays / 30).round();
-    return "$month m ago";
   }
-  return "no time to die";
+
+  return "";
 }
 
 String differenceInCalendarPresence(DateTime earlier) {
@@ -131,12 +136,13 @@ String getStringFromList(String value) {
   }
 }
 
-String getStringMessageStatus(MessageStatus messageStatus) {
+String getStringMessageStatus(
+    MessageStatus messageStatus, BuildContext context) {
   if (messageStatus == MessageStatus.notSent) {
-    return "Not Sent";
+    return context.loc.not_sent;
   } else if (messageStatus == MessageStatus.sent) {
-    return "Sent";
+    return context.loc.sent;
   } else {
-    return "Viewed";
+    return context.loc.viewed;
   }
 }

@@ -144,8 +144,8 @@ class _MesssageScreenState extends State<MesssageScreen> {
                         ),
                         Text(
                           chat.presence!
-                              ? 'Online'
-                              : 'Online ${chat.stampTimeUserFormated}',
+                              ? context.loc.online
+                              : '${context.loc.online} ${chat.stampTimeUserFormated}',
                           style: TextStyle(
                             color: Colors.black.withOpacity(
                               themeMode == ThemeMode.light ? 0.4 : 0.6,

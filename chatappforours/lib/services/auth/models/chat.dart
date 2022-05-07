@@ -1,12 +1,12 @@
 import 'package:chatappforours/constants/chat_constant_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
-import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
 
 class Chat {
   final String idChat;
-  final String stampTime;
+  final DateTime stampTime;
   final DateTime stampTimeChat;
   String lastText;
   final TypeChat typeChat;
@@ -36,12 +36,11 @@ class Chat {
   });
   factory Chat.fromSnapshot({
     required DocumentSnapshot<Map<String, dynamic>> docs,
+    BuildContext? context,
   }) =>
       Chat(
         idChat: docs.id,
-        stampTime: differenceInCalendarDays(
-          docs.get(timeLastChatField).toDate(),
-        ),
+        stampTime: docs.get(timeLastChatField).toDate(),
         nameChat: getNameChat(
             typeChat: getTypeChat(value: docs.get(typeChatField).toString()),
             value: docs.get(nameChatField).toString()),

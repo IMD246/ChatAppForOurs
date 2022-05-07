@@ -255,7 +255,9 @@ class _MessageCardState extends State<MessageCard> {
                           : Alignment.center,
                       child: Text(
                         getStringMessageStatus(
-                            widget.chatMessage.messageStatus),
+                          widget.chatMessage.messageStatus,
+                          context,
+                        ),
                         style: TextStyle(
                           fontSize: 11,
                           color: textColorMode(

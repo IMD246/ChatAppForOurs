@@ -51,8 +51,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           final isOnline = data['presence'];
           final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
-          stampTimeUserFormated = differenceInCalendarDays(stampTimeUser);
-
+          stampTimeUserFormated = differenceInCalendarPresence(stampTimeUser);
           isUserPresence = isOnline;
         },
       );

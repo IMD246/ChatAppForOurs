@@ -71,5 +71,9 @@
     "me" : "Tôi",
     "language" : "Ngôn ngữ",
     "vietnamese" : "Tiếng Việt",
-    "english" : "Tiếng Anh"
+    "english" : "Tiếng Anh",
+    "viewed" : "Đã xem",
+    "sent" : "Đã gửi",
+    "not_sent" : "Chưa gửi",
+    "ago" : "trước"
 }
