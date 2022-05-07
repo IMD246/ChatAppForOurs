@@ -7,7 +7,6 @@ import 'package:chatappforours/view/chat/messageScreen/components/chat_input_fie
 import 'package:chatappforours/view/chat/messageScreen/components/message_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class BodyMessage extends StatefulWidget {
@@ -26,18 +25,16 @@ class _BodyMessageState extends State<BodyMessage> {
   void initState() {
     firebaseChatMessage = FirebaseChatMessage();
     scrollController = ItemScrollController();
-    KeyboardVisibilityController().onChange.listen(
-      (isVisible) {
-        if (isVisible) {
-        } else {
-          firebaseChatMessage.deleteMessageNotSent(
-            ownerUserID: id,
-            chatID: widget.chat.idChat,
-          );
-        }
-      },
-    );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    firebaseChatMessage.deleteMessageNotSent(
+      ownerUserID: id,
+      chatID: widget.chat.idChat,
+    );
+    super.dispose();
   }
 
   @override

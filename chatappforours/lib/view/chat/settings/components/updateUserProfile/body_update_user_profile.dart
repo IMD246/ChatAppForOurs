@@ -42,129 +42,132 @@ class _BodyUpdateUserProfileState extends State<BodyUpdateUserProfile> {
     Size size = MediaQuery.of(context).size;
     final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
     final userOwnerID = FirebaseAuth.instance.currentUser!.uid;
-    return Column(
-      children: [
-        if (!isKeyboard) SizedBox(height: size.height * 0.115),
-        TextFieldContainer(
-          child: Column(
-            children: [
-              TextField(
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: textColorMode(ThemeMode.light)),
-                onTap: () {
-                  setState(
-                    () {
-                      errorStringFirstName =
-                          checkFirstName(firstName.text, context);
-                    },
-                  );
-                },
-                onChanged: (val) {
-                  setState(() {
-                    errorStringFirstName = checkFirstName(val, context);
-                  });
-                },
-                decoration: inputDecoration(
-                  context: context,
-                  textHint: context.loc.type_your_first_name,
-                  icon: Icons.lock,
-                  color: textColorMode(ThemeMode.light),
-                ),
-                controller: firstName,
-              ),
-              Visibility(
-                visible: errorStringFirstName.isNotEmpty,
-                child: Text(
-                  errorStringFirstName,
-                  style: const TextStyle(
-                    color: kErrorColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        TextFieldContainer(
-          child: Column(
-            children: [
-              TextField(
-                onSubmitted: (_) async {
-                  if (errorStringLastName.isEmpty &&
-                      errorStringFirstName.isEmpty) {
-                    {
-                      await firebaseUserProfile.upLoadUserProfile(
-                        userID: userOwnerID,
-                        fullName: "${firstName.text} ${lastName.text.trim()}",
-                      );
-                      await showErrorDialog(
-                        context: context,
-                        text: context.loc.update_user_profile_successfully,
-                        title: context.loc.update_user_profile_notification,
-                      );
-                      firstName.clear();
-                      lastName.clear();
-                    }
-                  }
-                },
-                textInputAction: TextInputAction.done,
-                style: TextStyle(color: textColorMode(ThemeMode.light)),
-                onTap: () {
-                  setState(() {
-                    errorStringLastName =
-                        checkLastName(lastName.text.trim(), context);
-                  });
-                },
-                onChanged: (val) {
-                  setState(() {
-                    errorStringLastName = checkLastName(val.trim(), context);
-                  });
-                },
-                decoration: inputDecoration(
-                  context: context,
-                  textHint: context.loc.type_your_last_name,
-                  icon: Icons.lock,
-                  color: textColorMode(ThemeMode.light),
-                ),
-                controller: lastName,
-              ),
-              Visibility(
-                visible: errorStringLastName.isNotEmpty,
-                child: Text(
-                  errorStringLastName,
-                  style: const TextStyle(
-                    color: kErrorColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: size.height * 0.03),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
-          child: PrimaryButton(
-            context: context,
-            text: context.loc.update_user_profile,
-            press: () async {
-              if (errorStringLastName.isEmpty && errorStringFirstName.isEmpty) {
-                {
-                  await firebaseUserProfile.upLoadUserProfile(
-                    userID: userOwnerID,
-                    fullName: "${firstName.text} ${lastName.text.trim()}",
-                  );
-                  await showErrorDialog(
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          if (!isKeyboard) SizedBox(height: size.height * 0.05),
+          TextFieldContainer(
+            child: Column(
+              children: [
+                TextField(
+                  textInputAction: TextInputAction.next,
+                  style: TextStyle(color: textColorMode(ThemeMode.light)),
+                  onTap: () {
+                    setState(
+                      () {
+                        errorStringFirstName =
+                            checkFirstName(firstName.text, context);
+                      },
+                    );
+                  },
+                  onChanged: (val) {
+                    setState(() {
+                      errorStringFirstName = checkFirstName(val, context);
+                    });
+                  },
+                  decoration: inputDecoration(
                     context: context,
-                    text: context.loc.update_user_profile_successfully,
-                    title: context.loc.update_user_profile_notification,
-                  );
-                  firstName.clear();
-                  lastName.clear();
-                }
-              }
-            },
+                    textHint: context.loc.type_your_first_name,
+                    icon: Icons.lock,
+                    color: textColorMode(ThemeMode.light),
+                  ),
+                  controller: firstName,
+                ),
+                Visibility(
+                  visible: errorStringFirstName.isNotEmpty,
+                  child: Text(
+                    errorStringFirstName,
+                    style: const TextStyle(
+                      color: kErrorColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        )
-      ],
+          TextFieldContainer(
+            child: Column(
+              children: [
+                TextField(
+                  onSubmitted: (_) async {
+                    if (errorStringLastName.isEmpty &&
+                        errorStringFirstName.isEmpty) {
+                      {
+                        await firebaseUserProfile.upLoadUserProfile(
+                          userID: userOwnerID,
+                          fullName: "${firstName.text} ${lastName.text.trim()}",
+                        );
+                        await showErrorDialog(
+                          context: context,
+                          text: context.loc.update_user_profile_successfully,
+                          title: context.loc.update_user_profile_notification,
+                        );
+                        firstName.clear();
+                        lastName.clear();
+                      }
+                    }
+                  },
+                  textInputAction: TextInputAction.done,
+                  style: TextStyle(color: textColorMode(ThemeMode.light)),
+                  onTap: () {
+                    setState(() {
+                      errorStringLastName =
+                          checkLastName(lastName.text.trim(), context);
+                    });
+                  },
+                  onChanged: (val) {
+                    setState(() {
+                      errorStringLastName = checkLastName(val.trim(), context);
+                    });
+                  },
+                  decoration: inputDecoration(
+                    context: context,
+                    textHint: context.loc.type_your_last_name,
+                    icon: Icons.lock,
+                    color: textColorMode(ThemeMode.light),
+                  ),
+                  controller: lastName,
+                ),
+                Visibility(
+                  visible: errorStringLastName.isNotEmpty,
+                  child: Text(
+                    errorStringLastName,
+                    style: const TextStyle(
+                      color: kErrorColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+                horizontal: kDefaultPadding, vertical: kDefaultPadding),
+            child: PrimaryButton(
+              context: context,
+              text: context.loc.update_user_profile,
+              press: () async {
+                if (errorStringLastName.isEmpty &&
+                    errorStringFirstName.isEmpty) {
+                  {
+                    await firebaseUserProfile.upLoadUserProfile(
+                      userID: userOwnerID,
+                      fullName: "${firstName.text} ${lastName.text.trim()}",
+                    );
+                    await showErrorDialog(
+                      context: context,
+                      text: context.loc.update_user_profile_successfully,
+                      title: context.loc.update_user_profile_notification,
+                    );
+                    firstName.clear();
+                    lastName.clear();
+                  }
+                }
+              },
+            ),
+          )
+        ],
+      ),
     );
   }
 }

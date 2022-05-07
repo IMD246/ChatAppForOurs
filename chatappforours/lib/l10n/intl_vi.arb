@@ -75,5 +75,12 @@
     "viewed" : "Đã xem",
     "sent" : "Đã gửi",
     "not_sent" : "Chưa gửi",
-    "ago" : "trước"
+    "ago" : "trước",
+    "seconds" : "giây",
+    "minutes" : "phút",
+    "days" : "ngày",
+    "hours" : "giờ",
+    "months" : "tháng",
+    "years" : "năm"
+    
 }

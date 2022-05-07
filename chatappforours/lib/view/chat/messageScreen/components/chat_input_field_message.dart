@@ -119,19 +119,6 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                     Expanded(
                       child: TextField(
                         controller: textController,
-                        onTap: () async {
-                          await firebaseChatMessage.createTextMessageNotSent(
-                            userID: id,
-                            chatID: widget.chat.idChat,
-                          );
-                          if (widget.scroll.isAttached) {
-                            widget.scroll.scrollTo(
-                              index: intMaxValue,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeIn,
-                            );
-                          }
-                        },
                         onChanged: (value) async {
                           if (textController.text.isNotEmpty) {
                             await firebaseChatMessage.createTextMessageNotSent(

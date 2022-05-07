@@ -26,7 +26,33 @@ String differenceInCalendarDays(DateTime earlier, BuildContext? context) {
       return "$month m ${context.loc.ago}";
     }
   }
+  return "";
+}
 
+String differenceInCalendarDaysLocalization(
+    DateTime earlier, BuildContext? context) {
+  if (context != null) {
+    DateTime later = DateTime.now();
+    if (later.difference(earlier).inHours >= 0 &&
+        later.difference(earlier).inHours < 24) {
+      if (later.difference(earlier).inMinutes >= 0 &&
+          later.difference(earlier).inMinutes < 1) {
+        return "${later.difference(earlier).inSeconds} ${context.loc.seconds} ${context.loc.ago}";
+      } else if (later.difference(earlier).inMinutes >= 1 &&
+          later.difference(earlier).inMinutes < 60) {
+        return "${later.difference(earlier).inMinutes} ${context.loc.minutes} ${context.loc.ago}";
+      } else if (later.difference(earlier).inMinutes >= 60) {
+        return "${later.difference(earlier).inHours} ${context.loc.hours} ${context.loc.ago}";
+      }
+    } else if (later.difference(earlier).inHours >= 24 &&
+        later.difference(earlier).inHours < 720) {
+      return "${later.difference(earlier).inDays} ${context.loc.days} ${context.loc.ago}";
+    } else {
+      int month = 1;
+      month = (month * later.difference(earlier).inDays / 30).round();
+      return "$month ${context.loc.months} ${context.loc.ago}";
+    }
+  }
   return "";
 }
 

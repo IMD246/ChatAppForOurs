@@ -146,7 +146,7 @@ class _MesssageScreenState extends State<MesssageScreen> {
                         Text(
                           chat.presence!
                               ? context.loc.online
-                              : '${context.loc.online} ${differenceInCalendarDays(widget.chat.stampTimeUser!, context)}',
+                              : '${context.loc.online} ${differenceInCalendarDaysLocalization(widget.chat.stampTimeUser!, context)}',
                           style: TextStyle(
                             color: Colors.black.withOpacity(
                               themeMode == ThemeMode.light ? 0.4 : 0.6,
