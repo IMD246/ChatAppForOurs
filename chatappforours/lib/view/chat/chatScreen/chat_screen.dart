@@ -53,6 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
             final userProfile = snapshot.data;
             if (snapshot.hasData) {
               return Scaffold(
+                resizeToAvoidBottomInset: false,
                 appBar: buildAppbar(
                   currentIndex,
                   ThemeMode.light,
@@ -98,11 +99,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
                   items: [
                     BottomNavigationBarItem(
-                      icon:const Icon(Icons.messenger),
+                      icon: const Icon(Icons.messenger),
                       label: context.loc.chat,
                     ),
                     BottomNavigationBarItem(
-                      icon:const Icon(Icons.people),
+                      icon: const Icon(Icons.people),
                       label: context.loc.contacts,
                     ),
                   ],

@@ -68,7 +68,7 @@ class _ContactCardState extends State<ContactCard> {
     Size size = MediaQuery.of(context).size;
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        return GestureDetector(
+        return InkWell(
           onTap: () async {
             if (!widget.requestFriend) {
               final chat = await firebaseChat.getChatByListIDUser(
@@ -162,7 +162,8 @@ class _ContactCardState extends State<ContactCard> {
                                     ),
                             ],
                           ),
-                          Padding(
+                          Container(
+                            width: size.width * 0.45,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: kDefaultPadding / 2),
                             child: Text(
@@ -172,14 +173,14 @@ class _ContactCardState extends State<ContactCard> {
                                   : null,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w500,
-                                fontSize: 16,
+                                fontSize: 14,
                               ),
                             ),
                           ),
                           const Spacer(),
                           Visibility(
-                            visible: widget.requestFriend == true,
-                            child: Row(
+                            visible: widget.requestFriend,
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 FillOutlineButton(
@@ -196,17 +197,18 @@ class _ContactCardState extends State<ContactCard> {
                                   },
                                   text: context.loc.accept,
                                 ),
-                                SizedBox(
-                                  width: size.width * 0.01,
-                                ),
-                                FillOutlineButton(
-                                  press: () async {
-                                    await firebaseFriendList.deleteFriend(
-                                      ownerUserID: id,
-                                      userID: widget.friend.userID,
-                                    );
-                                  },
-                                  text: context.loc.cancel,
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: kDefaultPadding * 0.2),
+                                  child: FillOutlineButton(
+                                    press: () async {
+                                      await firebaseFriendList.deleteFriend(
+                                        ownerUserID: id,
+                                        userID: widget.friend.userID,
+                                      );
+                                    },
+                                    text: context.loc.cancel,
+                                  ),
                                 ),
                               ],
                             ),

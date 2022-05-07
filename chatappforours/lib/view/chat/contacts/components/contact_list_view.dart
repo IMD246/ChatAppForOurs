@@ -34,6 +34,7 @@ class ContactListView extends StatelessWidget {
                   if (snapshot.hasData) {
                     final listFriend = snapshot.data as Iterable<FriendList>;
                     return ListView.builder(
+                      shrinkWrap: true,
                       itemCount: listFriend.length,
                       itemBuilder: (context, index) {
                         return ContactCard(

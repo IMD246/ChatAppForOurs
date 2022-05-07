@@ -41,7 +41,7 @@ class _ChatCardState extends State<ChatCard> {
     final firebaseUserProfile = FirebaseUserProfile();
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        return GestureDetector(
+        return InkWell(
           onTap: () async {
             final userProfile = await firebaseUserProfile.getUserProfile(
                 userID: widget.chat.listUser.first);

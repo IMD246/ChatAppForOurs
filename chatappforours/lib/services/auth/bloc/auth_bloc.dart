@@ -8,6 +8,7 @@ import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -189,6 +190,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           final userProfile = await firebaseUserProfile.getUserProfile(
               userID: authProvider.currentUser?.id);
           if (userProfile != null) {
+            await FirebaseFirestore.instance.clearPersistence();
             await authProvider.logOut();
           }
           emit(
