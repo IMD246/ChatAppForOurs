@@ -7,6 +7,7 @@ import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
+import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/body_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -145,7 +146,7 @@ class _MesssageScreenState extends State<MesssageScreen> {
                         Text(
                           chat.presence!
                               ? context.loc.online
-                              : '${context.loc.online} ${chat.stampTimeUserFormated}',
+                              : '${context.loc.online} ${differenceInCalendarDays(widget.chat.stampTimeUser!, context)}',
                           style: TextStyle(
                             color: Colors.black.withOpacity(
                               themeMode == ThemeMode.light ? 0.4 : 0.6,

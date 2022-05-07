@@ -1,16 +1,13 @@
 import 'dart:async';
 
 import 'package:chatappforours/enum/enum.dart';
-import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
-import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
-import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/chat_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -31,7 +28,7 @@ class ChatListView extends StatefulWidget {
 
 class _ChatListViewState extends State<ChatListView> {
   final List<Chat> listChatData = [];
-  final StreamController _streamController = StreamController();
+  late final StreamController _streamController;
   late final FirebaseUsersJoinChat firebaseUsersJoinChat;
   late final FirebaseUserProfile firebaseUserProfile;
   late final FirebaseChat firebaseChat;
@@ -43,6 +40,7 @@ class _ChatListViewState extends State<ChatListView> {
   getAllDataChat({required Iterable<Chat> list}) async {
     listChatData.clear();
     _streamController.onPause;
+    _streamController.add(listChatData);
     for (var i = 0; i < list.length; i++) {
       final chat = await firebaseChat.getChatByID(
           idChat: list.elementAt(i).idChat, userChatID: ownerUserID);
@@ -54,7 +52,6 @@ class _ChatListViewState extends State<ChatListView> {
       if (chat.listUser[0] == chat.listUser[1]) {
         userIDFriend = chat.listUser.elementAt(0);
         chat.listUser.removeAt(1);
-        chat.nameChat = context.loc.only_you;
       } else {
         chat.listUser.remove(ownerUserID);
         userIDFriend = chat.listUser.first;
@@ -81,12 +78,8 @@ class _ChatListViewState extends State<ChatListView> {
           }
           chat.rule = userJoinChat!.ruleChat;
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
-          final isOnline = data['presence'];
-          final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
-          final date = differenceInCalendarDays(stampTimeUser, context);
-          chat.stampTimeUser = stampTimeUser;
-          chat.stampTimeUserFormated = date;
-          chat.presence = isOnline;
+          chat.presence = data['presence'];
+          chat.stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
         },
       );
       listChatData.add(chat);
@@ -98,6 +91,7 @@ class _ChatListViewState extends State<ChatListView> {
   getAllDataChatOnline({required Iterable<Chat> list}) async {
     listChatData.clear();
     _streamController.onPause;
+    _streamController.add(listChatData);
     for (var i = 0; i < list.length; i++) {
       final chat = await firebaseChat.getChatByID(
           idChat: list.elementAt(i).idChat, userChatID: ownerUserID);
@@ -109,7 +103,6 @@ class _ChatListViewState extends State<ChatListView> {
       if (chat.listUser[0] == chat.listUser[1]) {
         userIDFriend = chat.listUser.elementAt(0);
         chat.listUser.removeAt(1);
-        chat.nameChat = context.loc.only_you;
       } else {
         chat.listUser.remove(ownerUserID);
         userIDFriend = chat.listUser.first;
@@ -127,35 +120,31 @@ class _ChatListViewState extends State<ChatListView> {
         (event) async {
           final data = Map<String, dynamic>.from(event.snapshot.value as Map);
           chat.rule = userJoinChat!.ruleChat;
-          final isOnline = data['presence'];
-          final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
-          final date = differenceInCalendarDays(stampTimeUser, context);
-          chat.stampTimeUser = stampTimeUser;
-          chat.stampTimeUserFormated = date;
-          chat.presence = isOnline;
-          if (isOnline == true) {
+          chat.presence = data['presence'];
+          chat.stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
+          if (chat.presence == true) {
             listChatData.add(chat);
           }
         },
       );
       _streamController.sink.add(listChatData);
-      _streamController.onResume;
     }
   }
 
   @override
   void initState() {
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
+    _streamController = StreamController();
     firebaseUserProfile = FirebaseUserProfile();
     firebaseChat = FirebaseChat();
     firebaseChatMessage = FirebaseChatMessage();
-
     super.initState();
   }
 
   @override
   void dispose() {
     listChatData.clear();
+    _streamController.add(listChatData);
     super.dispose();
   }
 
@@ -178,15 +167,6 @@ class _ChatListViewState extends State<ChatListView> {
                     itemBuilder: (context, index) {
                       return ChatCard(
                         chat: allChatCard.elementAt(index),
-                        press: () {
-                          final chatData = allChatCard.elementAt(index);
-                          context.read<AuthBloc>().add(
-                                AuthEventGetInChatFromBodyChatScreen(
-                                  chat: chatData,
-                                  currentIndex: 0,
-                                ),
-                              );
-                        },
                       );
                     },
                   );

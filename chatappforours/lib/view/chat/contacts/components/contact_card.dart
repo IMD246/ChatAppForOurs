@@ -54,10 +54,8 @@ class _ContactCardState extends State<ContactCard> {
         final data = Map<String, dynamic>.from(event.snapshot.value as Map);
         bool isOnline = data['presence'];
         final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
-        final date = differenceInCalendarDays(stampTimeUser,context);
         setState(() {
           widget.friend.presence = isOnline;
-          widget.friend.stampTimeUser = date;
           stampTime = stampTimeUser;
         });
       },
@@ -78,7 +76,10 @@ class _ContactCardState extends State<ContactCard> {
               );
               if (chat != null) {
                 chat.presence = widget.friend.presence;
-                chat.stampTimeUserFormated = widget.friend.stampTimeUser;
+                chat.stampTimeUser = stampTime;
+                final userProfileFriend = await firebaseUserProfile
+                    .getUserProfile(userID: widget.friend.userID);
+                chat.nameChat = userProfileFriend!.fullName;
                 context.read<AuthBloc>().add(
                       AuthEventGetInChatFromBodyContactScreen(
                         chat: chat,

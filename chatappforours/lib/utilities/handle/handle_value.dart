@@ -1,5 +1,6 @@
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/extensions/locallization.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:flutter/material.dart';
 
 String differenceInCalendarDays(DateTime earlier, BuildContext? context) {
@@ -144,5 +145,14 @@ String getStringMessageStatus(
     return context.loc.sent;
   } else {
     return context.loc.viewed;
+  }
+}
+
+String handleNameChat(
+    String ownerUserID, String userIDChat, Chat chat, BuildContext context) {
+  if (ownerUserID == userIDChat) {
+    return context.loc.only_you;
+  } else {
+    return chat.nameChat ?? "";
   }
 }

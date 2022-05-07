@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
+import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
@@ -17,10 +18,8 @@ class ChatCard extends StatefulWidget {
   const ChatCard({
     Key? key,
     required this.chat,
-    required this.press,
   }) : super(key: key);
   final Chat chat;
-  final VoidCallback press;
 
   @override
   State<ChatCard> createState() => _ChatCardState();
@@ -43,7 +42,17 @@ class _ChatCardState extends State<ChatCard> {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         return GestureDetector(
-          onTap: widget.press,
+          onTap: () async {
+            final userProfile = await firebaseUserProfile.getUserProfile(
+                userID: widget.chat.listUser.first);
+            widget.chat.nameChat = userProfile!.fullName;
+            context.read<AuthBloc>().add(
+                  AuthEventGetInChatFromBodyChatScreen(
+                    chat: widget.chat,
+                    currentIndex: 0,
+                  ),
+                );
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: kDefaultPadding,
@@ -55,87 +64,66 @@ class _ChatCardState extends State<ChatCard> {
                   future: firebaseUserProfile.getUserProfile(
                       userID: widget.chat.listUser.first),
                   builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.done:
-                        if (snapshot.hasData) {
-                          final userProfile = snapshot.data;
-                          return Stack(
-                            children: [
-                              if (userProfile!.urlImage != null)
-                                CircleAvatar(
-                                  backgroundColor: Colors.cyan[100],
-                                  child: ClipOval(
-                                    child: SizedBox.fromSize(
-                                      size: const Size.fromRadius(60),
-                                      child: CachedNetworkImage(
-                                        imageUrl: userProfile.urlImage!,
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) =>
-                                            const CircularProgressIndicator(),
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(Icons.error),
-                                      ),
-                                    ),
+                    if (snapshot.hasData) {
+                      final userProfile = snapshot.data;
+                      return Stack(
+                        children: [
+                          if (userProfile!.urlImage != null)
+                            CircleAvatar(
+                              backgroundColor: Colors.cyan[100],
+                              child: ClipOval(
+                                child: SizedBox.fromSize(
+                                  size: const Size.fromRadius(60),
+                                  child: CachedNetworkImage(
+                                    imageUrl: userProfile.urlImage!,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) =>
+                                        const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
                                   ),
                                 ),
-                              if (userProfile.urlImage == null)
-                                CircleAvatar(
-                                  backgroundColor: Colors.cyan[100],
-                                  backgroundImage: const AssetImage(
-                                    "assets/images/defaultImage.png",
+                              ),
+                            ),
+                          if (userProfile.urlImage == null)
+                            CircleAvatar(
+                              backgroundColor: Colors.cyan[100],
+                              backgroundImage: const AssetImage(
+                                "assets/images/defaultImage.png",
+                              ),
+                            ),
+                          if (widget.chat.presence == true)
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                height: 16,
+                                width: 16,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: kPrimaryColor,
+                                  border: Border.all(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    width: 3,
                                   ),
                                 ),
-                              if (widget.chat.presence == true)
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Container(
-                                    height: 16,
-                                    width: 16,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: kPrimaryColor,
-                                      border: Border.all(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        width: 3,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              if (widget.chat.presence == false)
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Text(
-                                    differenceInCalendarPresence(
-                                        widget.chat.stampTimeUser!),
-                                    style: const TextStyle(fontSize: 13),
-                                  ),
-                                ),
-                            ],
-                          );
-                        } else {
-                          return const Text(
-                            "",
-                          );
-                        }
-                      case ConnectionState.waiting:
-                        return const Center(
-                          child: SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      default:
-                        return const Center(
-                          child: SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
+                              ),
+                            ),
+                          if (widget.chat.presence == false)
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Text(
+                                differenceInCalendarPresence(
+                                    widget.chat.stampTimeUser!),
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ),
+                        ],
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
                     }
                   },
                 ),
@@ -148,7 +136,8 @@ class _ChatCardState extends State<ChatCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.chat.nameChat ?? "",
+                          handleNameChat(userOwnerID,
+                              widget.chat.listUser.first, widget.chat, context),
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
@@ -169,7 +158,8 @@ class _ChatCardState extends State<ChatCard> {
                 Opacity(
                   opacity: 0.64,
                   child: Text(
-                      differenceInCalendarDays(widget.chat.stampTime, context),),
+                    differenceInCalendarDays(widget.chat.stampTime, context),
+                  ),
                 ),
               ],
             ),
