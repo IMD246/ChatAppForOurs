@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatappforours/services/auth/models/auth_exception.dart';
 import 'package:chatappforours/services/auth/models/auth_provider.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
@@ -134,6 +136,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             fullName: event.fullName,
             urlImage: '',
             isDarkMode: false,
+            language: Platform.localeName.substring(0, 2).toString(),
           );
           await friendListFirebase.createNewFriendDefault(
             userIDFriend: user.id!,
@@ -452,12 +455,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                 ownerUserID: user.id!,
               );
               final userProfile = UserProfile(
-                email: user.email!,
-                fullName: user.displayName!,
-                urlImage: user.photoURL,
-                isEmailVerified: true,
-                isDarkMode: false,
-              );
+                  email: user.email!,
+                  fullName: user.displayName!,
+                  urlImage: user.photoURL,
+                  isEmailVerified: true,
+                  isDarkMode: false,
+                  language: Platform.localeName.substring(0, 2).toString());
               await userProfileFirebase.createUserProfile(
                 userID: user.id!,
                 userProfile: userProfile,

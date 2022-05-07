@@ -90,12 +90,13 @@ class _BodySignUpState extends State<BodySignUp> {
                           onTap: () {
                             setState(() {
                               errorStringFirstName =
-                                  checkFirstName(firstName.text,context);
+                                  checkFirstName(firstName.text, context);
                             });
                           },
                           onChanged: (val) {
                             setState(() {
-                              errorStringFirstName = checkFirstName(val,context);
+                              errorStringFirstName =
+                                  checkFirstName(val, context);
                             });
                           },
                           decoration: inputDecoration(
@@ -129,13 +130,14 @@ class _BodySignUpState extends State<BodySignUp> {
                           onTap: () {
                             setState(() {
                               errorStringLastName =
-                                  checkFirstName(lastName.text,context);
+                                  checkFirstName(lastName.text, context);
                             });
                           },
                           onChanged: (val) {
                             setState(
                               () {
-                                errorStringLastName = checkFirstName(val,context);
+                                errorStringLastName =
+                                    checkFirstName(val, context);
                               },
                             );
                           },
@@ -169,12 +171,13 @@ class _BodySignUpState extends State<BodySignUp> {
                           textInputAction: TextInputAction.next,
                           onTap: () {
                             setState(() {
-                              errorStringEmail = checkFormatEmail(email.text,context);
+                              errorStringEmail =
+                                  checkFormatEmail(email.text, context);
                             });
                           },
                           onChanged: (val) {
                             setState(() {
-                              errorStringEmail = checkFormatEmail(val,context);
+                              errorStringEmail = checkFormatEmail(val, context);
                             });
                           },
                           decoration: inputDecoration(
@@ -222,12 +225,12 @@ class _BodySignUpState extends State<BodySignUp> {
                           onTap: () {
                             setState(() {
                               errorStringPassWord =
-                                  checkPassword(password.text,context);
+                                  checkPassword(password.text, context);
                             });
                           },
                           onChanged: (val) {
                             setState(() {
-                              errorStringPassWord = checkPassword(val,context);
+                              errorStringPassWord = checkPassword(val, context);
                             });
                           },
                           decoration: inputDecoration(
@@ -274,7 +277,7 @@ class _BodySignUpState extends State<BodySignUp> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: kDefaultPadding),
                 child: PrimaryButton(
-                  text: 'Sign Up',
+                  text: context.loc.sign_up,
                   press: () {
                     if (errorStringEmail.isEmpty &&
                         errorStringFirstName.isEmpty &&
@@ -309,7 +312,7 @@ class _BodySignUpState extends State<BodySignUp> {
                     },
                     child: Text(
                       context.loc.sign_in,
-                      style:const TextStyle(
+                      style: const TextStyle(
                         color: kPrimaryColor,
                         fontWeight: FontWeight.bold,
                       ),

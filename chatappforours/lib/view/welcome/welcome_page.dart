@@ -32,6 +32,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     final ThemeChanger themeChanger = Provider.of<ThemeChanger>(context);
+    themeChanger.setContext(context: context);
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateLoggedIn) {
@@ -39,6 +40,7 @@ class _WelcomePageState extends State<WelcomePage> {
           themeChanger.setTheme(
             userProfile.isDarkMode,
           );
+          themeChanger.setLanguge(userProfile.language);
         }
         if (state.isLoading) {
           LoadingScreen().show(

@@ -11,7 +11,7 @@
     "already_have_an_account" : "Đã có tài khoản!",
     "sign_in" : "Đăng Nhập",
     "send_email" : "Gửi Email",
-    "already_remember_password" : "Đã nhớ mật khẩu!",
+    "already_remember_passsword" : "Đã nhớ mật khẩu!",
     "user_not_found_in_database_error" : "Lỗi không tìm thấy người dùng",
     "user_not_found_in_database" : "Không tìm thấy người dùng",   
     "email_already_in_use_error" : "Lỗi email đã sử dụng",
@@ -68,5 +68,8 @@
     "added" : "Đã thêm",
     "skip" : "Bỏ qua",
     "online" : "Hoạt động",
-    "me" : "Tôi"
+    "me" : "Tôi",
+    "language" : "Ngôn ngữ",
+    "vietnamese" : "Tiếng Việt",
+    "english" : "Tiếng Anh"
 }

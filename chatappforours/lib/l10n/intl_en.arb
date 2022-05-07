@@ -68,5 +68,8 @@
     "added" : "Added",
     "skip" : "Skip",
     "online" : "online",
-    "me" : "Me"
+    "me" : "Me",
+    "language" : "Language",
+    "vietnamese" : "Vietnamese",
+    "english" : "English"
 }

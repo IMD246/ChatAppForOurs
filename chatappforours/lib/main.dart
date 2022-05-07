@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,11 +39,17 @@ class Material extends StatelessWidget {
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final isDarkTheme = Provider.of<ThemeChanger>(context).getTheme();
+    final themeChanger = Provider.of<ThemeChanger>(context);
+    final isDarkTheme = themeChanger.getTheme();
+    final language = themeChanger.langugage.substring(0, 2).toString();
+    final String defaultLocale = Platform.localeName.substring(0, 2).toString();
     return BlocProvider<AuthBloc>(
       create: (context) => AuthBloc(FirebaseAuthProvider()),
       child: MaterialApp(
         supportedLocales: AppLocalizations.supportedLocales,
+        locale: language.compareTo(defaultLocale) == 0
+            ? Locale(defaultLocale)
+            : Locale(language),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         debugShowCheckedModeBanner: false,
         theme: lightThemeData(context),

@@ -8,13 +8,15 @@ import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
+import 'package:chatappforours/view/chat/settings/components/change_language.dart';
 import 'package:chatappforours/view/chat/settings/components/updatePassword/update_password_screen.dart';
 import 'package:chatappforours/view/chat/settings/components/updateUserProfile/update_user_profile_screen.dart';
 import 'package:file_picker/file_picker.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+// ignore: unused_import
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BodySetting extends StatefulWidget {
   const BodySetting({Key? key}) : super(key: key);
@@ -37,6 +39,7 @@ class _BodySettingState extends State<BodySetting> {
   @override
   Widget build(BuildContext context) {
     ThemeChanger themeChanger = Provider.of<ThemeChanger>(context);
+    themeChanger.context = context;
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state is AuthStateSetting) {
@@ -206,13 +209,65 @@ class _BodySettingState extends State<BodySetting> {
                                 () {
                                   context.read<AuthBloc>().add(
                                       AuthEventUploadStateTheme(
-                                          isDarkTheme: val));
+                                          isDarkTheme: val),);
                                   themeChanger.setTheme(val);
                                 },
                               );
                             },
                           ),
                         ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) {
+                            return const ChangeLanguage();
+                          },),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: kDefaultPadding),
+                        child: Row(
+                          children: [
+                            const CircleAvatar(
+                              backgroundImage: AssetImage(
+                                'assets/icons/languages.png',
+                              ),
+                            ),
+                            const SizedBox(width: kDefaultPadding * 0.5),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: kDefaultPadding * 0.05,
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    context.loc.language,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: textColorMode(
+                                        ThemeMode.light,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    themeChanger.getLanguage(),
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: textColorMode(
+                                        ThemeMode.light,
+                                      ).withOpacity(0.5),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(

@@ -98,7 +98,7 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                           },
                           decoration: inputDecoration(
                             context: context,
-                            textHint: 'Type Your Email',
+                            textHint: context.loc.type_your_email,
                             icon: Icons.email,
                             color: textColorMode(ThemeMode.light),
                           ),

@@ -102,7 +102,14 @@ class FirebaseUserProfile {
       await userProfilePath.doc(userID).update(mapUser);
     }
   }
-
+Future<void> updateUserLanguage({
+    required String userID,
+    required String language,
+  }) async {
+      Map<String, dynamic> mapUser = <String, dynamic>{};
+      mapUser.addAll({languageField: language});
+      await userProfilePath.doc(userID).update(mapUser);
+  }
   Future<void> uploadDarkTheme({
     required String? userID,
     required bool isDarkTheme,

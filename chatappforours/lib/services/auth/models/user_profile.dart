@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatappforours/constants/user_profile_constant_field.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -6,9 +8,11 @@ class UserProfile {
   final String email;
   final String fullName;
   final String? urlImage;
+  final String language;
   bool? isEmailVerified = false;
   bool isDarkMode = false;
   UserProfile({
+    required this.language,
     this.idUser,
     required this.email,
     required this.fullName,
@@ -27,5 +31,8 @@ class UserProfile {
             : snapshot.get(urlImageField),
         isDarkMode: snapshot.get(isDarkModeField),
         idUser: snapshot.id,
+        language: snapshot.data()?[languageField] != null
+            ? snapshot.get(languageField)
+            : Platform.localeName.substring(0, 2).toString(),
       );
 }
