@@ -42,7 +42,6 @@ class _BodySignInState extends State<BodySignIn> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(

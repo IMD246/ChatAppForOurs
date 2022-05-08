@@ -58,17 +58,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void didChangeDependencies() {
-    setState(() {
-      if (widget.countFriend > 0) {
-        NotificationService.fromSnapshot().initNotification();
-        NotificationService().showNotification(
-          1,
-          context.loc.request_friend_notification_title,
-          context.loc.request_friend_notification_body(widget.countFriend),
-          3,
-        );
-      }
-    },);
+    setState(
+      () {
+        if (widget.countFriend > 0) {
+          NotificationService.fromSnapshot().initNotification();
+          NotificationService().showNotification(
+            1,
+            context.loc.request_friend_notification_title,
+            context.loc.request_friend_notification_body(widget.countFriend),
+            3,
+          );
+        }
+      },
+    );
 
     super.didChangeDependencies();
   }
@@ -83,7 +85,6 @@ class _ChatScreenState extends State<ChatScreen> {
             final userProfile = snapshot.data;
             if (snapshot.hasData) {
               return Scaffold(
-                resizeToAvoidBottomInset: false,
                 appBar: buildAppbar(
                   currentIndex,
                   ThemeMode.light,

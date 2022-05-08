@@ -7,7 +7,6 @@ import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
-import 'package:chatappforours/view/chat/messageScreen/components/audio_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/image_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/text_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -89,10 +88,10 @@ class _MessageCardState extends State<MessageCard> {
             chatMessage: chatMessage,
             isSelected: isSelected,
           );
-        case TypeMessage.audio:
-          return AudioMessasge(
-            chatMessage: chatMessage,
-          );
+        // case TypeMessage.audio:
+        //   return AudioMessasge(
+        //     chatMessage: chatMessage,
+        //   );
         case TypeMessage.image:
           return ImageMessage(
             chatMessage: chatMessage,
