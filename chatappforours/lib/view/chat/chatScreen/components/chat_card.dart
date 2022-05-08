@@ -138,9 +138,10 @@ class _ChatCardState extends State<ChatCard> {
                         Text(
                           handleNameChat(userOwnerID,
                               widget.chat.listUser.first, widget.chat, context),
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
-                            fontSize: 16,
+                            fontSize: 14,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -158,7 +159,8 @@ class _ChatCardState extends State<ChatCard> {
                 Opacity(
                   opacity: 0.64,
                   child: Text(
-                    differenceInCalendarDays(widget.chat.stampTime, context),
+                    differenceInCalendarDaysLocalization(
+                        widget.chat.stampTime, context),
                   ),
                 ),
               ],
