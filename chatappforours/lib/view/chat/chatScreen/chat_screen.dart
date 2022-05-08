@@ -144,8 +144,6 @@ class _ChatScreenState extends State<ChatScreen> {
               return const Scaffold(
                 body: Center(
                   child: SizedBox(
-                    height: 200,
-                    width: 200,
                     child: CircularProgressIndicator(),
                   ),
                 ),
