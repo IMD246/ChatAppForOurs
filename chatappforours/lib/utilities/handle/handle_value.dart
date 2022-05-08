@@ -163,6 +163,17 @@ String getStringFromList(String value) {
   }
 }
 
+String handleStringMessageLocalization(String value, BuildContext context) {
+  final List<String> list =
+      value.substring(value.length - 9, value.length).split(" ");
+  final v1 = value.substring(0, value.length - 12);
+  final string1 = context.loc.sent_text_image + " ";
+  final string2 = list.elementAt(1) + " ";
+  final string3 = context.loc.photo;
+  final string = v1 + string1 + string2 + string3;
+  return string;
+}
+
 String getStringMessageStatus(
     MessageStatus messageStatus, BuildContext context) {
   if (messageStatus == MessageStatus.notSent) {

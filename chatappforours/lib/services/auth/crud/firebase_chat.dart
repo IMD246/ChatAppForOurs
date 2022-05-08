@@ -1,4 +1,5 @@
 import 'package:chatappforours/constants/chat_constant_field.dart';
+import 'package:chatappforours/constants/message_chat_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
@@ -40,10 +41,12 @@ class FirebaseChat {
 
   Future<void> updateChatLastText({
     required String text,
+    required TypeMessage typeMessage,
     required String chatID,
   }) async {
     Map<String, dynamic> map = <String, dynamic>{
       lastTextField: text,
+      typeMessageField:typeMessage.toString(),
       timeLastChatField: DateTime.now(),
     };
     await firebaseChat.doc(chatID).update(map);

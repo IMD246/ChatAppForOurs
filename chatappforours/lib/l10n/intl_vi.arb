@@ -89,6 +89,7 @@
     "english" : "Tiếng Anh",
     "viewed" : "Đã xem",
     "sent" : "Đã gửi",
+    "sent_text_image" : "đã gửi",
     "not_sent" : "Chưa gửi",
     "ago" : "trước",
     "seconds" : "giây",
@@ -97,6 +98,7 @@
     "hours" : "giờ",
     "months" : "tháng",
     "years" : "năm",
+    "photo" : "ảnh",
     "request_friend_notification_title": "Thông báo Yêu Cầu Kết Bạn",
     "request_friend_notification_body": "Bạn có {countFriend} yêu cầu kết bạn",
     "@request_friend_notification_body":

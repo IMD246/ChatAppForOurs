@@ -89,6 +89,7 @@
     "english" : "English",
     "viewed" : "viewed",
     "sent" : "sent",
+    "sent_text_image" : "sent",
     "not_sent" : "Not sent",
     "ago" : "ago",
     "seconds" : "seconds",
@@ -97,6 +98,7 @@
     "hours" : "hours",
     "months" : "months",
     "years" : "years",
+    "photo" : "photo",
     "request_friend_notification_title": "Request Friend Notification",
     "request_friend_notification_body": "You Have {countFriend} Request Friend",
     "@request_friend_notification_body":{

@@ -1,4 +1,5 @@
 import 'package:chatappforours/constants/chat_constant_field.dart';
+import 'package:chatappforours/constants/message_chat_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,8 +19,10 @@ class Chat {
   String? stampTimeUserFormated;
   DateTime? stampTimeUser;
   final bool isActive;
+  final TypeMessage typeMessage;
   List<String> listUser = [];
   Chat({
+    required this.typeMessage,
     required this.isActive,
     required this.idChat,
     required this.stampTime,
@@ -53,6 +56,9 @@ class Chat {
         ),
         stampTimeChat: docs.get(stampTimeField).toDate(),
         isActive: docs.get(isActiveField),
+        typeMessage: docs.data()?[typeMessageField] != null
+            ? getTypeMessage(value: docs.get(typeMessageField).toString())
+            : TypeMessage.text,
       );
 }
 
@@ -61,6 +67,16 @@ String? getNameChat({required TypeChat typeChat, required String value}) {
     return value;
   } else {
     return null;
+  }
+}
+
+TypeMessage getTypeMessage({required String value}) {
+  if (value.toString().compareTo(TypeMessage.audio.toString()) == 0) {
+    return TypeMessage.audio;
+  } else if (value.toString().compareTo(TypeMessage.image.toString()) == 0) {
+    return TypeMessage.image;
+  } else {
+    return TypeMessage.text;
   }
 }
 

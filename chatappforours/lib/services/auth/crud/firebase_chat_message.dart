@@ -141,6 +141,7 @@ class FirebaseChatMessage {
     await firebaseChat.updateChatLastText(
       text: "$nameSender sent ${listUrlImage.length} photo",
       chatID: chatID,
+      typeMessage: TypeMessage.image,
     );
   }
 
@@ -221,6 +222,7 @@ class FirebaseChatMessage {
     await firebaseChat.updateChatLastText(
       text: text,
       chatID: chat.idChat,
+      typeMessage: TypeMessage.text,
     );
   }
 
