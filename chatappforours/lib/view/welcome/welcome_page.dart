@@ -5,6 +5,7 @@ import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/utilities/loading/loading_screen.dart';
 import 'package:chatappforours/view/ForgotPassword/forgot_password.dart';
 import 'package:chatappforours/view/chat/chatScreen/chat_screen.dart';
@@ -24,6 +25,7 @@ class WelcomePage extends StatefulWidget {
 
 class _WelcomePageState extends State<WelcomePage> {
   final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+  final FirebaseFriendList firebaseFriendList = FirebaseFriendList();
   @override
   void initState() {
     super.initState();
@@ -74,8 +76,19 @@ class _WelcomePageState extends State<WelcomePage> {
             currentIndex: 1,
           );
         } else if (state is AuthStateLoggedIn) {
-          return const ChatScreen(
-            currentIndex: 0,
+          return FutureBuilder<int>(
+            future: firebaseFriendList.countAllFriendIsRequested(
+                ownerUserID: state.userProfile.idUser!),
+            builder: (context, snapShot) {
+              if (snapShot.hasData) {
+                return ChatScreen(
+                  currentIndex: 0,
+                  countFriend: snapShot.data!,
+                );
+              } else {
+                return const Scaffold();
+              }
+            },
           );
         } else if (state is AuthStateRegistering) {
           return const SignUp();

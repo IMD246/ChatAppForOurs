@@ -19,10 +19,25 @@
     "wrong_password_error" : "Wrong pasword error",
     "wrong_password" : "Wrong password",   
     "generic_error" : "Generic error",
-    "auth_error" : "Auth Error",   
+    "auth_error" : "Auth Error",
     "verification_email_error" : "Verification Email Error",
-    "check_your_email" : "Check your gmail",   
-    "to_verification" : "to verification",
+    "reset_password_dialog" : "Reset password dialog",
+    "check_your_email_to_verification" : "Check your gmail {gmailAddress} to verification",   
+    "@check_your_email_to_verification":{
+        "placeholders" : {
+            "gmailAddress" : {
+                "type" : "String"
+            }
+        }
+    },
+    "check_your_email_to_reset_password" : "Check your gmail {gmailAddress} to reset password",   
+    "@check_your_email_to_reset_password":{
+        "placeholders" : {
+            "gmailAddress" : {
+                "type" : "String"
+            }
+        }
+    },
     "user_doesnt_logged_in_error" : "User doesn't logged in error",
     "user_doesnt_logged_in" : "user doesn't logged in",
     "to_reset_password" : "to_reset_password",  
@@ -81,5 +96,15 @@
     "days" : "days",
     "hours" : "hours",
     "months" : "months",
-    "years" : "years"
+    "years" : "years",
+    "request_friend_notification_title": "Request Friend Notification",
+    "request_friend_notification_body": "You Have {countFriend} Request Friend",
+    "@request_friend_notification_body":{
+        "placeholders" :{
+            "countFriend": 
+            {
+                "type" : "int"
+            }
+        }
+    }
 }

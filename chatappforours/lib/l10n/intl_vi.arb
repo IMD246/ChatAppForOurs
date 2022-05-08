@@ -21,8 +21,23 @@
     "generic_error" : "Lỗi chung",
     "auth_error" : "Lỗi quyền",   
     "verification_email_error" : "Lỗi xác thực email",
-    "check_your_email" : "Kiểm tra thư gmail của bạn",   
-    "to_verification" : "để xác thực",
+    "reset_password_dialog" : "Hộp thoại đặt lại mật khẩu",
+    "check_your_email_to_verification" : "Kiểm tra thư {gmailAddress} của bạn để xác thực",   
+    "@check_your_email_to_verification":{
+        "placeholders" : {
+            "gmailAddress" : {
+                "type" : "String"
+            }
+        }
+    },
+    "check_your_email_to_reset_password" : "Kiểm tra thư {gmailAddress} của bạn để đặt lại mật khẩu",   
+    "@check_your_email_to_reset_password":{
+        "placeholders" : {
+            "gmailAddress" : {
+                "type" : "String"
+            }
+        }
+    },
     "user_doesnt_logged_in_error" : "lỗi người dùng không đăng nhập",
     "user_doesnt_logged_in" : "người dùng không đăng nhập",
     "to_reset_password" : "để đặt lại mật khẩu",  
@@ -81,6 +96,16 @@
     "days" : "ngày",
     "hours" : "giờ",
     "months" : "tháng",
-    "years" : "năm"
-    
+    "years" : "năm",
+    "request_friend_notification_title": "Thông báo Yêu Cầu Kết Bạn",
+    "request_friend_notification_body": "Bạn có {countFriend} yêu cầu kết bạn",
+    "@request_friend_notification_body":
+    {
+        "placeholders" :{
+            "countFriend": 
+            {
+                "type" : "int"
+            }
+        }
+    }
 }

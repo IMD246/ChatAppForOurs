@@ -42,11 +42,10 @@ class _SignInState extends State<SignIn> {
                 text: context.loc.wrong_password);
           } else if (state.exception is AuthEmailNeedsVefiricationException) {
             await showErrorDialog(
-                context: context,
-                title: context.loc.verification_email_error,
-                text: "${context.loc.check_your_email} ${[
-                  state.email
-                ]} ${context.loc.to_verification}");
+              context: context,
+              title: context.loc.verification_email_error,
+              text: context.loc.check_your_email_to_verification(state.email!),
+            );
           } else if (state.exception is UserNotLoggedInAuthException) {
             await showErrorDialog(
               context: context,

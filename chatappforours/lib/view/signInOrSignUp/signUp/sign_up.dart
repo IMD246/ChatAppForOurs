@@ -30,9 +30,7 @@ class _SignUpState extends State<SignUp> {
             await showErrorDialog(
                 context: context,
                 title: context.loc.verification_email_error,
-                text: "${context.loc.check_your_email} ${[
-                  state.email
-                ]} ${context.loc.to_verification}");
+                text: context.loc.check_your_email_to_verification(state.email!),);
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(
               context: context,

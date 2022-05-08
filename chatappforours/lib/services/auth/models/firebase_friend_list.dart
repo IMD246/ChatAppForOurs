@@ -120,4 +120,18 @@ class FirebaseFriendList {
         );
     return friendList;
   }
+
+  Future<int> countAllFriendIsRequested({required String ownerUserID}) async {
+    final friendRequestCount = await friendListDocument
+        .collection('friendList')
+        .doc(ownerUserID)
+        .collection('friend')
+        .where(isRequestField, isEqualTo: false)
+        .get()
+        .then((value) {
+      return value.size;
+    });
+
+    return friendRequestCount;
+  }
 }

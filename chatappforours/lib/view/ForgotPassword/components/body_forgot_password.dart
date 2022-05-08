@@ -41,11 +41,9 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
       listener: (context, state) async {
         if (state is AuthStateForgotPassWord) {
           if (state.hasSentEmail) {
-            await showPasswordResetSentDialog(
+            await showPasswordResetDialog(
               context: context,
-              text: "${context.loc.check_your_email} ${[
-                email.text
-              ]} ${context.loc.to_reset_password}",
+              text: context.loc.check_your_email_to_reset_password(email.text),
             );
             email.clear();
           }
@@ -79,7 +77,7 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                               {
                                 context.read<AuthBloc>().add(
                                       AuthEventForgetPassword(
-                                        email: email.text,
+                                        email: email.text.trim(),
                                       ),
                                     );
                               }
@@ -88,12 +86,13 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                           onTap: () {
                             setState(() {
                               errorStringEmail =
-                                  checkFormatEmail(email.text, context);
+                                  checkFormatEmail(email.text.trim(), context);
                             });
                           },
                           onChanged: (val) {
                             setState(() {
-                              errorStringEmail = checkFormatEmail(val, context);
+                              errorStringEmail =
+                                  checkFormatEmail(val.trim(), context);
                             });
                           },
                           decoration: inputDecoration(
@@ -131,7 +130,7 @@ class _BodyForgotPasswordState extends State<BodyForgotPassword> {
                       {
                         context.read<AuthBloc>().add(
                               AuthEventForgetPassword(
-                                email: email.text,
+                                email: email.text.trim(),
                               ),
                             );
                       }
