@@ -101,6 +101,47 @@ class FirebaseChatMessage {
         .set(map);
   }
 
+  Future<void> createAudioMessage({
+    required userID,
+    required chatID,
+  }) async {
+    Map<String, dynamic> map = {
+      idSenderField: userID,
+      hasSenderField: true,
+      messageField: ". . .",
+      urlAudioField: ".",
+      typeMessageField: TypeMessage.audio.toString(),
+      messageStatusField: MessageStatus.notSent.toString(),
+      stampTimeField: DateTime.now(),
+    };
+    await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .doc()
+        .set(map);
+  }
+
+  Future<ChatMessage> getAudioMessageNotSentOwnerUser({
+    required userID,
+    required chatID,
+  }) async {
+    return await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .where(idSenderField, isEqualTo: userID)
+        .where(typeMessageField, isEqualTo: TypeMessage.audio.toString())
+        .where(messageStatusField, isEqualTo: MessageStatus.notSent.toString())
+        .orderBy(stampTimeField, descending: true)
+        .limit(1)
+        .get()
+        .then(
+          (value) => ChatMessage.fromSnapshot(
+            docs: value.docs.first,
+            ownerUserID: userID,
+          ),
+        );
+  }
+
   Future<ChatMessage> getImageMessageNotSentOwnerUser({
     required userID,
     required chatID,
@@ -145,6 +186,30 @@ class FirebaseChatMessage {
     );
   }
 
+  Future<void> uploadAudioMessageNotSent({
+    required String chatID,
+    required String urlAudio,
+    required String nameSender,
+    required ChatMessage lastMessageUserOwner,
+  }) async {
+    final firebaseChat = FirebaseChat();
+    Map<String, dynamic> map = {
+      urlAudioField: urlAudio,
+      typeMessageField: TypeMessage.audio.toString(),
+      messageStatusField: MessageStatus.sent.toString(),
+    };
+    await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .doc(lastMessageUserOwner.idMessage)
+        .update(map);
+    await firebaseChat.updateChatLastText(
+      text: nameSender,
+      chatID: chatID,
+      typeMessage: TypeMessage.audio,
+    );
+  }
+
   Future<void> deleteMessageNotSent({
     required String ownerUserID,
     required String chatID,
@@ -155,6 +220,7 @@ class FirebaseChatMessage {
           .doc(chatID)
           .collection('message')
           .where(idSenderField, isEqualTo: ownerUserID)
+          .where(typeMessageField, isEqualTo: TypeMessage.text.toString())
           .where(messageStatusField,
               isEqualTo: MessageStatus.notSent.toString())
           .orderBy(stampTimeField, descending: true)

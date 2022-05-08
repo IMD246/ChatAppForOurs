@@ -20,8 +20,10 @@ class Chat {
   DateTime? stampTimeUser;
   final bool isActive;
   final TypeMessage typeMessage;
+  
   List<String> listUser = [];
   Chat({
+    
     required this.typeMessage,
     required this.isActive,
     required this.idChat,
@@ -59,6 +61,7 @@ class Chat {
         typeMessage: docs.data()?[typeMessageField] != null
             ? getTypeMessage(value: docs.get(typeMessageField).toString())
             : TypeMessage.text,
+      
       );
 }
 

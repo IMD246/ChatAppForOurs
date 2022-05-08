@@ -112,8 +112,7 @@ String formatTime(Duration duration) {
     duration.inSeconds.remainder(60),
   );
   return [
-    if (duration.inHours > 0)
-     hours,
+    if (duration.inHours > 0) hours,
     minutes,
     seconds,
   ].join(':');
@@ -178,6 +177,23 @@ String getStringFromList(String value) {
   } else {
     return value;
   }
+}
+
+String getStringMessageByTypeMessage(
+    {required TypeMessage typeMessage,
+    required String value,
+    required BuildContext context}) {
+  if (typeMessage == TypeMessage.text) {
+    getStringFromList(value);
+  } else if (typeMessage == TypeMessage.image) {
+    return handleStringMessageLocalization(
+      getStringFromList(value),
+      context,
+    );
+  } else if (typeMessage == TypeMessage.audio) {
+    return value + " ${context.loc.message_recording}";
+  }
+  return value;
 }
 
 String handleStringMessageLocalization(String value, BuildContext context) {

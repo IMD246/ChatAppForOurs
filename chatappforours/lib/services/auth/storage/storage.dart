@@ -45,6 +45,46 @@ class Storage {
     }
   }
 
+  Future<void> uploadFileAudio(
+      {required String filePath,
+      required FirebaseChatMessage firebaseChatMessage,
+      required ChatMessage lastMessageUserOwner,
+      required FirebaseUserProfile firebaseUserProfile,
+      required String idChat,
+      BuildContext? context}) async {
+    File file = File(filePath);
+    try {
+      await storage
+          .ref('audio/${lastMessageUserOwner.idMessage}')
+          .putFile(
+            file,
+          )
+          .then(
+        (p0) async {
+          final urlAudio = await getDownloadURLAudio(
+              fileName: lastMessageUserOwner.idMessage);
+          final userProfile = await firebaseUserProfile.getUserProfile(
+              userID: lastMessageUserOwner.userID);
+          await firebaseChatMessage.uploadAudioMessageNotSent(
+            chatID: idChat,
+            lastMessageUserOwner: lastMessageUserOwner,
+            urlAudio: urlAudio ?? "",
+            nameSender: userProfile!.fullName,
+          );
+        },
+      );
+    } on FirebaseException catch (_) {
+      ScaffoldMessenger.of(context!).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Upload Audio File Failed',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+  }
+
   Future<void> uploadMultipleFile({
     required List<PlatformFile> listFile,
     BuildContext? context,
@@ -97,6 +137,16 @@ class Storage {
     try {
       String downloadURL =
           await storage.ref('image/$fileName').getDownloadURL();
+      return downloadURL;
+    } on FirebaseException catch (_) {
+      return null;
+    }
+  }
+
+  Future<String?> getDownloadURLAudio({required String fileName}) async {
+    try {
+      String downloadURL =
+          await storage.ref('audio/$fileName').getDownloadURL();
       return downloadURL;
     } on FirebaseException catch (_) {
       return null;

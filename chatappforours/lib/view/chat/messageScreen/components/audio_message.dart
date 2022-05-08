@@ -18,9 +18,32 @@ class _AudioMessasgeState extends State<AudioMessasge> {
   bool isPlaying = false;
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
+  Future setAudio() async {
+    audioPlayer.setReleaseMode(ReleaseMode.LOOP);
+    audioPlayer.setUrl(widget.chatMessage.urlAudio, isLocal: true);
+  }
+
   @override
   void initState() {
     super.initState();
+    setState(() {
+      audioPlayer.setUrl(widget.chatMessage.urlAudio);
+    });
+    audioPlayer.onDurationChanged.listen((newDuration) {
+      setState(() {
+        duration = newDuration;
+      });
+    });
+    audioPlayer.onPlayerStateChanged.listen((state) {
+      setState(() {
+        isPlaying = state == PlayerState.PLAYING;
+      });
+    });
+    audioPlayer.onAudioPositionChanged.listen((newPosition) {
+      setState(() {
+        position = newPosition;
+      });
+    });
   }
 
   @override
@@ -32,6 +55,7 @@ class _AudioMessasgeState extends State<AudioMessasge> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: kPrimaryColor.withOpacity(
@@ -45,7 +69,7 @@ class _AudioMessasgeState extends State<AudioMessasge> {
               if (isPlaying) {
                 await audioPlayer.pause();
               } else {
-                // await audioPlayer.play();
+                await audioPlayer.play(widget.chatMessage.urlAudio);
               }
             },
             child: Icon(
@@ -61,10 +85,16 @@ class _AudioMessasgeState extends State<AudioMessasge> {
             min: 0,
             max: duration.inSeconds.toDouble(),
             value: position.inSeconds.toDouble(),
-            onChanged: (value) async {},
+            onChanged: (value) async {
+              final position = Duration(
+                seconds: value.toInt(),
+              );
+              await audioPlayer.seek(position);
+              await audioPlayer.resume();
+            },
           ),
           Text(
-            formatTime(position),
+            formatTime(duration - position),
             style:
                 TextStyle(color: textColorMode(ThemeMode.light), fontSize: 12),
           ),

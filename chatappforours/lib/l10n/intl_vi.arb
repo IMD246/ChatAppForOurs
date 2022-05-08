@@ -99,6 +99,8 @@
     "months" : "tháng",
     "years" : "năm",
     "photo" : "ảnh",
+    "recording" : "Đang ghi âm...",
+    "message_recording" : "đã gửi 1 tin nhắn âm thanh",
     "request_friend_notification_title": "Thông báo Yêu Cầu Kết Bạn",
     "request_friend_notification_body": "Bạn có {countFriend} yêu cầu kết bạn",
     "@request_friend_notification_body":
