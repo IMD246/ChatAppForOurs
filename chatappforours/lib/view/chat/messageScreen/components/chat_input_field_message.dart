@@ -46,7 +46,8 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
     await recorder.stopRecorder();
     final path = await recorder.stopRecorder();
     if (path != null) {
-      var duration = await player.setUrl(path);
+      await player.setUrl(path);
+      final duration = await player.getDuration();
       if (duration > 0) {
         await firebaseChatMessage.createAudioMessage(
           userID: id,
@@ -122,12 +123,15 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                 await initRecorder();
                 if (recorder.isRecording && isSelected == true) {
                   await stop();
+                  setState(() {
+                    isSelected = false;
+                  });
                 } else {
                   await record();
+                  setState(() {
+                    isSelected = true;
+                  });
                 }
-                setState(() {
-                  isSelected = !isSelected;
-                });
               },
               icon: isSelected ? const Icon(Icons.stop) : const Icon(Icons.mic),
               color: Theme.of(context).primaryColor,
