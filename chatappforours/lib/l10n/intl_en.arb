@@ -99,6 +99,8 @@
     "months" : "months",
     "years" : "years",
     "photo" : "photo",
+    "recording" : "Recording...",
+    "message_recording" : "sent 1 audio message",
     "request_friend_notification_title": "Request Friend Notification",
     "request_friend_notification_body": "You Have {countFriend} Request Friend",
     "@request_friend_notification_body":{

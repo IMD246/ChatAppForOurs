@@ -14,9 +14,11 @@ class ChatMessage {
   final bool hasSender;
   final String stampTimeFormated;
   final DateTime stampTime;
+  final String urlAudio;
   List<String>? listURLImage = [];
   final bool checkTimeGreaterOneMinute;
   ChatMessage({
+    required this.urlAudio,
     required this.idMessage,
     required this.stampTime,
     required this.stampTimeFormated,
@@ -52,6 +54,8 @@ class ChatMessage {
       stampTimeFormated: differenceInCalendarStampTime(
         docs.get(stampTimeField).toDate(),
       ),
+        urlAudio:
+            getTypeMessage(value: docs.get(typeMessageField).toString()) == TypeMessage.audio ? docs.get('url_audio').toString() : "",
       listURLImage: checkTypeMessageImage(
               typeMessage:
                   getTypeMessage(value: docs.get(typeMessageField).toString()))

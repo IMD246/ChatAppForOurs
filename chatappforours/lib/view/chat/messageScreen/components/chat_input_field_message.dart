@@ -1,11 +1,16 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:chatappforours/utilities/handle/handle_value.dart';
+import 'package:chatappforours/view/chat/messageScreen/components/send_message.dart';
+import 'package:chatappforours/view/chat/messageScreen/components/upload_image_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/public/flutter_sound_recorder.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../../constants/constants.dart';
@@ -30,6 +35,48 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   late final FirebaseUserProfile firebaseUserProfile;
   String id = FirebaseAuth.instance.currentUser!.uid;
   late final Storage storage;
+  final recorder = FlutterSoundRecorder();
+  final player = AudioPlayer();
+  bool isSelected = false;
+  Future record() async {
+    await recorder.startRecorder(toFile: 'audio');
+  }
+
+  Future stop() async {
+    await recorder.stopRecorder();
+    final path = await recorder.stopRecorder();
+    if (path != null) {
+      await player.setUrl(path);
+      final duration = await player.getDuration();
+      if (duration > 0) {
+        await firebaseChatMessage.createAudioMessage(
+          userID: id,
+          chatID: widget.chat.idChat,
+        );
+        final lastMessageAudioOwnerUser =
+            await firebaseChatMessage.getAudioMessageNotSentOwnerUser(
+          userID: id,
+          chatID: widget.chat.idChat,
+        );
+        await storage.uploadFileAudio(
+          filePath: path,
+          firebaseChatMessage: firebaseChatMessage,
+          firebaseUserProfile: firebaseUserProfile,
+          idChat: widget.chat.idChat,
+          lastMessageUserOwner: lastMessageAudioOwnerUser,
+        );
+      }
+    }
+  }
+
+  Future initRecorder() async {
+    final status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      throw 'Microphone permission not granted';
+    }
+    await recorder.openRecorder();
+  }
+
   @override
   void initState() {
     textController = TextEditingController();
@@ -43,6 +90,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   void dispose() {
     textController.clear();
     textController.dispose();
+    recorder.closeRecorder();
     super.dispose();
   }
 
@@ -63,47 +111,29 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
       child: SafeArea(
         child: Row(
           children: [
-            IconButton(
-              onPressed: () async {
-                final results = await FilePicker.platform.pickFiles(
-                  allowMultiple: true,
-                  type: FileType.custom,
-                  allowedExtensions: ['jpg', 'jpeg', 'png'],
-                );
-                if (results == null) {
-                } else {
-                  await firebaseChatMessage.createImageMessage(
-                    userID: id,
-                    chatID: widget.chat.idChat,
-                  );
-                  final lastMessageUserOwner =
-                      await firebaseChatMessage.getImageMessageNotSentOwnerUser(
-                    userID: id,
-                    chatID: widget.chat.idChat,
-                  );
-                  await storage.uploadMultipleFile(
-                    listFile: results.files,
-                    idChat: widget.chat.idChat,
-                    firebaseChatMessage: firebaseChatMessage,
-                    firebaseUserProfile: firebaseUserProfile,
-                    lastMessageUserOwner: lastMessageUserOwner,
-                    context: context,
-                  );
-                  if (widget.scroll.isAttached) {
-                    widget.scroll.scrollTo(
-                      index: intMaxValue,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeIn,
-                    );
-                  }
-                }
-              },
-              icon: const Icon(Icons.photo),
-              color: Theme.of(context).primaryColor,
+            UploadImageMessage(
+              firebaseChatMessage: firebaseChatMessage,
+              id: id,
+              storage: storage,
+              firebaseUserProfile: firebaseUserProfile,
+              widget: widget,
             ),
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.mic),
+              onPressed: () async {
+                await initRecorder();
+                if (recorder.isRecording && isSelected == true) {
+                  await stop();
+                  setState(() {
+                    isSelected = false;
+                  });
+                } else {
+                  await record();
+                  setState(() {
+                    isSelected = true;
+                  });
+                }
+              },
+              icon: isSelected ? const Icon(Icons.stop) : const Icon(Icons.mic),
               color: Theme.of(context).primaryColor,
             ),
             Expanded(
@@ -119,6 +149,11 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                     Expanded(
                       child: TextField(
                         controller: textController,
+                        onTap: () async {
+                          if (recorder.isRecording) {
+                            await stop();
+                          }
+                        },
                         onChanged: (value) async {
                           if (textController.text.isNotEmpty) {
                             await firebaseChatMessage.createTextMessageNotSent(
@@ -144,7 +179,9 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                         maxLines: 5,
                         keyboardType: TextInputType.multiline,
                         decoration: InputDecoration(
-                          hintText: context.loc.type_message,
+                          hintText: recorder.isRecording
+                              ? context.loc.recording
+                              : context.loc.type_message,
                           hintStyle: TextStyle(
                             color: Theme.of(context).primaryColor,
                           ),
@@ -153,13 +190,24 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                       ),
                     ),
                     const SizedBox(width: kDefaultPadding / 4),
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.sentiment_satisfied_alt,
-                        color: Theme.of(context).primaryColor,
+                    if (isSelected)
+                      StreamBuilder<RecordingDisposition>(
+                        stream: recorder.onProgress,
+                        builder: (context, snapshot) {
+                          final duration = snapshot.hasData
+                              ? snapshot.data!.duration
+                              : Duration.zero;
+                          return Text("${formatTime(duration)} s");
+                        },
+                      )
+                    else
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.sentiment_satisfied_alt,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 decoration: BoxDecoration(
@@ -169,30 +217,11 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
               ),
             ),
             if (textController.text.isNotEmpty)
-              IconButton(
-                onPressed: () async {
-                  setState(
-                    () {
-                      firebaseChatMessage.deleteMessageNotSent(
-                        ownerUserID: id,
-                        chatID: widget.chat.idChat,
-                      );
-                      firebaseChatMessage.updateTextMessageNotSent(
-                        chat: widget.chat,
-                        text: textController.text,
-                        ownerUserID: id,
-                      );
-                      textController.clear();
-                      if (widget.scroll.isAttached) {
-                        widget.scroll.jumpTo(
-                          index: intMaxValue,
-                        );
-                      }
-                    },
-                  );
-                },
-                icon: const Icon(Icons.send),
-                color: Theme.of(context).primaryColor,
+              SendMessage(
+                firebaseChatMessage: firebaseChatMessage,
+                id: id,
+                widget: widget,
+                textController: textController,
               ),
             if (textController.text.isEmpty)
               Padding(

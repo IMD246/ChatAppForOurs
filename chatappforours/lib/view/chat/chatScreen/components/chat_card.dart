@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -149,13 +148,11 @@ class _ChatCardState extends State<ChatCard> {
                         Opacity(
                           opacity: 0.64,
                           child: Text(
-                            (widget.chat.typeMessage == TypeMessage.text ||
-                                    widget.chat.typeMessage ==
-                                        TypeMessage.audio)
-                                ? getStringFromList(widget.chat.lastText)
-                                : handleStringMessageLocalization(
-                                    getStringFromList(widget.chat.lastText),
-                                    context),
+                            getStringMessageByTypeMessage(
+                              typeMessage: widget.chat.typeMessage,
+                              value: widget.chat.lastText,
+                              context: context,
+                            ),
                             style: const TextStyle(fontSize: 12),
                           ),
                         ),

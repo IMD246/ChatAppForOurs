@@ -137,8 +137,8 @@ class _WelcomePageState extends State<WelcomePage> {
                           ),
                           Icon(
                             Icons.arrow_forward_ios_outlined,
-                            color:
-                                textColorMode(ThemeMode.light).withOpacity(0.7),
+                            color: textColorMode(ThemeMode.light)
+                                .withOpacity(0.7),
                           ),
                         ],
                       ),
