@@ -73,6 +73,8 @@
     "update_user_profile_notification" : "Update User Profile Notification",
     "update_password_successfully" : "Update password successfully!",
     "update_password_notification" : "Update password Notification",
+    "update_password_error_title" : "Error Auth Sign In",
+    "update_password_error_text" : "Let linking with Gmail's Provider to using this feature",
     "type_verify_password" : "Type Verify Password",
     "waiting" : "Waiting...",
     "type_message" : "Type Message",

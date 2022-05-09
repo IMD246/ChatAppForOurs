@@ -73,6 +73,8 @@
     "update_user_profile_notification" : "Thông báo cập nhật hồ sơ ",
     "update_password_successfully" : "Cập nhật mật khẩu thành công!",
     "update_password_notification" : "Thông báo cập nhật mật khẩu",
+    "update_password_error_title" : "Lỗi quyền đăng nhập",
+    "update_password_error_text" : "Hãy liên kết với nhà cung cấp Gmail để dùng tính năng này",
     "type_verify_password" : "Nhập Mật Khẩu Xác Minh",
     "waiting" : "Đợi...",
     "type_message" : "Nhập tin nhắn",

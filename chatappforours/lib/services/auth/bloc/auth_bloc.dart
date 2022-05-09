@@ -108,6 +108,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (event, emit) async {
         final email = event.email;
         final password = event.password;
+       
         try {
           emit(
             const AuthStateRegistering(
@@ -440,9 +441,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         try {
           if (user.email != null) {
-            final getUserProfile = await userProfileFirebase
+            final getUserProfileVerify = await userProfileFirebase
                 .getUserProfileByEmail(email: user.email);
-            if (getUserProfile == null) {
+            if (getUserProfileVerify == null) {
               final userProfile = UserProfile(
                   email: user.email!,
                   fullName: user.displayName!,
@@ -454,18 +455,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                 userID: user.id!,
                 userProfile: userProfile,
               );
-              final getUserProfileAgain =
+              final getUserProfile =
                   await userProfileFirebase.getUserProfile(userID: user.id);
               emit(
                 AuthStateLoggedIn(
-                  userProfile: getUserProfileAgain!,
+                  userProfile: getUserProfile!,
                   isLoading: false,
                 ),
               );
             } else {
               emit(
                 AuthStateLoggedIn(
-                  userProfile: getUserProfile,
+                  userProfile: getUserProfileVerify,
                   isLoading: false,
                 ),
               );
