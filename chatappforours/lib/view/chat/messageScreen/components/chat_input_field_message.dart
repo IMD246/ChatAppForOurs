@@ -43,30 +43,22 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   }
 
   Future stop() async {
-    await recorder.stopRecorder();
     final path = await recorder.stopRecorder();
-    if (path != null) {
-      await player.setUrl(path);
-      final duration = await player.getDuration();
-      if (duration > 0) {
-        await firebaseChatMessage.createAudioMessage(
+    setState(
+      () {
+        firebaseChatMessage.createAudioMessage(
           userID: id,
           chatID: widget.chat.idChat,
         );
-        final lastMessageAudioOwnerUser =
-            await firebaseChatMessage.getAudioMessageNotSentOwnerUser(
-          userID: id,
-          chatID: widget.chat.idChat,
-        );
-        await storage.uploadFileAudio(
-          filePath: path,
+        storage.uploadFileAudio(
+          filePath: path!,
           firebaseChatMessage: firebaseChatMessage,
           firebaseUserProfile: firebaseUserProfile,
           idChat: widget.chat.idChat,
-          lastMessageUserOwner: lastMessageAudioOwnerUser,
+          userOwnerID: id,
         );
-      }
-    }
+      },
+    );
   }
 
   Future initRecorder() async {
@@ -91,6 +83,10 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
     textController.clear();
     textController.dispose();
     recorder.closeRecorder();
+    firebaseChatMessage.deleteMessageNotSent(
+      ownerUserID: id,
+      chatID: widget.chat.idChat,
+    );
     super.dispose();
   }
 
@@ -122,13 +118,13 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
               onPressed: () async {
                 await initRecorder();
                 if (recorder.isRecording && isSelected == true) {
-                  await stop();
                   setState(() {
+                    stop();
                     isSelected = false;
                   });
                 } else {
-                  await record();
                   setState(() {
+                    record();
                     isSelected = true;
                   });
                 }
