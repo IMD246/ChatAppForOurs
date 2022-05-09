@@ -112,13 +112,24 @@ class _BodyUpdatePasswordState extends State<BodyUpdatePassword> {
                     if (errorStringVerifyPassWord.isEmpty &&
                         errorStringPassWord.isEmpty) {
                       {
-                        await FirebaseAuth.instance.currentUser!
-                            .updatePassword(password.text);
-                        await showErrorDialog(
-                          context: context,
-                          text: "Update password successfully!",
-                          title: "Update Password Notification",
-                        );
+                        try {
+                          await authUser!.updatePassword(password.text);
+                          await showErrorDialog(
+                            context: context,
+                            text: context.loc.update_password_successfully,
+                            title: context.loc.update_password_notification,
+                          );
+                        } catch (_) {
+                          final credential = EmailAuthProvider.credential(
+                              email: authUser!.email!, password: password.text);
+                          await FirebaseAuth.instance.currentUser!
+                              .linkWithCredential(credential);
+                          await showErrorDialog(
+                            context: context,
+                            text: context.loc.update_password_successfully,
+                            title: context.loc.update_password_notification,
+                          );
+                        }
                         password.clear();
                         verifyPassword.clear();
                       }
@@ -196,18 +207,15 @@ class _BodyUpdatePasswordState extends State<BodyUpdatePassword> {
                         title: context.loc.update_password_notification,
                       );
                     } catch (_) {
-                      setState(() {
-                        final credential = EmailAuthProvider.credentialWithLink(
-                            email: authUser!.email!,
-                            emailLink: authUser!.email!);
-                        authUser!.linkWithCredential(credential);
-                        authUser!.updatePassword(password.text);
-                        showErrorDialog(
-                          context: context,
-                          text: context.loc.update_password_successfully,
-                          title: context.loc.update_password_notification,
-                        );
-                      });
+                      final credential = EmailAuthProvider.credential(
+                          email: authUser!.email!, password: password.text);
+                      await FirebaseAuth.instance.currentUser!
+                          .linkWithCredential(credential);
+                      await showErrorDialog(
+                        context: context,
+                        text: context.loc.update_password_successfully,
+                        title: context.loc.update_password_notification,
+                      );
                     }
                     password.clear();
                     verifyPassword.clear();

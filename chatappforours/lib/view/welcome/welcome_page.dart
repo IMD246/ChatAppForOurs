@@ -35,6 +35,7 @@ class _WelcomePageState extends State<WelcomePage> {
   Widget build(BuildContext context) {
     final ThemeChanger themeChanger = Provider.of<ThemeChanger>(context);
     Size size = MediaQuery.of(context).size;
+    final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
     themeChanger.setContext(context: context);
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) async {
@@ -97,16 +98,17 @@ class _WelcomePageState extends State<WelcomePage> {
         } else if (state is AuthStateForgotPassWord) {
           return const ForgotPassword();
         } else {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: SafeArea(
-              child: Column(
+          return SafeArea(
+            child: Scaffold(
+              backgroundColor: Colors.white,
+              body: Column(
                 children: [
                   const Spacer(flex: 1),
-                  Image.asset(
-                    "assets/images/welcome_image.png",
-                    height: size.height * 0.45,
-                  ),
+                  if (!isKeyboard)
+                    Image.asset(
+                      "assets/images/welcome_image.png",
+                      height: size.height * 0.45,
+                    ),
                   const Spacer(flex: 2),
                   Text(
                     context.loc.welcome,
@@ -137,8 +139,8 @@ class _WelcomePageState extends State<WelcomePage> {
                           ),
                           Icon(
                             Icons.arrow_forward_ios_outlined,
-                            color: textColorMode(ThemeMode.light)
-                                .withOpacity(0.7),
+                            color:
+                                textColorMode(ThemeMode.light).withOpacity(0.7),
                           ),
                         ],
                       ),
