@@ -5,7 +5,6 @@ import 'package:chatappforours/services/auth/models/auth_provider.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
-import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,9 +37,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           } else {
             if (user != null) {
               if (user.isEmailVerified == true) {
-                await firebaseUserProfile.updateUserPresenceDisconnect(
-                  uid: user.id!,
-                );
                 emit(
                   AuthStateLoggedIn(userProfile: userProfile, isLoading: false),
                 );
@@ -91,10 +87,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             final getUserProfile =
                 await firebaseUserProfile.getUserProfile(userID: user.id);
 
-            await firebaseUserProfile.updateUserPresenceDisconnect(
-              uid: user.id!,
-            );
-            await firebaseUserProfile.upDateUserIsEmailVerified(
+            await firebaseUserProfile.updateUserIsEmailVerified(
               userID: user.id!,
             );
             emit(
@@ -115,7 +108,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (event, emit) async {
         final email = event.email;
         final password = event.password;
-        final FirebaseFriendList friendListFirebase = FirebaseFriendList();
         try {
           emit(
             const AuthStateRegistering(
@@ -137,11 +129,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             fullName: event.fullName,
             urlImage: '',
             isDarkMode: false,
+            isEmailVerified: false,
             language: Platform.localeName.substring(0, 2).toString(),
-          );
-          await friendListFirebase.createNewFriendDefault(
-            userIDFriend: user.id!,
-            ownerUserID: user.id!,
           );
           await authProvider.sendEmailVerification();
           final userProfileFirebase = FirebaseUserProfile();
@@ -157,14 +146,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                 isLoading: false,
               ),
             );
+          } else {
+            await userProfileFirebase.updateUserIsEmailVerified(
+                userID: user.id!);
+            emit(
+              AuthStateRegistering(
+                exception: AuthEmailNeedsVefiricationException(),
+                email: event.email,
+                isLoading: false,
+              ),
+            );
           }
-          emit(
-            AuthStateRegistering(
-              exception: AuthEmailNeedsVefiricationException(),
-              email: event.email,
-              isLoading: false,
-            ),
-          );
         } on Exception catch (e) {
           emit(AuthStateRegistering(
             exception: e,
@@ -438,8 +430,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
     on<AuthEventSignInWithGoogle>(
       (event, emit) async {
-        final FirebaseFriendList friendListFirebase = FirebaseFriendList();
         final userProfileFirebase = FirebaseUserProfile();
+        final user = await authProvider.createUserWithGoogle();
         emit(
           const AuthStateLoggedOut(
             isLoading: true,
@@ -447,15 +439,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           ),
         );
         try {
-          final user = await authProvider.createUserWithGoogle();
           if (user.email != null) {
             final getUserProfile = await userProfileFirebase
                 .getUserProfileByEmail(email: user.email);
             if (getUserProfile == null) {
-              await friendListFirebase.createNewFriendDefault(
-                userIDFriend: user.id!,
-                ownerUserID: user.id!,
-              );
               final userProfile = UserProfile(
                   email: user.email!,
                   fullName: user.displayName!,
@@ -467,23 +454,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                 userID: user.id!,
                 userProfile: userProfile,
               );
-
-              await userProfileFirebase.updateUserPresenceDisconnect(
-                uid: user.id!,
-              );
+              final getUserProfileAgain =
+                  await userProfileFirebase.getUserProfile(userID: user.id);
               emit(
                 AuthStateLoggedIn(
-                  userProfile: getUserProfile!,
+                  userProfile: getUserProfileAgain!,
                   isLoading: false,
                 ),
               );
             } else {
-              await userProfileFirebase.updateUserPresenceDisconnect(
-                uid: user.id!,
-              );
-              await userProfileFirebase.upDateUserIsEmailVerified(
-                userID: user.id!,
-              );
               emit(
                 AuthStateLoggedIn(
                   userProfile: getUserProfile,

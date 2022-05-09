@@ -95,140 +95,127 @@ class _ContactCardState extends State<ContactCard> {
               vertical: kDefaultPadding * 0.75,
             ),
             child: FutureBuilder<UserProfile?>(
-              future: firebaseUserProfile.getUserProfile(
-                  userID: widget.friend.userID),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.done:
-                    if (snapshot.hasData) {
-                      final userProfile = snapshot.data;
-                      return Row(
-                        children: [
-                          Stack(
-                            children: [
-                              if (userProfile!.urlImage != null)
-                                CircleAvatar(
-                                  backgroundColor: Colors.cyan[100],
-                                  child: ClipOval(
-                                    child: SizedBox.fromSize(
-                                      size: const Size.fromRadius(60),
-                                      child: CachedNetworkImage(
-                                        imageUrl: userProfile.urlImage!,
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) =>
-                                            const CircularProgressIndicator(),
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(Icons.error),
-                                      ),
+                future: firebaseUserProfile.getUserProfile(
+                    userID: widget.friend.userID),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final userProfile = snapshot.data;
+                    return Row(
+                      children: [
+                        Stack(
+                          children: [
+                            if (userProfile!.urlImage != null)
+                              CircleAvatar(
+                                backgroundColor: Colors.cyan[100],
+                                child: ClipOval(
+                                  child: SizedBox.fromSize(
+                                    size: const Size.fromRadius(60),
+                                    child: CachedNetworkImage(
+                                      imageUrl: userProfile.urlImage!,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
                                     ),
                                   ),
                                 ),
-                              if (userProfile.urlImage == null)
-                                CircleAvatar(
-                                  backgroundColor: Colors.cyan[100],
-                                  backgroundImage: const AssetImage(
-                                    "assets/images/defaultImage.png",
-                                  ),
+                              ),
+                            if (userProfile.urlImage == null)
+                              CircleAvatar(
+                                backgroundColor: Colors.cyan[100],
+                                backgroundImage: const AssetImage(
+                                  "assets/images/defaultImage.png",
                                 ),
-                              widget.friend.presence
-                                  ? Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: Container(
-                                        width: 16,
-                                        height: 16,
-                                        decoration: BoxDecoration(
-                                          color: kPrimaryColor,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            width: 3,
-                                            color: Theme.of(context)
-                                                .scaffoldBackgroundColor,
-                                          ),
+                              ),
+                            widget.friend.presence
+                                ? Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      width: 16,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: kPrimaryColor,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          width: 3,
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
                                         ),
                                       ),
-                                    )
-                                  : Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: Text(
-                                        stampTime != null
-                                            ? differenceInCalendarPresence(
-                                                stampTime!,
-                                              )
-                                            : "",
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
                                     ),
-                            ],
-                          ),
-                          Container(
-                            width: size.width * 0.45,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: kDefaultPadding / 2),
-                            child: Text(
-                              userProfile.fullName,
-                              overflow: widget.requestFriend
-                                  ? TextOverflow.ellipsis
-                                  : null,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                              ),
+                                  )
+                                : Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Text(
+                                      stampTime != null
+                                          ? differenceInCalendarPresence(
+                                              stampTime!,
+                                            )
+                                          : "",
+                                      style: const TextStyle(fontSize: 13),
+                                    ),
+                                  ),
+                          ],
+                        ),
+                        Container(
+                          width: size.width * 0.45,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: kDefaultPadding / 2),
+                          child: Text(
+                            userProfile.fullName,
+                            overflow: widget.requestFriend
+                                ? TextOverflow.ellipsis
+                                : null,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
                             ),
                           ),
-                          const Spacer(),
-                          Visibility(
-                            visible: widget.requestFriend,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                FillOutlineButton(
+                        ),
+                        const Spacer(),
+                        Visibility(
+                          visible: widget.requestFriend,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              FillOutlineButton(
+                                press: () async {
+                                  await firebaseFriendList.updateRequestFriend(
+                                    ownerUserID: id,
+                                    userID: widget.friend.userID,
+                                  );
+                                  await firebaseChat.createChat(
+                                    typeChat: TypeChat.normal,
+                                    listUserID: [id, widget.friend.userID],
+                                  );
+                                },
+                                text: context.loc.accept,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: kDefaultPadding * 0.2),
+                                child: FillOutlineButton(
                                   press: () async {
-                                    await firebaseFriendList
-                                        .updateRequestFriend(
+                                    await firebaseFriendList.deleteFriend(
                                       ownerUserID: id,
                                       userID: widget.friend.userID,
                                     );
-                                    await firebaseChat.createChat(
-                                      typeChat: TypeChat.normal,
-                                      listUserID: [id, widget.friend.userID],
-                                    );
                                   },
-                                  text: context.loc.accept,
+                                  text: context.loc.cancel,
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: kDefaultPadding * 0.2),
-                                  child: FillOutlineButton(
-                                    press: () async {
-                                      await firebaseFriendList.deleteFriend(
-                                        ownerUserID: id,
-                                        userID: widget.friend.userID,
-                                      );
-                                    },
-                                    text: context.loc.cancel,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      );
-                    } else {
-                      return Container();
-                    }
-                  default:
-                    return const Center(
-                      child: SizedBox(
-                        height: 25,
-                        width: 20,
-                        child: CircularProgressIndicator(),
-                      ),
+                        ),
+                      ],
                     );
-                }
-              },
-            ),
+                  } else {
+                    return Container();
+                  }
+                }),
           ),
         );
       },
