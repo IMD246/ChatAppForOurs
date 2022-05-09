@@ -3,8 +3,6 @@ import 'package:chatappforours/constants/message_chat_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/widgets.dart';
-
 class Chat {
   final String idChat;
   final DateTime stampTime;
@@ -20,10 +18,9 @@ class Chat {
   DateTime? stampTimeUser;
   final bool isActive;
   final TypeMessage typeMessage;
-  
+
   List<String> listUser = [];
   Chat({
-    
     required this.typeMessage,
     required this.isActive,
     required this.idChat,
@@ -41,11 +38,12 @@ class Chat {
   });
   factory Chat.fromSnapshot({
     required DocumentSnapshot<Map<String, dynamic>> docs,
-    BuildContext? context,
   }) =>
       Chat(
         idChat: docs.id,
-        stampTime: docs.get(timeLastChatField).toDate(),
+        stampTime: docs.data()?[timeLastChatField] != null
+            ? docs.get(timeLastChatField).toDate()
+            : DateTime.now(),
         nameChat: getNameChat(
             typeChat: getTypeChat(value: docs.get(typeChatField).toString()),
             value: docs.get(nameChatField).toString()),
@@ -61,7 +59,6 @@ class Chat {
         typeMessage: docs.data()?[typeMessageField] != null
             ? getTypeMessage(value: docs.get(typeMessageField).toString())
             : TypeMessage.text,
-      
       );
 }
 

@@ -63,7 +63,7 @@
     "request_friend" : "Request Friend",
     "accept" : "Accept",
     "cancel" : "Cancel",
-    "no_friend_available" : "No any request friend",
+    "no_friend_available" : "No any friend",
     "no_file_selected" : "No file selected",
     "update_user_profile" : "Update User Profile",
     "update_password" : "Update Password",

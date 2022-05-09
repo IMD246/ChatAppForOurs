@@ -16,11 +16,11 @@ class FirebaseUserProfile {
     await userProfilePath.doc(userID).set(
       {
         emailField: userProfile.email,
-        userIDField: userID,
         fullNameField: userProfile.fullName,
         urlImageField: userProfile.urlImage,
         isDarkModeField: userProfile.isDarkMode,
-        isEmailVerifiedField: false,
+        languageField: userProfile.language,
+        isEmailVerifiedField: userProfile.isEmailVerified,
       },
     );
   }
@@ -93,7 +93,7 @@ class FirebaseUserProfile {
     }
   }
 
-  Future<void> upDateUserIsEmailVerified({
+  Future<void> updateUserIsEmailVerified({
     required String? userID,
   }) async {
     if (userID != null) {
@@ -102,14 +102,16 @@ class FirebaseUserProfile {
       await userProfilePath.doc(userID).update(mapUser);
     }
   }
-Future<void> updateUserLanguage({
+
+  Future<void> updateUserLanguage({
     required String userID,
     required String language,
   }) async {
-      Map<String, dynamic> mapUser = <String, dynamic>{};
-      mapUser.addAll({languageField: language});
-      await userProfilePath.doc(userID).update(mapUser);
+    Map<String, dynamic> mapUser = <String, dynamic>{};
+    mapUser.addAll({languageField: language});
+    await userProfilePath.doc(userID).update(mapUser);
   }
+
   Future<void> uploadDarkTheme({
     required String? userID,
     required bool isDarkTheme,

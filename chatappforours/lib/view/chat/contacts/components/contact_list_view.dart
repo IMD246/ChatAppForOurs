@@ -44,17 +44,19 @@ class ContactListView extends StatelessWidget {
                       },
                     );
                   } else {
-                    return Text(context.loc.no_friend_available);
+                    return Center(
+                      child: Text(
+                        context.loc.no_friend_available,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    );
                   }
                 default:
-                  return Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    child: Center(
-                      child: SizedBox(
-                        height: size.height * 0.4,
-                        width: size.width * 0.4,
-                        child: const CircularProgressIndicator(),
-                      ),
+                  return SizedBox(
+                    height: size.height * 0.2,
+                    width: size.width * 0.2,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
                     ),
                   );
               }

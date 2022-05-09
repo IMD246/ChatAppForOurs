@@ -88,7 +88,7 @@ class FirebaseFriendList {
         .delete();
   }
 
-  Stream<Iterable<FriendList>> getAllFriendIsAccepted({required ownerUserID}) {
+  Stream<Iterable<FriendList>?> getAllFriendIsAccepted({required ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
         .doc(ownerUserID)
@@ -96,15 +96,19 @@ class FirebaseFriendList {
         .where(isRequestField, isEqualTo: true)
         .orderBy(stampTimeField, descending: true)
         .snapshots()
-        .map(
-          (event) => event.docs.map(
-            (e) => FriendList.fromSnapshot(snapshot: e),
-          ),
+        .map((event) {
+      if (event.docs.isNotEmpty) {
+        return event.docs.map(
+          (e) => FriendList.fromSnapshot(snapshot: e),
         );
+      } else {
+        return null;
+      }
+    });
     return friendList;
   }
 
-  Stream<Iterable<FriendList>> getAllFriendIsRequested(
+  Stream<Iterable<FriendList>?> getAllFriendIsRequested(
       {required String ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
@@ -114,10 +118,16 @@ class FirebaseFriendList {
         .orderBy(stampTimeField, descending: true)
         .snapshots()
         .map(
-          (event) => event.docs.map(
+      (event) {
+        if (event.docs.isNotEmpty) {
+          return event.docs.map(
             (e) => FriendList.fromSnapshot(snapshot: e),
-          ),
-        );
+          );
+        } else {
+          return null;
+        }
+      },
+    );
     return friendList;
   }
 

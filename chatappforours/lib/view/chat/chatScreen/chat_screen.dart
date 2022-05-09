@@ -30,7 +30,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   late int currentIndex;
-  late final FirebaseUserProfile firebaseUserProfile;
+  final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
   final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
 
   String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
@@ -38,16 +38,11 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     tz.initializeTimeZones();
     currentIndex = widget.currentIndex;
-    firebaseUserProfile = FirebaseUserProfile();
-    setState(
-      () {
-        firebaseUserProfile.updateUserPresence(
-          uid: ownerUserID,
-          bool: true,
-        );
-      },
-    );
-
+    setState(() {
+      firebaseUserProfile.updateUserPresenceDisconnect(
+        uid: ownerUserID,
+      );
+    });
     super.initState();
   }
 
