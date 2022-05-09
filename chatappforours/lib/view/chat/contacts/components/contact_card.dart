@@ -3,7 +3,6 @@ import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
-import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
@@ -13,6 +12,7 @@ import 'package:chatappforours/services/auth/models/friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
+import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -80,12 +80,13 @@ class _ContactCardState extends State<ContactCard> {
                 final userProfileFriend = await firebaseUserProfile
                     .getUserProfile(userID: widget.friend.userID);
                 chat.nameChat = userProfileFriend!.fullName;
-                context.read<AuthBloc>().add(
-                      AuthEventGetInChatFromBodyContactScreen(
-                        chat: chat,
-                        currentIndex: 1,
-                      ),
-                    );
+                 Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) {
+                  return MesssageScreen(chat: chat, currentIndex: 1,);
+                },
+              ),
+            );
               }
             }
           },

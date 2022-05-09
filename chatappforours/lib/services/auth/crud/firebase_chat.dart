@@ -46,7 +46,7 @@ class FirebaseChat {
   }) async {
     Map<String, dynamic> map = <String, dynamic>{
       lastTextField: text,
-      typeMessageField:typeMessage.toString(),
+      typeMessageField: typeMessage.toString(),
       timeLastChatField: DateTime.now(),
     };
     await firebaseChat.doc(chatID).update(map);
@@ -105,20 +105,28 @@ class FirebaseChat {
     );
   }
 
-  Stream<Iterable<Chat>> getAllChat({
+  Stream<Iterable<Chat>?> getAllChat({
     required String ownerUserID,
   }) {
-    return firebaseChat
+   return firebaseChat
         .where(listUserField, arrayContains: ownerUserID)
         .where(isActiveField, isEqualTo: true)
         .orderBy(timeLastChatField, descending: true)
         .snapshots()
         .map(
-          (event) => event.docs.map(
-            (e) => Chat.fromSnapshot(
-              docs: e,
-            ),
-          ),
-        );
+      (event) {
+        if (event.docs.isNotEmpty) {
+          return event.docs.map(
+            (e) {
+              return Chat.fromSnapshot(
+                docs: e,
+              );
+            },
+          );
+        } else {
+          return null;
+        }
+      },
+    );
   }
 }

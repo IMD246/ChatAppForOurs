@@ -9,7 +9,6 @@ import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/utilities/loading/loading_screen.dart';
 import 'package:chatappforours/view/ForgotPassword/forgot_password.dart';
 import 'package:chatappforours/view/chat/chatScreen/chat_screen.dart';
-import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:chatappforours/view/chat/settings/setting_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
@@ -58,24 +57,6 @@ class _WelcomePageState extends State<WelcomePage> {
       builder: (context, state) {
         if (state is AuthStateLoggedOut) {
           return const SignIn();
-        } else if (state is AuthStateGetInChatFromBodyChatScreen) {
-          return MesssageScreen(
-            chat: state.chat,
-            currentIndex: 0,
-          );
-        } else if (state is AuthStateGetInChatFromBodyContactScreen) {
-          return MesssageScreen(
-            chat: state.chat,
-            currentIndex: 1,
-          );
-        } else if (state is AuthStateGetOutChatFromBodyChatScreen) {
-          return const ChatScreen(
-            currentIndex: 0,
-          );
-        } else if (state is AuthStateGetOutChatFromBodyContactScreen) {
-          return const ChatScreen(
-            currentIndex: 1,
-          );
         } else if (state is AuthStateLoggedIn) {
           return FutureBuilder<int>(
             future: firebaseFriendList.countAllFriendIsRequested(

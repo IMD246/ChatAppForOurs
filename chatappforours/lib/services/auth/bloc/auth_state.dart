@@ -1,5 +1,4 @@
 import 'package:chatappforours/services/auth/models/auth_user.dart';
-import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -82,29 +81,4 @@ class AuthStateSignInWithFacebook extends AuthState {
   const AuthStateSignInWithFacebook(
       {required this.exception, required bool isLoading})
       : super(isLoading: isLoading);
-}
-class AuthStateGetInChatFromBodyChatScreen extends AuthState {
-  final Chat chat;
-  final int currentIndex;
-  const AuthStateGetInChatFromBodyChatScreen({
-    required this.currentIndex,
-    required this.chat,
-  }) : super(isLoading: false);
-}
-
-class AuthStateGetInChatFromBodyContactScreen extends AuthState {
-  final Chat chat;
-  final int currentIndex;
-  const AuthStateGetInChatFromBodyContactScreen({
-    required this.currentIndex,
-    required this.chat,
-  }) : super(isLoading: false);
-}
-
-class AuthStateGetOutChatFromBodyChatScreen extends AuthState {
-  const AuthStateGetOutChatFromBodyChatScreen() : super(isLoading: false);
-}
-
-class AuthStateGetOutChatFromBodyContactScreen extends AuthState {
-  const AuthStateGetOutChatFromBodyContactScreen() : super(isLoading: false);
 }

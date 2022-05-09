@@ -32,7 +32,6 @@ class _ChatScreenState extends State<ChatScreen> {
   late int currentIndex;
   final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
   final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
-
   String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
@@ -87,16 +86,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   userProfile?.urlImage,
                 ),
                 body: currentIndex == 0
-                    ? BlocBuilder<AuthBloc, AuthState>(
-                        builder: (context, state) {
-                          return const BodyChatScreen();
-                        },
-                      )
-                    : BlocBuilder<AuthBloc, AuthState>(
-                        builder: (context, state) {
-                          return const BodyContactScreen();
-                        },
-                      ),
+                    ? const BodyChatScreen()
+                    : const BodyContactScreen(),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
                     Navigator.of(context).push(

@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
-import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
@@ -79,13 +78,7 @@ class _MesssageScreenState extends State<MesssageScreen> {
                   children: [
                     BackButton(
                       onPressed: () {
-                        widget.currentIndex == 0
-                            ? context.read<AuthBloc>().add(
-                                  const AuthEventGetOutChatFromBodyChatScreen(),
-                                )
-                            : context.read<AuthBloc>().add(
-                                  const AuthEventGetOutChatFromBodyContactScreen(),
-                                );
+                        Navigator.pop(context);
                       },
                     ),
                     Stack(
@@ -161,10 +154,6 @@ class _MesssageScreenState extends State<MesssageScreen> {
               } else {
                 return Text(context.loc.waiting);
               }
-            case ConnectionState.waiting:
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
             default:
               return const Center(
                 child: CircularProgressIndicator(),

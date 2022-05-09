@@ -1,8 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-
-import 'package:chatappforours/services/auth/models/chat.dart';
-
 @immutable
 abstract class AuthEvent {
   const AuthEvent();
@@ -68,28 +64,3 @@ class AuthEventSignInWithGoogle extends AuthEvent {
   const AuthEventSignInWithGoogle();
 }
 
-class AuthEventGetInChatFromBodyChatScreen extends AuthEvent {
-  final Chat chat;
-  final int currentIndex;
-  const AuthEventGetInChatFromBodyChatScreen({
-    required this.currentIndex,
-    required this.chat,
-  });
-}
-
-class AuthEventGetInChatFromBodyContactScreen extends AuthEvent {
-  final Chat chat;
-  final int currentIndex;
-  const AuthEventGetInChatFromBodyContactScreen({
-    required this.currentIndex,
-    required this.chat,
-  });
-}
-
-class AuthEventGetOutChatFromBodyChatScreen extends AuthEvent {
-  const AuthEventGetOutChatFromBodyChatScreen();
-}
-
-class AuthEventGetOutChatFromBodyContactScreen extends AuthEvent {
-  const AuthEventGetOutChatFromBodyContactScreen();
-}
