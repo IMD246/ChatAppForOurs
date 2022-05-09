@@ -30,10 +30,6 @@ class _BodyMessageState extends State<BodyMessage> {
 
   @override
   void dispose() {
-    firebaseChatMessage.deleteMessageNotSent(
-      ownerUserID: id,
-      chatID: widget.chat.idChat,
-    );
     super.dispose();
   }
 

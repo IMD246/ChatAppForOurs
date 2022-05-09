@@ -94,7 +94,7 @@ class _AudioMessasgeState extends State<AudioMessasge> {
             },
           ),
           Text(
-            formatTime(duration - position),
+            formatTime((duration - position)),
             style:
                 TextStyle(color: textColorMode(ThemeMode.light), fontSize: 12),
           ),

@@ -48,26 +48,30 @@ class Storage {
   Future<void> uploadFileAudio(
       {required String filePath,
       required FirebaseChatMessage firebaseChatMessage,
-      required ChatMessage lastMessageUserOwner,
       required FirebaseUserProfile firebaseUserProfile,
       required String idChat,
-      BuildContext? context}) async {
+      BuildContext? context,required String userOwnerID}) async {
     File file = File(filePath);
     try {
+      final lastMessageAudioOwnerUser = await
+           firebaseChatMessage.getAudioMessageNotSentOwnerUser(
+        userID: userOwnerID,
+        chatID: idChat,
+      );
       await storage
-          .ref('audio/${lastMessageUserOwner.idMessage}')
+          .ref('audio/${lastMessageAudioOwnerUser.idMessage}')
           .putFile(
             file,
           )
           .then(
         (p0) async {
           final urlAudio = await getDownloadURLAudio(
-              fileName: lastMessageUserOwner.idMessage);
+              fileName: lastMessageAudioOwnerUser.idMessage);
           final userProfile = await firebaseUserProfile.getUserProfile(
-              userID: lastMessageUserOwner.userID);
+              userID: lastMessageAudioOwnerUser.userID);
           await firebaseChatMessage.uploadAudioMessageNotSent(
             chatID: idChat,
-            lastMessageUserOwner: lastMessageUserOwner,
+            lastMessageUserOwner: lastMessageAudioOwnerUser,
             urlAudio: urlAudio ?? "",
             nameSender: userProfile!.fullName,
           );

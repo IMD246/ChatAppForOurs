@@ -220,7 +220,7 @@ class FirebaseChatMessage {
           .doc(chatID)
           .collection('message')
           .where(idSenderField, isEqualTo: ownerUserID)
-          .where(typeMessageField, isEqualTo: TypeMessage.text.toString())
+          .where(typeMessageField, isEqualTo: TypeMessage.text)
           .where(messageStatusField,
               isEqualTo: MessageStatus.notSent.toString())
           .orderBy(stampTimeField, descending: true)
