@@ -12,7 +12,9 @@ class Storage {
   Future<void> uploadFile(
       {required String filePath,
       required String fileName,
-      BuildContext? context}) async {
+      required BuildContext context,
+      required String userID,
+      required FirebaseUserProfile firebaseUserProfile}) async {
     File file = File(filePath);
     try {
       await storage
@@ -24,17 +26,26 @@ class Storage {
             ),
           )
           .then(
-            (p0) => ScaffoldMessenger.of(context!).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Upload Image Successful',
-                  textAlign: TextAlign.center,
-                ),
+        (p0) async {
+          final urlProfile = await getDownloadURL(
+            fileName: fileName,
+          );
+          await firebaseUserProfile.uploadUserImage(
+            userID: userID,
+            urlImage: urlProfile,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Upload Image Successful',
+                textAlign: TextAlign.center,
               ),
             ),
           );
+        },
+      );
     } on FirebaseException catch (_) {
-      ScaffoldMessenger.of(context!).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
             'Upload Image Failed',
@@ -50,11 +61,12 @@ class Storage {
       required FirebaseChatMessage firebaseChatMessage,
       required FirebaseUserProfile firebaseUserProfile,
       required String idChat,
-      BuildContext? context,required String userOwnerID}) async {
+      BuildContext? context,
+      required String userOwnerID}) async {
     File file = File(filePath);
     try {
-      final lastMessageAudioOwnerUser = await
-           firebaseChatMessage.getAudioMessageNotSentOwnerUser(
+      final lastMessageAudioOwnerUser =
+          await firebaseChatMessage.getAudioMessageNotSentOwnerUser(
         userID: userOwnerID,
         chatID: idChat,
       );

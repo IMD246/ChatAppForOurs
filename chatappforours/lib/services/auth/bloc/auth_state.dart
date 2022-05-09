@@ -1,4 +1,3 @@
-import 'package:chatappforours/services/auth/models/auth_user.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -59,23 +58,6 @@ class AuthStateRegistering extends AuthState {
       {required this.exception, required bool isLoading, this.email})
       : super(isLoading: isLoading);
 }
-
-class AuthStateSetting extends AuthState {
-  final AuthUser authUser;
-  const AuthStateSetting({required this.authUser, required bool isLoading})
-      : super(isLoading: isLoading);
-}
-
-class AuthStateUploadingImage extends AuthState {
-  const AuthStateUploadingImage({required bool isLoading})
-      : super(isLoading: isLoading);
-}
-
-class AuthStateUploadingTheme extends AuthState {
-  const AuthStateUploadingTheme({required bool isLoading})
-      : super(isLoading: isLoading);
-}
-
 class AuthStateSignInWithFacebook extends AuthState {
   final Exception? exception;
   const AuthStateSignInWithFacebook(

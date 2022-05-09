@@ -6,7 +6,6 @@ import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
-import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -108,7 +107,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (event, emit) async {
         final email = event.email;
         final password = event.password;
-       
+
         try {
           emit(
             const AuthStateRegistering(
@@ -185,6 +184,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           if (userProfile != null) {
             await FirebaseFirestore.instance.clearPersistence();
             await authProvider.logOut();
+            emit(
+              const AuthStateLoggedOut(
+                exception: null,
+                isLoading: false,
+              ),
+            );
           }
           emit(
             const AuthStateLoggedOut(
@@ -248,111 +253,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
       },
     );
-    on<AuthEventSetting>(
-      (event, emit) => {
-        emit(
-          AuthStateSetting(
-            isLoading: false,
-            authUser: authProvider.currentUser!,
-          ),
-        ),
-      },
-    );
-    on<AuthEventSettingBack>(
-      (event, emit) async {
-        final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-        final userProfile = await firebaseUserProfile.getUserProfile(
-            userID: authProvider.currentUser!.id);
-        emit(
-          AuthStateLoggedIn(isLoading: false, userProfile: userProfile!),
-        );
-      },
-    );
-    on<AuthEventUploadImage>(
-      (event, emit) async {
-        {
-          emit(
-            AuthStateSetting(
-              isLoading: true,
-              authUser: authProvider.currentUser!,
-            ),
-          );
-          Storage storage = Storage();
-          FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-          try {
-            await storage.uploadFile(
-              filePath: event.path,
-              fileName: event.fileName,
-              context: event.context,
-            );
-            final urlProfile = await storage.getDownloadURL(
-              fileName: event.fileName,
-            );
-            await firebaseUserProfile.uploadUserImage(
-              userID: authProvider.currentUser!.id,
-              urlImage: urlProfile,
-            );
-            emit(
-              AuthStateSetting(
-                isLoading: false,
-                authUser: authProvider.currentUser!,
-              ),
-            );
-          } on Exception catch (_) {
-            emit(
-              AuthStateSetting(
-                isLoading: false,
-                authUser: authProvider.currentUser!,
-              ),
-            );
-          }
-          emit(
-            AuthStateSetting(
-              isLoading: false,
-              authUser: authProvider.currentUser!,
-            ),
-          );
-        }
-      },
-    );
-    on<AuthEventUploadStateTheme>(
-      (event, emit) async {
-        {
-          emit(
-            AuthStateSetting(
-              isLoading: true,
-              authUser: authProvider.currentUser!,
-            ),
-          );
-          FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-          try {
-            await firebaseUserProfile.uploadDarkTheme(
-              userID: authProvider.currentUser!.id,
-              isDarkTheme: event.isDarkTheme,
-            );
-            emit(
-              AuthStateSetting(
-                isLoading: false,
-                authUser: authProvider.currentUser!,
-              ),
-            );
-          } on Exception catch (_) {
-            emit(
-              AuthStateSetting(
-                isLoading: false,
-                authUser: authProvider.currentUser!,
-              ),
-            );
-          }
-          emit(
-            AuthStateSetting(
-              isLoading: false,
-              authUser: authProvider.currentUser!,
-            ),
-          );
-        }
-      },
-    );
+
     on<AuthEventSignInWithFacebook>(
       (event, emit) async {
         // final FirebaseFriendList friendListFirebase = FirebaseFriendList();

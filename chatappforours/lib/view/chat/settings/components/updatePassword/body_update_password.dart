@@ -120,18 +120,44 @@ class _BodyUpdatePasswordState extends State<BodyUpdatePassword> {
                             title: context.loc.update_password_notification,
                           );
                         } catch (_) {
-                          final credential = EmailAuthProvider.credential(
-                              email: authUser!.email!, password: password.text);
-                          await FirebaseAuth.instance.currentUser!
-                              .linkWithCredential(credential);
-                          await showErrorDialog(
-                            context: context,
-                            text: context.loc.update_password_successfully,
-                            title: context.loc.update_password_notification,
-                          );
+                          try {
+                            final credential = EmailAuthProvider.credential(
+                              email: authUser!.email!,
+                              password: password.text,
+                            );
+                            await FirebaseAuth.instance.currentUser
+                                ?.linkWithCredential(credential);
+                          } on FirebaseAuthException catch (e) {
+                            switch (e.code) {
+                              case "provider-already-linked":
+                                await authUser!.updatePassword(password.text);
+                                await showErrorDialog(
+                                  context: context,
+                                  text:
+                                      context.loc.update_password_successfully,
+                                  title:
+                                      context.loc.update_password_notification,
+                                );
+                                password.clear();
+                                verifyPassword.clear();
+                                break;
+                              case "credential-already-in-use":
+                                await authUser!.updatePassword(password.text);
+                                await showErrorDialog(
+                                  context: context,
+                                  text:
+                                      context.loc.update_password_successfully,
+                                  title:
+                                      context.loc.update_password_notification,
+                                );
+                                password.clear();
+                                verifyPassword.clear();
+                                break;
+                            }
+                          }
+                          password.clear();
+                          verifyPassword.clear();
                         }
-                        password.clear();
-                        verifyPassword.clear();
                       }
                     }
                   },
@@ -207,18 +233,36 @@ class _BodyUpdatePasswordState extends State<BodyUpdatePassword> {
                         title: context.loc.update_password_notification,
                       );
                     } catch (_) {
-                      final credential = EmailAuthProvider.credential(
-                          email: authUser!.email!, password: password.text);
-                      await FirebaseAuth.instance.currentUser!
-                          .linkWithCredential(credential);
-                      await showErrorDialog(
-                        context: context,
-                        text: context.loc.update_password_successfully,
-                        title: context.loc.update_password_notification,
-                      );
+                      try {
+                        final credential = EmailAuthProvider.credential(
+                          email: authUser!.email!,
+                          password: password.text,
+                        );
+                        await FirebaseAuth.instance.currentUser
+                            ?.linkWithCredential(credential);
+                      } on FirebaseAuthException catch (e) {
+                        switch (e.code) {
+                          case "provider-already-linked":
+                            await authUser!.updatePassword(password.text);
+                            await showErrorDialog(
+                              context: context,
+                              text: context.loc.update_password_successfully,
+                              title: context.loc.update_password_notification,
+                            );
+                            break;
+                          case "credential-already-in-use":
+                            await authUser!.updatePassword(password.text);
+                            await showErrorDialog(
+                              context: context,
+                              text: context.loc.update_password_successfully,
+                              title: context.loc.update_password_notification,
+                            );
+                            break;
+                        }
+                      }
+                      password.clear();
+                      verifyPassword.clear();
                     }
-                    password.clear();
-                    verifyPassword.clear();
                   }
                 }
               },

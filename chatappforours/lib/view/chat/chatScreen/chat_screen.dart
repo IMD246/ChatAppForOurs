@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
-import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
@@ -11,6 +10,7 @@ import 'package:chatappforours/services/notification.dart/notification.dart';
 import 'package:chatappforours/view/chat/addFriend/add_friend_screen.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
+import 'package:chatappforours/view/chat/settings/setting_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -149,7 +149,11 @@ class _ChatScreenState extends State<ChatScreen> {
           if (urlImage != null)
             GestureDetector(
               onTap: () {
-                context.read<AuthBloc>().add(const AuthEventSetting());
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) {
+                    return const SettingScreen();
+                  },),
+                );
               },
               child: CircleAvatar(
                 backgroundColor: Colors.cyan[100],
@@ -171,7 +175,12 @@ class _ChatScreenState extends State<ChatScreen> {
           if (urlImage == null)
             GestureDetector(
               onTap: () {
-                context.read<AuthBloc>().add(const AuthEventSetting());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) {
+                    return const SettingScreen();
+                  }),
+                );
               },
               child: const CircleAvatar(
                 backgroundImage: AssetImage("assets/images/defaultImage.png"),

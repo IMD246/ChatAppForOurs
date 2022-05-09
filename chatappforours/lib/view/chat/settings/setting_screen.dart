@@ -1,9 +1,8 @@
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/extensions/locallization.dart';
-import 'package:chatappforours/services/auth/models/auth_user.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
-import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
+import 'package:chatappforours/services/auth/models/auth_user.dart';
 
 import 'package:chatappforours/view/chat/settings/components/body_setting.dart';
 import 'package:flutter/material.dart';
@@ -21,42 +20,36 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        if (state is AuthStateSetting) {
-          return Scaffold(
-            appBar: buildAppbar(themeMode: ThemeMode.light, context: context),
-            body: const BodySetting(),
-          );
-        } else {
-          return const Scaffold();
-        }
+        return Scaffold(
+          appBar: buildAppbar(themeMode: ThemeMode.light, context: context),
+          body: const BodySetting(),
+        );
       },
     );
   }
+}
 
-  AppBar buildAppbar(
-      {required ThemeMode themeMode,
-      required BuildContext context,
-      AuthUser? authUser}) {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      title: Row(
-        children: [
-          BackButton(
-            onPressed: () {
-              context.read<AuthBloc>().add(
-                    const AuthEventSettingBack(),
-                  );
-            },
+AppBar buildAppbar(
+    {required ThemeMode themeMode,
+    required BuildContext context,
+    AuthUser? authUser}) {
+  return AppBar(
+    automaticallyImplyLeading: false,
+    title: Row(
+      children: [
+        BackButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          color: textColorMode(themeMode),
+        ),
+        Text(
+          context.loc.me,
+          style: TextStyle(
             color: textColorMode(themeMode),
           ),
-          Text(
-            context.loc.me,
-            style: TextStyle(
-              color: textColorMode(themeMode),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 }

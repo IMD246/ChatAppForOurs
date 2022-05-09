@@ -52,11 +52,11 @@ class ContactListView extends StatelessWidget {
                     );
                   }
                 default:
-                  return SizedBox(
-                    height: size.height * 0.2,
-                    width: size.width * 0.2,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
+                  return Center(
+                    child: SizedBox(
+                      height: size.height * 0.5,
+                      width: size.width * 0.8,
+                      child: const CircularProgressIndicator(),
                     ),
                   );
               }

@@ -9,7 +9,6 @@ import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/utilities/loading/loading_screen.dart';
 import 'package:chatappforours/view/ForgotPassword/forgot_password.dart';
 import 'package:chatappforours/view/chat/chatScreen/chat_screen.dart';
-import 'package:chatappforours/view/chat/settings/setting_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
 import 'package:flutter/material.dart';
@@ -74,9 +73,7 @@ class _WelcomePageState extends State<WelcomePage> {
           );
         } else if (state is AuthStateRegistering) {
           return const SignUp();
-        } else if (state is AuthStateSetting) {
-          return const SettingScreen();
-        } else if (state is AuthStateForgotPassWord) {
+        }  else if (state is AuthStateForgotPassWord) {
           return const ForgotPassword();
         } else {
           return SafeArea(

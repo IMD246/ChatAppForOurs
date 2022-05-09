@@ -85,7 +85,8 @@ class _ChatListViewState extends State<ChatListView> {
     firebaseUserProfile = FirebaseUserProfile();
     firebaseChat = FirebaseChat();
     setState(() {
-      resultListChat = listChatData;
+      resultListChat =
+          listChatData.where((element) => element.presence == true).toList();
     });
     firebaseChatMessage = FirebaseChatMessage();
     super.initState();
@@ -99,7 +100,6 @@ class _ChatListViewState extends State<ChatListView> {
 
   @override
   void didChangeDependencies() {
-    getAllDataChat();
     super.didChangeDependencies();
   }
 
@@ -110,9 +110,7 @@ class _ChatListViewState extends State<ChatListView> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final list = snapshot.data!;
-          final listFilter = widget.isFilledActive
-              ? list.where((element) => element.presence == true).toList()
-              : list;
+          final listFilter = widget.isFilledActive ? resultListChat : list;
           return ListView.builder(
             itemCount: listFilter.length,
             itemBuilder: (context, index) {
