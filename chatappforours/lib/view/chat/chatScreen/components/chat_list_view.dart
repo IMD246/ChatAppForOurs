@@ -30,7 +30,6 @@ class _ChatListViewState extends State<ChatListView> {
   String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
-  List<Chat> resultListChat = [];
   Future<List<Chat>> getAllDataChat() async {
     listChatData.clear();
     for (var i = 0; i < widget.allChat.length; i++) {
@@ -84,10 +83,6 @@ class _ChatListViewState extends State<ChatListView> {
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
     firebaseUserProfile = FirebaseUserProfile();
     firebaseChat = FirebaseChat();
-    setState(() {
-      resultListChat =
-          listChatData.where((element) => element.presence == true).toList();
-    });
     firebaseChatMessage = FirebaseChatMessage();
     super.initState();
   }
@@ -110,7 +105,9 @@ class _ChatListViewState extends State<ChatListView> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final list = snapshot.data!;
-          final listFilter = widget.isFilledActive ? resultListChat : list;
+          final listFilter = widget.isFilledActive
+              ? list.where((element) => element.presence == true).toList()
+              : list;
           return ListView.builder(
             itemCount: listFilter.length,
             itemBuilder: (context, index) {
