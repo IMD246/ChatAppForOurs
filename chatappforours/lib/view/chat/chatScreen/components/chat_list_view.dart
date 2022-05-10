@@ -22,7 +22,7 @@ class ChatListView extends StatefulWidget {
 }
 
 class _ChatListViewState extends State<ChatListView> {
-  final List<Chat> listChatData = [];
+  List<Chat> listChatData = [];
   late final FirebaseUsersJoinChat firebaseUsersJoinChat;
   late final FirebaseUserProfile firebaseUserProfile;
   late final FirebaseChat firebaseChat;
@@ -83,6 +83,7 @@ class _ChatListViewState extends State<ChatListView> {
     firebaseUsersJoinChat = FirebaseUsersJoinChat();
     firebaseUserProfile = FirebaseUserProfile();
     firebaseChat = FirebaseChat();
+    listChatData.clear();
     firebaseChatMessage = FirebaseChatMessage();
     super.initState();
   }
@@ -95,6 +96,7 @@ class _ChatListViewState extends State<ChatListView> {
 
   @override
   void didChangeDependencies() {
+    listChatData.clear();
     super.didChangeDependencies();
   }
 

@@ -151,6 +151,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                           }
                         },
                         onChanged: (value) async {
+                          setState(() {});
                           if (textController.text.isNotEmpty) {
                             await firebaseChatMessage.createTextMessageNotSent(
                               userID: id,
@@ -184,7 +185,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                       ),
                     ),
                     const SizedBox(width: kDefaultPadding / 4),
-                    if (isSelected)
+                    if (recorder.isRecording)
                       StreamBuilder<RecordingDisposition>(
                         stream: recorder.onProgress,
                         builder: (context, snapshot) {
