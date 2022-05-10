@@ -164,12 +164,10 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                               );
                             }
                           }
-                          setState(() {
-                            if (textController.text.isEmpty) {
-                              firebaseChatMessage.deleteMessageNotSent(
-                                  ownerUserID: id, chatID: widget.chat.idChat);
-                            }
-                          });
+                          if (textController.text.isEmpty) {
+                            await firebaseChatMessage.deleteMessageNotSent(
+                                ownerUserID: id, chatID: widget.chat.idChat);
+                          }
                         },
                         minLines: 1,
                         maxLines: 5,

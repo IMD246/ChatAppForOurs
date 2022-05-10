@@ -3,6 +3,7 @@ import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
@@ -29,6 +30,7 @@ class MesssageScreen extends StatefulWidget {
 
 class _MesssageScreenState extends State<MesssageScreen> {
   final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+  final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
   String userOwnerID = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
@@ -37,6 +39,15 @@ class _MesssageScreenState extends State<MesssageScreen> {
       bool: true,
     );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    firebaseChatMessage.deleteMessageNotSent(
+      ownerUserID: userOwnerID,
+      chatID: widget.chat.idChat,
+    );
+    super.dispose();
   }
 
   @override

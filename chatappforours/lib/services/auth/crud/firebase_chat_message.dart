@@ -214,36 +214,26 @@ class FirebaseChatMessage {
     required String ownerUserID,
     required String chatID,
   }) async {
-    String? id;
-    if (id != null) {
-      final bool isCheck = await firebaseChatMessageDocument
-          .doc(chatID)
-          .collection('message')
-          .where(idSenderField, isEqualTo: ownerUserID)
-          .where(typeMessageField, isEqualTo: TypeMessage.text)
-          .where(messageStatusField,
-              isEqualTo: MessageStatus.notSent.toString())
-          .orderBy(stampTimeField, descending: true)
-          .limit(1)
-          .get()
-          .then(
-        (value) {
-          if (value.size > 0 && value.docs.first.exists) {
-            id = value.docs.first.id;
-            return true;
-          } else {
-            return false;
-          }
-        },
-      );
-      if (isCheck == true) {
-        await firebaseChatMessageDocument
-            .doc(chatID)
-            .collection('message')
-            .doc(id)
-            .delete();
-      }
-    }
+    await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .where(idSenderField, isEqualTo: ownerUserID)
+        .where(typeMessageField, isEqualTo: TypeMessage.text.toString())
+        .where(messageStatusField, isEqualTo: MessageStatus.notSent.toString())
+        .orderBy(stampTimeField, descending: true)
+        .limit(1)
+        .get()
+        .then(
+      (value) async {
+        if (value.size > 0 && value.docs.first.exists) {
+          await firebaseChatMessageDocument
+              .doc(chatID)
+              .collection('message')
+              .doc(ownerUserID)
+              .delete();
+        }
+      },
+    );
   }
 
   Future<void> updateMessageFriendToViewed({
