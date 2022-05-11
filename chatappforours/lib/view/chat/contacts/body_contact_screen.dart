@@ -11,7 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BodyContactScreen extends StatefulWidget {
-  const BodyContactScreen({Key? key}) : super(key: key);
+  const BodyContactScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<BodyContactScreen> createState() => _BodyContactScreenState();
@@ -25,12 +27,18 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
   @override
   void initState() {
     firebaseFriendList = FirebaseFriendList();
+
     super.initState();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override

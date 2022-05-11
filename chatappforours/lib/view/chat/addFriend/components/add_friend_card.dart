@@ -151,36 +151,38 @@ class _AddFriendCardState extends State<AddFriendCard> {
                     ownerUserID: widget.userProfile.idUser!,
                     userIDFriend: ownerUserID,
                   );
-                  final Map<String, String> data = {
-                    'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-                    'id': '1',
-                    'status': 'done',
-                  };
-                  String url = 'https://fcm.googleapis.com/fcm/send';
-                  String keyApp =
-                      'key=AAAAB461BsM:APA91bFXTTlSC4zu_o_iwauFGUO8xBUEw1ycrIb5YkgUk-aSzUMvC5zIOFRcgLIsrK8kTaLYdyJweZMT7GEwngwLOzYyDZSSeqOgURilsENtR8mCkV_2Le3JHx8NWeBnPr_l_6SyJS4A';
-                  final headers = <String, String>{
-                    'Content-type': 'application/json',
-                    'Authorization': keyApp,
-                  };
-                  try {
-                    http.post(
-                      Uri.parse(url),
-                      headers: headers,
-                      body: jsonEncode(
-                        <String, dynamic>{
-                          'notification': <String, dynamic>{
-                            'body': widget.userProfile.fullName,
-                            'title': widget.userProfile.idUser,
+                  if (widget.userProfile.idUser!.compareTo(ownerUserID) != 0) {
+                    final Map<String, String> data = {
+                      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                      'id': '1',
+                      'status': 'done',
+                    };
+                    String url = 'https://fcm.googleapis.com/fcm/send';
+                    String keyApp =
+                        'key=AAAAB461BsM:APA91bFXTTlSC4zu_o_iwauFGUO8xBUEw1ycrIb5YkgUk-aSzUMvC5zIOFRcgLIsrK8kTaLYdyJweZMT7GEwngwLOzYyDZSSeqOgURilsENtR8mCkV_2Le3JHx8NWeBnPr_l_6SyJS4A';
+                    final headers = <String, String>{
+                      'Content-type': 'application/json',
+                      'Authorization': keyApp,
+                    };
+                    try {
+                      http.post(
+                        Uri.parse(url),
+                        headers: headers,
+                        body: jsonEncode(
+                          <String, dynamic>{
+                            'notification': <String, dynamic>{
+                              'body': widget.userProfile.fullName,
+                              'title': widget.userProfile.idUser,
+                            },
+                            'priority': 'high',
+                            'data': data,
+                            "to": widget.userProfile.tokenUser,
                           },
-                          'priority': 'high',
-                          'data': data,
-                          "to": widget.userProfile.tokenUser,
-                        },
-                      ),
-                    );
-                  } catch (e) {
-                    rethrow;
+                        ),
+                      );
+                    } catch (e) {
+                      rethrow;
+                    }
                   }
                 }
               },
