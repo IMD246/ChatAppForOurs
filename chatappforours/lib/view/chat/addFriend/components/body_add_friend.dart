@@ -165,6 +165,7 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
               setState(
                 () {
                   searchTextController.clear();
+                  _onsearchChange(searchTextController.text);
                 },
               );
             },

@@ -24,19 +24,44 @@ class FirebaseChat {
       timeLastChatField: DateTime.now(),
       stampTimeField: DateTime.now(),
     };
-    await firebaseChat.doc(listUserID[0] + listUserID[1]).set(map).whenComplete(
-      () async {
-        await firebaseUserJoinChat.createUsersJoinChat(
-          listUserID: listUserID,
-          idChat: listUserID[0] + listUserID[1],
-          typeChat: typeChat,
-        );
-        await firebaseChatMessage.createFirstTextMessage(
-          userID: "",
-          chatID: listUserID[0] + listUserID[1],
-        );
-      },
-    );
+    final check1 = await firebaseChat
+        .doc(listUserID[0] + listUserID[1])
+        .get()
+        .then((value) {
+      if (value.exists) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    final check2 = await firebaseChat
+        .doc(listUserID[1] + listUserID[0])
+        .get()
+        .then((value) {
+      if (value.exists) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    if (check1 == false && check2 == false) {
+      await firebaseChat
+          .doc(listUserID[0] + listUserID[1])
+          .set(map)
+          .whenComplete(
+        () async {
+          await firebaseUserJoinChat.createUsersJoinChat(
+            listUserID: listUserID,
+            idChat: listUserID[0] + listUserID[1],
+            typeChat: typeChat,
+          );
+          await firebaseChatMessage.createFirstTextMessage(
+            userID: "",
+            chatID: listUserID[0] + listUserID[1],
+          );
+        },
+      );
+    }
   }
 
   Future<void> updateChatLastText({
@@ -108,7 +133,7 @@ class FirebaseChat {
   Stream<Iterable<Chat>?> getAllChat({
     required String ownerUserID,
   }) {
-   return firebaseChat
+    return firebaseChat
         .where(listUserField, arrayContains: ownerUserID)
         .where(isActiveField, isEqualTo: true)
         .orderBy(timeLastChatField, descending: true)

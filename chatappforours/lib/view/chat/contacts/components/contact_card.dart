@@ -80,13 +80,16 @@ class _ContactCardState extends State<ContactCard> {
                 final userProfileFriend = await firebaseUserProfile
                     .getUserProfile(userID: widget.friend.userID);
                 chat.nameChat = userProfileFriend!.fullName;
-                 Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) {
-                  return MesssageScreen(chat: chat, currentIndex: 1,);
-                },
-              ),
-            );
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) {
+                      return MesssageScreen(
+                        chat: chat,
+                        currentIndex: 1,
+                      );
+                    },
+                  ),
+                );
               }
             }
           },
