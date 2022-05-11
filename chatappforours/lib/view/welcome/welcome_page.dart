@@ -11,6 +11,7 @@ import 'package:chatappforours/view/ForgotPassword/forgot_password.dart';
 import 'package:chatappforours/view/chat/chatScreen/chat_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,11 @@ class _WelcomePageState extends State<WelcomePage> {
       listener: (context, state) async {
         if (state is AuthStateLoggedIn) {
           final userProfile = state.userProfile;
+          final String? token = await FirebaseMessaging.instance.getToken();
+          await firebaseUserProfile.updateTokenUserProfile(
+            token: token,
+            userID: state.userProfile.idUser,
+          );
           themeChanger.setTheme(
             userProfile.isDarkMode,
           );
@@ -63,7 +69,6 @@ class _WelcomePageState extends State<WelcomePage> {
             builder: (context, snapShot) {
               if (snapShot.hasData) {
                 return ChatScreen(
-                  currentIndex: 0,
                   countFriend: snapShot.data!,
                 );
               } else {
@@ -73,7 +78,7 @@ class _WelcomePageState extends State<WelcomePage> {
           );
         } else if (state is AuthStateRegistering) {
           return const SignUp();
-        }  else if (state is AuthStateForgotPassWord) {
+        } else if (state is AuthStateForgotPassWord) {
           return const ForgotPassword();
         } else {
           return SafeArea(

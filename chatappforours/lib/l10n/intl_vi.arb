@@ -64,6 +64,7 @@
     "accept" : "Chấp nhận",
     "cancel" : "Hủy",
     "no_friend_available" : "Không có bất kỳ người bạn nào",
+    "no_request_friend_available" : "Không có bất kỳ yêu cầu kết bạn nào",
     "no_file_selected" : "Không có file nào được chọn",
     "update_user_profile" : "Cập nhật hồ sơ",
     "update_password" : "Cập nhật mật khẩu",
@@ -103,14 +104,14 @@
     "photo" : "ảnh",
     "recording" : "Đang ghi âm...",
     "message_recording" : "đã gửi 1 tin nhắn âm thanh",
+    "no_any_chat_ative": "Không có bất kỳ chat nào hoạt động",
     "request_friend_notification_title": "Thông báo Yêu Cầu Kết Bạn",
-    "request_friend_notification_body": "Bạn có {countFriend} yêu cầu kết bạn",
-    "@request_friend_notification_body":
-    {
+    "request_friend_notification_body": "Bạn có yêu cầu kết bạn từ {friendProfile}",
+    "@request_friend_notification_body":{
         "placeholders" :{
-            "countFriend": 
+            "friendProfile": 
             {
-                "type" : "int"
+                "type" : "String"
             }
         }
     }

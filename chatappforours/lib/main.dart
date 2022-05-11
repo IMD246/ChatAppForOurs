@@ -1,21 +1,21 @@
 import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/crud/firebase_auth_provider.dart';
-import 'package:chatappforours/services/notification.dart/notification.dart';
 import 'package:chatappforours/utilities/theme/theme_data.dart';
 import 'package:chatappforours/view/welcome/welcome_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import 'dart:io';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService.fromSnapshot().initNotification();
   await Firebase.initializeApp();
+  await FirebaseMessaging.instance.requestPermission();
+  await FirebaseMessaging.instance.getInitialMessage();
   runApp(const StartApp());
 }
 
@@ -36,10 +36,16 @@ class _StartAppState extends State<StartApp> {
   }
 }
 
-class Material extends StatelessWidget {
+class Material extends StatefulWidget {
   const Material({
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<Material> createState() => _MaterialState();
+}
+
+class _MaterialState extends State<Material> {
   @override
   Widget build(BuildContext context) {
     final themeChanger = Provider.of<ThemeChanger>(context);

@@ -43,6 +43,13 @@ class ContactListView extends StatelessWidget {
                         );
                       },
                     );
+                  } else if (filledRequestFriend) {
+                    return Center(
+                      child: Text(
+                        context.loc.no_request_friend_available,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    );
                   } else {
                     return Center(
                       child: Text(

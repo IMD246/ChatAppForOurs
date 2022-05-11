@@ -39,10 +39,12 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   final player = AudioPlayer();
   bool isSelected = false;
   Future record() async {
+    isSelected = true;
     await recorder.startRecorder(toFile: 'audio');
   }
 
   Future stop() async {
+    isSelected = false;
     final path = await recorder.stopRecorder();
     setState(
       () {
@@ -120,12 +122,10 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                 if (recorder.isRecording && isSelected == true) {
                   setState(() {
                     stop();
-                    isSelected = false;
                   });
                 } else {
                   setState(() {
                     record();
-                    isSelected = true;
                   });
                 }
               },
@@ -145,9 +145,13 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                     Expanded(
                       child: TextField(
                         controller: textController,
-                        onTap: () async {
-                          if (recorder.isRecording) {
-                            await stop();
+                        onTap: () {
+                          if (isSelected) {
+                            setState(() {
+                              isSelected = false;
+                              recorder.stopRecorder();
+                              recorder.deleteRecord(fileName: 'audio');
+                            });
                           }
                         },
                         onChanged: (value) async {
@@ -185,7 +189,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                       ),
                     ),
                     const SizedBox(width: kDefaultPadding / 4),
-                    if (recorder.isRecording)
+                    if (isSelected)
                       StreamBuilder<RecordingDisposition>(
                         stream: recorder.onProgress,
                         builder: (context, snapshot) {

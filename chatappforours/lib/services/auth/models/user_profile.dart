@@ -9,9 +9,11 @@ class UserProfile {
   final String fullName;
   final String? urlImage;
   final String language;
+  final String? tokenUser;
   bool? isEmailVerified = false;
   bool isDarkMode = false;
   UserProfile({
+    required this.tokenUser,
     required this.language,
     this.idUser,
     required this.email,
@@ -34,5 +36,8 @@ class UserProfile {
         language: snapshot.data()?[languageField] != null
             ? snapshot.get(languageField)
             : Platform.localeName.substring(0, 2).toString(),
+        tokenUser: snapshot.data()?[tokenUserField] != null
+            ? snapshot.get(tokenUserField)
+            : null,
       );
 }

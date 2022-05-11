@@ -5,9 +5,6 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   NotificationService();
-  factory NotificationService.fromSnapshot() {
-    return NotificationService();
-  }
   Future<void> initNotification() async {
     const AndroidInitializationSettings androidInitializationSettings =
         AndroidInitializationSettings('@mipmap/ic_notification');
@@ -27,7 +24,7 @@ class NotificationService {
   }
 
   Future<void> showNotification(
-      int id, String title, String body, int seconds) async {
+      {required int id,required String title,required String body,required int seconds}) async {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       id,
       title,
@@ -37,8 +34,8 @@ class NotificationService {
       ),
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'main_channel',
-          "Main Channel",
+          'mychannel',
+          "My Channel",
           importance: Importance.max,
           priority: Priority.max,
           icon: '@mipmap/ic_notification',

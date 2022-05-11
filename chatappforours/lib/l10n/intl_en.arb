@@ -64,6 +64,7 @@
     "accept" : "Accept",
     "cancel" : "Cancel",
     "no_friend_available" : "No any friend",
+    "no_request_friend_available" : "No any request friend",
     "no_file_selected" : "No file selected",
     "update_user_profile" : "Update User Profile",
     "update_password" : "Update Password",
@@ -102,14 +103,15 @@
     "years" : "years",
     "photo" : "photo",
     "recording" : "Recording...",
+    "no_any_chat_ative": "No any chat active",
     "message_recording" : "sent 1 audio message",
     "request_friend_notification_title": "Request Friend Notification",
-    "request_friend_notification_body": "You Have {countFriend} Request Friend",
+    "request_friend_notification_body": "You Have Request Friend From {friendProfile}",
     "@request_friend_notification_body":{
         "placeholders" :{
-            "countFriend": 
+            "friendProfile": 
             {
-                "type" : "int"
+                "type" : "String"
             }
         }
     }

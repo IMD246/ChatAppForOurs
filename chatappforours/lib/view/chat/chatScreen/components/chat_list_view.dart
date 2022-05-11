@@ -1,4 +1,5 @@
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
@@ -102,6 +103,7 @@ class _ChatListViewState extends State<ChatListView> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return FutureBuilder<List<Chat>>(
       future: getAllDataChat(),
       builder: (context, snapshot) {
@@ -119,7 +121,19 @@ class _ChatListViewState extends State<ChatListView> {
             },
           );
         } else {
-          return Container();
+          return SizedBox(
+            height: size.height * 0.45,
+            width: size.width * 0.45,
+            child: Center(
+              child: Text(
+                context.loc.no_any_chat_ative,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          );
         }
       },
     );

@@ -124,6 +124,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             email: email,
             password: password,
           );
+          final token = await FirebaseAuth.instance.currentUser!.getIdToken();
           final userProfile = UserProfile(
             email: user.email!,
             fullName: event.fullName,
@@ -131,6 +132,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             isDarkMode: false,
             isEmailVerified: false,
             language: Platform.localeName.substring(0, 2).toString(),
+            tokenUser: token,
           );
           await authProvider.sendEmailVerification();
           final userProfileFirebase = FirebaseUserProfile();
@@ -345,13 +347,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             final getUserProfileVerify = await userProfileFirebase
                 .getUserProfileByEmail(email: user.email);
             if (getUserProfileVerify == null) {
+              final token =
+                  await FirebaseAuth.instance.currentUser!.getIdToken();
               final userProfile = UserProfile(
-                  email: user.email!,
-                  fullName: user.displayName!,
-                  urlImage: user.photoURL,
-                  isEmailVerified: true,
-                  isDarkMode: false,
-                  language: Platform.localeName.substring(0, 2).toString());
+                email: user.email!,
+                fullName: user.displayName!,
+                urlImage: user.photoURL,
+                isEmailVerified: true,
+                isDarkMode: false,
+                language: Platform.localeName.substring(0, 2).toString(),
+                tokenUser: token,
+              );
               await userProfileFirebase.createUserProfile(
                 userID: user.id!,
                 userProfile: userProfile,

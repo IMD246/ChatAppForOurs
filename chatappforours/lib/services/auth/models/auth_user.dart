@@ -8,8 +8,8 @@ class AuthUser {
   final bool? isEmailVerified;
   final String? displayName;
   final String? photoURL;
-  const AuthUser(
-      {this.displayName,
+  const AuthUser({
+      this.displayName,
       this.photoURL,
       required this.id,
       required this.email,
@@ -19,5 +19,5 @@ class AuthUser {
       email: user?.email,
       isEmailVerified: user!.emailVerified ? true : false,
       displayName: user.displayName ?? "",
-      photoURL: user.photoURL ?? "");
+      photoURL: user.photoURL ?? "",);
 }

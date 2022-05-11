@@ -6,12 +6,13 @@ import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
-import 'package:chatappforours/services/notification.dart/notification.dart';
+import 'package:chatappforours/services/notification/notification.dart';
 import 'package:chatappforours/view/chat/addFriend/add_friend_screen.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
 import 'package:chatappforours/view/chat/settings/setting_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -19,54 +20,47 @@ import 'package:timezone/data/latest.dart' as tz;
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
     Key? key,
-    required this.currentIndex,
-    this.countFriend = 0,
+    required this.countFriend,
   }) : super(key: key);
-  final int currentIndex;
   final int countFriend;
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  late int currentIndex;
+  int currentIndex = 0;
   final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
   final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
   String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
-    tz.initializeTimeZones();
-    currentIndex = widget.currentIndex;
-    setState(() {
-      firebaseUserProfile.updateUserPresenceDisconnect(
-        uid: ownerUserID,
-      );
-    });
+    setState(
+      () {
+        tz.initializeTimeZones();
+        final noti = NotificationService();
+        noti.initNotification();
+        FirebaseMessaging.onMessage.listen(
+          (event) {
+            if (event.notification != null) {
+              noti.showNotification(
+                id: 1,
+                title: context.loc.request_friend_notification_title,
+                body: context.loc.request_friend_notification_body(
+                  event.notification!.body!,
+                ),
+                seconds: 3,
+              );
+            }
+          },
+        );
+      },
+    );
     super.initState();
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    setState(
-      () {
-        if (widget.countFriend > 0) {
-          NotificationService.fromSnapshot().initNotification();
-          NotificationService().showNotification(
-            1,
-            context.loc.request_friend_notification_title,
-            context.loc.request_friend_notification_body(widget.countFriend),
-            3,
-          );
-        }
-      },
-    );
-
-    super.didChangeDependencies();
   }
 
   @override
@@ -150,9 +144,11 @@ class _ChatScreenState extends State<ChatScreen> {
             GestureDetector(
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) {
-                    return const SettingScreen();
-                  },),
+                  MaterialPageRoute(
+                    builder: (_) {
+                      return const SettingScreen();
+                    },
+                  ),
                 );
               },
               child: CircleAvatar(

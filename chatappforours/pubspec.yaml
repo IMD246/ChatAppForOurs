@@ -57,6 +57,7 @@ dependencies:
   provider: ^6.0.2
   shared_preferences: ^2.0.13
   flutter_lifecycle_state: ^1.0.0
+  firebase_messaging: ^11.3.0
   firebase_database: ^9.0.11
   scrollable_positioned_list: ^0.3.1
   flutter_keyboard_visibility: ^5.2.0
@@ -65,7 +66,8 @@ dependencies:
   audioplayers: ^0.20.1
   flutter_sound: ^9.2.12
   permission_handler: ^9.2.0
- 
+  http: ^0.13.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -92,7 +92,17 @@ class FirebaseUserProfile {
       await userProfilePath.doc(userID).update(mapUser);
     }
   }
-
+Future<void> updateTokenUserProfile({
+    required String? token,
+    required String? userID,
+  }) async {
+    if (userID != null) {
+      Map<String, dynamic> mapUser = <String, dynamic>{
+        tokenUserField:token
+      };
+      await userProfilePath.doc(userID).update(mapUser);
+    }
+  }
   Future<void> updateUserIsEmailVerified({
     required String? userID,
   }) async {
