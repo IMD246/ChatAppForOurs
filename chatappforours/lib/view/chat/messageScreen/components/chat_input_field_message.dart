@@ -1,9 +1,11 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
+import 'package:chatappforours/services/notification/send_message.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/send_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/upload_image_message.dart';
@@ -46,21 +48,45 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   Future stop() async {
     isSelected = false;
     final path = await recorder.stopRecorder();
-    setState(
-      () {
-        firebaseChatMessage.createAudioMessage(
-          userID: id,
-          chatID: widget.chat.idChat,
-        );
-        storage.uploadFileAudio(
-          filePath: path!,
-          firebaseChatMessage: firebaseChatMessage,
-          firebaseUserProfile: firebaseUserProfile,
-          idChat: widget.chat.idChat,
-          userOwnerID: id,
-        );
-      },
+
+    firebaseChatMessage.createAudioMessage(
+      userID: id,
+      chatID: widget.chat.idChat,
     );
+    storage.uploadFileAudio(
+      filePath: path!,
+      firebaseChatMessage: firebaseChatMessage,
+      firebaseUserProfile: firebaseUserProfile,
+      idChat: widget.chat.idChat,
+      userOwnerID: id,
+    );
+    final userIDFriend = widget.chat.listUser.first;
+    final ownerUserID = id;
+    if (userIDFriend.compareTo(ownerUserID) != 0) {
+      final userProfile = await firebaseUserProfile.getUserProfile(
+        userID: ownerUserID,
+      );
+      final userProfileFriend = await firebaseUserProfile.getUserProfile(
+        userID: userIDFriend,
+      );
+      final Map<String, dynamic> notification = {
+        'title': userProfile!.fullName,
+        'body': userProfile.fullName,
+      };
+      final Map<String, String> data = {
+        'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+        'id': widget.chat.idChat,
+        'fuType': TypeNotification.chat.toString(),
+        "sendById": ownerUserID,
+        "sendBy": userProfile.fullName,
+        'status': 'done',
+      };
+      sendMessage(
+        notification: notification,
+        tokenUserFriend: userProfileFriend!.tokenUser!,
+        data: data,
+      );
+    }
   }
 
   Future initRecorder() async {

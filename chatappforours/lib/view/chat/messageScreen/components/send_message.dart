@@ -1,5 +1,8 @@
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/notification/send_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/chat_input_field_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -23,16 +26,13 @@ class SendMessage extends StatefulWidget {
 }
 
 class _SendMessageState extends State<SendMessage> {
+  final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
   final String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   @override
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async {
-        // Map<String, String> map = <String, String>{
-        //   idSenderField: widget.id,
-        //   messageField: widget.textController.text,
-        //   urlImageField: widget.widget.chat.urlUserFriend ?? "",
-        // };
+        String message = widget.textController.text;
         setState(
           () {
             widget.firebaseChatMessage.deleteMessageNotSent(
@@ -44,31 +44,44 @@ class _SendMessageState extends State<SendMessage> {
               text: widget.textController.text,
               ownerUserID: widget.id,
             );
-            widget.textController.clear();
             if (widget.widget.scroll.isAttached) {
-              widget.widget.scroll.jumpTo(
+              widget.textController.clear();
+              widget.widget.scroll.scrollTo(
                 index: intMaxValue,
+                duration: const Duration(seconds: 3),
+                curve: Curves.easeIn,
               );
             }
           },
         );
-        // final chatMessage =
-        //     await widget.firebaseChatMessage.getLastMessageOfAChat(
-        //   chatID: widget.widget.chat.idChat,
-        //   ownerUserID: ownerUserID,
-        // );
-        // final token = await FirebaseAuth.instance.currentUser!.getIdToken();
-        // setState(() {
-        //   FirebaseMessaging.instance.getToken(vapidKey: token);
-        //   if (widget.widget.chat.listUser.first != widget.id) {
-        //     FirebaseMessaging.instance.sendMessage(
-        //       messageType: 'chat',
-        //       messageId: chatMessage!.idMessage,
-        //       data: map,
-        //       to: "widget.id",
-        //     );
-        //   }
-        // });
+        // Push notification to others in chat
+        final userIDFriend = widget.widget.chat.listUser.first;
+        final ownerUserID = widget.id;
+        if (userIDFriend.compareTo(ownerUserID) != 0) {
+          final userProfile = await firebaseUserProfile.getUserProfile(
+            userID: widget.id,
+          );
+          final userProfileFriend = await firebaseUserProfile.getUserProfile(
+            userID: userIDFriend,
+          );
+          final Map<String, dynamic> notification = {
+            'title': userProfile!.fullName,
+            'body': message,
+          };
+          final Map<String, String> data = {
+            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+            'id': widget.widget.chat.idChat,
+            'messageType': TypeNotification.chat.toString(),
+            "sendById": ownerUserID,
+            "sendBy": userProfile.fullName,
+            'status': 'done',
+          };
+          sendMessage(
+            notification: notification,
+            tokenUserFriend: userProfileFriend!.tokenUser!,
+            data: data,
+          );
+        }
       },
       icon: const Icon(Icons.send),
       color: Theme.of(context).primaryColor,

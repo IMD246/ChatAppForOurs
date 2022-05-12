@@ -4,15 +4,18 @@ import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
-import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/notification.dart';
+import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/addFriend/add_friend_screen.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
+import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:chatappforours/view/chat/settings/setting_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,7 +34,9 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   int currentIndex = 0;
   final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-  final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
+  final FirebaseChat firebaseChat = FirebaseChat();
+  final userPresenceDatabaseReference =
+      FirebaseDatabase.instance.ref('userPresence');
   String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
@@ -59,6 +64,56 @@ class _ChatScreenState extends State<ChatScreen> {
                   title: context.loc.accept_friend_notification_title,
                   body: context.loc.accept_friend_notification_body(
                     event.notification!.body!,
+                  ),
+                );
+              }
+            }
+          },
+        );
+        FirebaseMessaging.onMessageOpenedApp.listen(
+          (event) async {
+            if (event.notification != null && event.data.isNotEmpty) {
+              if (event.data['messageType'] ==
+                  TypeNotification.chat.toString()) {
+                final chat = await firebaseChat.getChatByID(
+                  idChat: event.data['id'],
+                  userChatID: event.data['sendById'],
+                );
+                String body = event.notification!.body!;
+
+                if (chat.typeMessage == TypeMessage.audio) {
+                  body = context.loc.message_recording;
+                }
+                if (chat.typeMessage == TypeMessage.image) {
+                  body =
+                      handleStringMessageLocalization(chat.lastText, context);
+                }
+
+                chat.nameChat = event.data['sendBy'];
+                await userPresenceDatabaseReference
+                    .child(event.data['sendById'])
+                    .once()
+                    .then(
+                  (event) {
+                    final data =
+                        Map<String, dynamic>.from(event.snapshot.value as Map);
+                    bool isOnline = data['presence'];
+                    final stampTimeUser =
+                        DateTime.tryParse(data['stamp_time'])!;
+                    chat.presence = isOnline;
+                    chat.stampTimeUser = stampTimeUser;
+                  },
+                );
+                noti.showNotification(
+                  id: 1,
+                  title: event.notification!.title!,
+                  body: body,
+                );
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) {
+                      return MesssageScreen(chat: chat);
+                    },
                   ),
                 );
               }

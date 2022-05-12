@@ -1,12 +1,11 @@
 import 'dart:convert';
 
-import 'package:chatappforours/enum/enum.dart';
 import 'package:http/http.dart' as http;
 
 sendMessage({
   required Map<String, dynamic> notification,
   required String tokenUserFriend,
-  required TypeNotification typeNotification,
+  required Map<String,String> data,
 }) async{
   String url = 'https://fcm.googleapis.com/fcm/send';
   String keyApp =
@@ -14,12 +13,6 @@ sendMessage({
   final headers = <String, String>{
     'Content-type': 'application/json',
     'Authorization': keyApp,
-  };
-  final Map<String, String> data = {
-    'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-    'id': '1',
-    'messageType': typeNotification.toString(),
-    'status': 'done',
   };
   try {
    await http.post(

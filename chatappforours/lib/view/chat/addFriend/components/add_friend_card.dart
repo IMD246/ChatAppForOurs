@@ -159,10 +159,16 @@ class _AddFriendCardState extends State<AddFriendCard> {
                       'body': userProfile!.fullName,
                       'title': userProfile.idUser,
                     };
+                    final Map<String, String> data = {
+                      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                      'id': '1',
+                      'messageType': TypeNotification.addFriend.toString(),
+                      'status': 'done',
+                    };
                     sendMessage(
                       notification: notifcation,
                       tokenUserFriend: widget.userProfile.tokenUser!,
-                      typeNotification: TypeNotification.addFriend,
+                      data: data,
                     );
                   }
                 }

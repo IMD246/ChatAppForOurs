@@ -1,12 +1,14 @@
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
+import 'package:chatappforours/services/notification/send_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/chat_input_field_message.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-class UploadImageMessage extends StatelessWidget {
+class UploadImageMessage extends StatefulWidget {
   const UploadImageMessage({
     Key? key,
     required this.firebaseChatMessage,
@@ -23,6 +25,11 @@ class UploadImageMessage extends StatelessWidget {
   final FirebaseUserProfile firebaseUserProfile;
 
   @override
+  State<UploadImageMessage> createState() => _UploadImageMessageState();
+}
+
+class _UploadImageMessageState extends State<UploadImageMessage> {
+  @override
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async {
@@ -33,30 +40,62 @@ class UploadImageMessage extends StatelessWidget {
         );
         if (results == null) {
         } else {
-          await firebaseChatMessage.createImageMessage(
-            userID: id,
-            chatID: widget.chat.idChat,
+          await widget.firebaseChatMessage.createImageMessage(
+            userID: widget.id,
+            chatID: widget.widget.chat.idChat,
           );
           final lastMessageUserOwner =
-              await firebaseChatMessage.getImageMessageNotSentOwnerUser(
-            userID: id,
-            chatID: widget.chat.idChat,
+              await widget.firebaseChatMessage.getImageMessageNotSentOwnerUser(
+            userID: widget.id,
+            chatID: widget.widget.chat.idChat,
           );
-          await storage.uploadMultipleFile(
-            listFile: results.files,
-            idChat: widget.chat.idChat,
-            firebaseChatMessage: firebaseChatMessage,
-            firebaseUserProfile: firebaseUserProfile,
-            lastMessageUserOwner: lastMessageUserOwner,
-            context: context,
+          setState(
+            () {
+              widget.storage.uploadMultipleFile(
+                listFile: results.files,
+                idChat: widget.widget.chat.idChat,
+                firebaseChatMessage: widget.firebaseChatMessage,
+                firebaseUserProfile: widget.firebaseUserProfile,
+                lastMessageUserOwner: lastMessageUserOwner,
+                context: context,
+              );
+              if (widget.widget.scroll.isAttached) {
+                widget.widget.scroll.scrollTo(
+                  index: intMaxValue,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeIn,
+                );
+              }
+            },
           );
-          if (widget.scroll.isAttached) {
-            widget.scroll.scrollTo(
-              index: intMaxValue,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeIn,
-            );
-          }
+        }
+        final userIDFriend = widget.widget.chat.listUser.first;
+        final ownerUserID = widget.id;
+        if (userIDFriend.compareTo(ownerUserID) != 0) {
+          final userProfile = await widget.firebaseUserProfile.getUserProfile(
+            userID: ownerUserID,
+          );
+          final userProfileFriend =
+              await widget.firebaseUserProfile.getUserProfile(
+            userID: userIDFriend,
+          );
+          final Map<String, dynamic> notification = {
+            'title': userProfile!.fullName,
+            'body': userProfile.fullName,
+          };
+          final Map<String, String> data = {
+            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+            'id': widget.widget.chat.idChat,
+            'messageType': TypeNotification.chat.toString(),
+            "sendById": ownerUserID,
+            "sendBy": userProfile.fullName,
+            'status': 'done',
+          };
+          sendMessage(
+            notification: notification,
+            tokenUserFriend: userProfileFriend!.tokenUser!,
+            data: data,
+          );
         }
       },
       icon: const Icon(Icons.photo),

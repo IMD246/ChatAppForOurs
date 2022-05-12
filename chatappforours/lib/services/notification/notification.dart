@@ -23,14 +23,17 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  Future<void> showNotification(
-      {required int id,required String title,required String body}) async {
+  Future<void> showNotification({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       id,
       title,
       body,
       tz.TZDateTime.now(tz.local).add(
-       const Duration(seconds: 1),
+        const Duration(seconds: 1),
       ),
       const NotificationDetails(
         android: AndroidNotificationDetails(

@@ -19,7 +19,10 @@ Future<void> _firebaseMessagingBackgroundHandler(
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseMessaging.instance.requestPermission();
+  await FirebaseMessaging.instance.requestPermission(
+    alert: false,
+    badge: false,
+  );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const StartApp());
 }

@@ -202,7 +202,7 @@ class _ContactCardState extends State<ContactCard> {
                                             .getUserProfile(
                                       userID: id,
                                     );
-                                     final userProfileFriend =
+                                    final userProfileFriend =
                                         await firebaseUserProfile
                                             .getUserProfile(
                                       userID: widget.friend.userID,
@@ -211,11 +211,20 @@ class _ContactCardState extends State<ContactCard> {
                                       'title': id,
                                       'body': userProfile!.fullName
                                     };
+                                    final Map<String, String> data = {
+                                      'click_action':
+                                          'FLUTTER_NOTIFICATION_CLICK',
+                                      'id': '1',
+                                      'messageType': TypeNotification
+                                          .acceptFriend
+                                          .toString(),
+                                      'status': 'done',
+                                    };
                                     sendMessage(
                                       notification: notification,
-                                      tokenUserFriend: userProfileFriend!.tokenUser!,
-                                      typeNotification:
-                                          TypeNotification.acceptFriend,
+                                      tokenUserFriend:
+                                          userProfileFriend!.tokenUser!,
+                                      data: data,
                                     );
                                   }
                                 },
