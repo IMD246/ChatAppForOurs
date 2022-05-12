@@ -11,6 +11,7 @@ import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+
 class AddFriendCard extends StatefulWidget {
   const AddFriendCard({
     Key? key,
@@ -150,9 +151,13 @@ class _AddFriendCardState extends State<AddFriendCard> {
                     userIDFriend: ownerUserID,
                   );
                   if (widget.userProfile.idUser!.compareTo(ownerUserID) != 0) {
+                    final userProfile =
+                        await firebaseUserProfile.getUserProfile(
+                      userID: ownerUserID,
+                    );
                     final notifcation = <String, dynamic>{
-                      'body': widget.userProfile.fullName,
-                      'title': widget.userProfile.idUser,
+                      'body': userProfile!.fullName,
+                      'title': userProfile.idUser,
                     };
                     sendMessage(
                       notification: notifcation,

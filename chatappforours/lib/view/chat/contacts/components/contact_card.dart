@@ -202,13 +202,18 @@ class _ContactCardState extends State<ContactCard> {
                                             .getUserProfile(
                                       userID: id,
                                     );
+                                     final userProfileFriend =
+                                        await firebaseUserProfile
+                                            .getUserProfile(
+                                      userID: widget.friend.userID,
+                                    );
                                     final Map<String, dynamic> notification = {
                                       'title': id,
                                       'body': userProfile!.fullName
                                     };
                                     sendMessage(
                                       notification: notification,
-                                      tokenUserFriend: userProfile.tokenUser!,
+                                      tokenUserFriend: userProfileFriend!.tokenUser!,
                                       typeNotification:
                                           TypeNotification.acceptFriend,
                                     );
