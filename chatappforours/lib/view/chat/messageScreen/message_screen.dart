@@ -67,13 +67,16 @@ class _MesssageScreenState extends State<MesssageScreen> {
   AppBar buildAppbar(Chat chat, ThemeMode themeMode, BuildContext context) {
     final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
     final String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
-    final String userIDFriend;
+    final String? userIDFriend;
 
     if (chat.listUser.length > 1 && chat.listUser[0] == chat.listUser[1]) {
       chat.listUser.removeAt(1);
       userIDFriend = chat.listUser.first;
-    } else {
+    } else if (chat.listUser.length > 1 &&
+        chat.listUser[0] != chat.listUser[1]) {
       chat.listUser.remove(ownerUserID);
+      userIDFriend = chat.listUser.first;
+    } else {
       userIDFriend = chat.listUser.first;
     }
 
