@@ -20,10 +20,8 @@ class MesssageScreen extends StatefulWidget {
   const MesssageScreen({
     Key? key,
     required this.chat,
-    required this.currentIndex,
   }) : super(key: key);
   final Chat chat;
-  final int currentIndex;
   @override
   State<MesssageScreen> createState() => _MesssageScreenState();
 }
@@ -70,12 +68,15 @@ class _MesssageScreenState extends State<MesssageScreen> {
     final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
     final String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
     final String userIDFriend;
-    if (chat.listUser[0] == ownerUserID) {
-      userIDFriend = ownerUserID;
+
+    if (chat.listUser.length > 1 && chat.listUser[0] == chat.listUser[1]) {
+      chat.listUser.removeAt(1);
+      userIDFriend = chat.listUser.first;
     } else {
-      userIDFriend =
-          (chat.listUser.where((element) => element != ownerUserID)).first;
+      chat.listUser.remove(ownerUserID);
+      userIDFriend = chat.listUser.first;
     }
+
     return AppBar(
       automaticallyImplyLeading: false,
       title: FutureBuilder<UserProfile?>(

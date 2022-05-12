@@ -48,7 +48,6 @@ class _ChatCardState extends State<ChatCard> {
             builder: (context) {
               return MesssageScreen(
                 chat: widget.chat,
-                currentIndex: 0,
               );
             },
           ),

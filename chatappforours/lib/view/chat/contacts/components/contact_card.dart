@@ -85,7 +85,6 @@ class _ContactCardState extends State<ContactCard> {
                     builder: (_) {
                       return MesssageScreen(
                         chat: chat,
-                        currentIndex: 1,
                       );
                     },
                   ),
