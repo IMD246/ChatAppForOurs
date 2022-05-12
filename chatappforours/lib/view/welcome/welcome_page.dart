@@ -91,6 +91,7 @@ class _WelcomePageState extends State<WelcomePage> {
                     Image.asset(
                       "assets/images/welcome_image.png",
                       height: size.height * 0.45,
+                      width: size.width,
                     ),
                   const Spacer(flex: 2),
                   Text(

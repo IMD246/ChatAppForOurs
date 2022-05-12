@@ -5,7 +5,7 @@ import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
-import 'package:chatappforours/services/notification/send_message.dart';
+import 'package:chatappforours/services/notification/send_notification_message.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -164,6 +164,8 @@ class _AddFriendCardState extends State<AddFriendCard> {
                       'id': '1',
                       'messageType': TypeNotification.addFriend.toString(),
                       'status': 'done',
+                      'image': userProfile.urlImage ??
+                          "https://i.stack.imgur.com/l60Hf.png",
                     };
                     sendMessage(
                       notification: notifcation,

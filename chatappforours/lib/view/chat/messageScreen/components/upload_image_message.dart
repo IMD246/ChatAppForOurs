@@ -3,7 +3,7 @@ import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
-import 'package:chatappforours/services/notification/send_message.dart';
+import 'package:chatappforours/services/notification/send_notification_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/chat_input_field_message.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -89,6 +89,8 @@ class _UploadImageMessageState extends State<UploadImageMessage> {
             'messageType': TypeNotification.chat.toString(),
             "sendById": ownerUserID,
             "sendBy": userProfile.fullName,
+             'image': userProfile.urlImage ??
+                          "https://i.stack.imgur.com/l60Hf.png",
             'status': 'done',
           };
           sendMessage(

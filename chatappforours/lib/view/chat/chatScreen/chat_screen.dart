@@ -8,6 +8,7 @@ import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/notification.dart';
+import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/addFriend/add_friend_screen.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
@@ -46,25 +47,31 @@ class _ChatScreenState extends State<ChatScreen> {
         final noti = NotificationService();
         noti.initNotification();
         FirebaseMessaging.onMessage.listen(
-          (event) {
+          (event) async {
             if (event.notification != null && event.data.isNotEmpty) {
               if (event.data['messageType'] ==
                   TypeNotification.addFriend.toString()) {
+                final largeIconPath = await UtilsDownloadFile.downloadFile(
+                    event.data['image'], 'largeIcon');
                 noti.showNotification(
                   id: 1,
                   title: context.loc.request_friend_notification_title,
                   body: context.loc.request_friend_notification_body(
                     event.notification!.body!,
                   ),
+                  urlImage: largeIconPath,
                 );
               } else if (event.data['messageType'] ==
                   TypeNotification.acceptFriend.toString()) {
+                final largeIconPath = await UtilsDownloadFile.downloadFile(
+                    event.data['image'], 'largeIcon');
                 noti.showNotification(
                   id: 1,
                   title: context.loc.accept_friend_notification_title,
                   body: context.loc.accept_friend_notification_body(
                     event.notification!.body!,
                   ),
+                  urlImage: largeIconPath,
                 );
               }
             }
@@ -79,6 +86,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   idChat: event.data['id'],
                   userChatID: event.data['sendById'],
                 );
+                final largeIconPath = await UtilsDownloadFile.downloadFile(
+                    event.data['image'], 'largeIcon');
                 String body = event.notification!.body!;
 
                 if (chat.typeMessage == TypeMessage.audio) {
@@ -88,7 +97,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   body =
                       handleStringMessageLocalization(chat.lastText, context);
                 }
-
                 chat.nameChat = event.data['sendBy'];
                 await userPresenceDatabaseReference
                     .child(event.data['sendById'])
@@ -108,6 +116,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   id: 1,
                   title: event.notification!.title!,
                   body: body,
+                  urlImage: largeIconPath,
                 );
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -128,6 +137,11 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override

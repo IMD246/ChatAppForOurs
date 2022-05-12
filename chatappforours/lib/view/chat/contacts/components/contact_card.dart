@@ -10,7 +10,7 @@ import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart'
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
-import 'package:chatappforours/services/notification/send_message.dart';
+import 'package:chatappforours/services/notification/send_notification_message.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
@@ -215,6 +215,8 @@ class _ContactCardState extends State<ContactCard> {
                                       'click_action':
                                           'FLUTTER_NOTIFICATION_CLICK',
                                       'id': '1',
+                                      'image': userProfile.urlImage ??
+                                          "https://i.stack.imgur.com/l60Hf.png",
                                       'messageType': TypeNotification
                                           .acceptFriend
                                           .toString(),

@@ -5,7 +5,7 @@ import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
-import 'package:chatappforours/services/notification/send_message.dart';
+import 'package:chatappforours/services/notification/send_notification_message.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/send_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/upload_image_message.dart';
@@ -79,6 +79,8 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
         'fuType': TypeNotification.chat.toString(),
         "sendById": ownerUserID,
         "sendBy": userProfile.fullName,
+         'image': userProfile.urlImage ??
+                          "https://i.stack.imgur.com/l60Hf.png",
         'status': 'done',
       };
       sendMessage(
