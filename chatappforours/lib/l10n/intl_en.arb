@@ -114,5 +114,15 @@
                 "type" : "String"
             }
         }
+    },
+    "accept_friend_notification_title": "Accept Friend Notification",
+    "accept_friend_notification_body": "You and {friendFullName} is friend now!",
+    "@accept_friend_notification_body":{
+        "placeholders" :{
+            "friendFullName": 
+            {
+                "type" : "String"
+            }
+        }
     }
 }

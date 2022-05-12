@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
@@ -41,15 +42,26 @@ class _ChatScreenState extends State<ChatScreen> {
         noti.initNotification();
         FirebaseMessaging.onMessage.listen(
           (event) {
-            if (event.notification != null) {
-              noti.showNotification(
-                id: 1,
-                title: context.loc.request_friend_notification_title,
-                body: context.loc.request_friend_notification_body(
-                  event.notification!.body!,
-                ),
-                seconds: 3,
-              );
+            if (event.notification != null && event.data.isNotEmpty) {
+              if (event.data['messageType'] ==
+                  TypeNotification.addFriend.toString()) {
+                noti.showNotification(
+                  id: 1,
+                  title: context.loc.request_friend_notification_title,
+                  body: context.loc.request_friend_notification_body(
+                    event.notification!.body!,
+                  ),
+                );
+              } else if (event.data['messageType'] ==
+                  TypeNotification.acceptFriend.toString()) {
+                noti.showNotification(
+                  id: 1,
+                  title: context.loc.accept_friend_notification_title,
+                  body: context.loc.accept_friend_notification_body(
+                    event.notification!.body!,
+                  ),
+                );
+              }
             }
           },
         );
@@ -62,6 +74,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void dispose() {
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(

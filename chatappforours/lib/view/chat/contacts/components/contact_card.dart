@@ -10,6 +10,7 @@ import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart'
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
+import 'package:chatappforours/services/notification/send_message.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
@@ -80,6 +81,7 @@ class _ContactCardState extends State<ContactCard> {
                 final userProfileFriend = await firebaseUserProfile
                     .getUserProfile(userID: widget.friend.userID);
                 chat.nameChat = userProfileFriend!.fullName;
+
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) {
@@ -194,6 +196,23 @@ class _ContactCardState extends State<ContactCard> {
                                     typeChat: TypeChat.normal,
                                     listUserID: [id, widget.friend.userID],
                                   );
+                                  if (widget.friend.userID.compareTo(id) != 0) {
+                                    final userProfile =
+                                        await firebaseUserProfile
+                                            .getUserProfile(
+                                      userID: id,
+                                    );
+                                    final Map<String, dynamic> notification = {
+                                      'title': id,
+                                      'body': userProfile!.fullName
+                                    };
+                                    sendMessage(
+                                      notification: notification,
+                                      tokenUserFriend: userProfile.tokenUser!,
+                                      typeNotification:
+                                          TypeNotification.acceptFriend,
+                                    );
+                                  }
                                 },
                                 text: context.loc.accept,
                               ),

@@ -114,5 +114,15 @@
                 "type" : "String"
             }
         }
+    },
+    "accept_friend_notification_title": "Thông báo chấp nhận kết bạn",
+    "accept_friend_notification_body": "Bạn và {friendFullName} bây giờ đã là bạn!",
+    "@accept_friend_notification_body":{
+        "placeholders" :{
+            "friendFullName": 
+            {
+                "type" : "String"
+            }
+        }
     }
 }
