@@ -43,6 +43,7 @@ class _ChatScreenState extends State<ChatScreen> {
     pageController = PageController(initialPage: currentIndex);
     setState(
       () {
+        firebaseUserProfile.updateUserPresenceDisconnect(uid: ownerUserID);
         tz.initializeTimeZones();
         final noti = NotificationService();
         noti.initNotification();

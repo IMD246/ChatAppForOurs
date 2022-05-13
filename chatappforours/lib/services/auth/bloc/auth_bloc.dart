@@ -36,6 +36,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           } else {
             if (user != null) {
               if (user.isEmailVerified == true) {
+                await firebaseUserProfile.updateUserPresenceDisconnect(
+                    uid: user.id!);
                 emit(
                   AuthStateLoggedIn(userProfile: userProfile, isLoading: false),
                 );

@@ -32,10 +32,6 @@ class _MesssageScreenState extends State<MesssageScreen> {
   String userOwnerID = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
-    firebaseUserProfile.updateUserPresence(
-      uid: userOwnerID,
-      bool: true,
-    );
     super.initState();
   }
 
