@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
@@ -87,7 +89,7 @@ class _ChatScreenState extends State<ChatScreen> {
       },
     );
     FirebaseMessaging.onMessageOpenedApp.listen(
-      (event) async {g
+      (event) async {
         if (event.data['messageType'] ==
             TypeNotification.addFriend.toString()) {
           await noti.showNotification(
@@ -107,24 +109,15 @@ class _ChatScreenState extends State<ChatScreen> {
             urlImage: event.data['image'],
           );
         } else {
+          Map<String, dynamic> temp = jsonDecode(event.data['chat']);
           final chat = await firebaseChat.getChatByID(
-            idChat: event.data['id'],
+            idChat: temp['idChat'],
             userChatID: event.data['sendById'],
           );
           chat.nameChat = event.data['sendBy'];
-          await userPresenceDatabaseReference
-              .child(event.data['sendById'])
-              .once()
-              .then(
-            (event) {
-              final data =
-                  Map<String, dynamic>.from(event.snapshot.value as Map);
-              bool isOnline = data['presence'];
-              final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
-              chat.presence = isOnline;
-              chat.stampTimeUser = stampTimeUser;
-            },
-          );
+          chat.presence = temp['presence'];
+          chat.stampTimeUser = DateTime.parse(temp['stampTimeUser']);
+          chat.listUser.remove(event.data['sendById']);
           await noti.showNotification(
             id: 1,
             title: event.notification!.title!,

@@ -92,12 +92,17 @@ class _UploadImageMessageState extends State<UploadImageMessage> {
               urlImage,
               'largeIcon',
             );
-            final Map<String, String> data = {
+            final Map<String, dynamic> data = {
               'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-              'id': widget.widget.chat.idChat,
+              'id': 1,
               'messageType': TypeNotification.chat.toString(),
               "sendById": ownerUserID,
               "sendBy": userProfile.fullName,
+              "chat": <String, dynamic>{
+                "idChat": widget.widget.chat.idChat,
+                "presence": widget.widget.chat.presence,
+                "stampTimeUser": widget.widget.chat.stampTimeUser.toString(),
+              },
               'image': largeIconPath,
               'status': 'done',
             };

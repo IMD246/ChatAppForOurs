@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 sendMessage({
   required Map<String, dynamic> notification,
   required String tokenUserFriend,
-  required Map<String,String> data,
+  required Map<String,dynamic> data,
 }) async{
   String url = 'https://fcm.googleapis.com/fcm/send';
   String keyApp =

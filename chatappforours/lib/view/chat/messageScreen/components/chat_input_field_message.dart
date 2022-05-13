@@ -91,12 +91,17 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
         urlImage,
         'largeIcon',
       );
-      final Map<String, String> data = {
+      final Map<String, dynamic> data = {
         'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-        'id': widget.chat.idChat,
-        'fuType': TypeNotification.chat.toString(),
+        'id': 1,
+        'messageType': TypeNotification.chat.toString(),
         "sendById": ownerUserID,
         "sendBy": userProfile.fullName,
+        "chat": <String, dynamic>{
+          "idChat": widget.chat.idChat,
+          "presence": widget.chat.presence,
+          "stampTimeUser": widget.chat.stampTimeUser.toString(),
+        },
         'image': largeIconPath,
         'status': 'done',
       };
