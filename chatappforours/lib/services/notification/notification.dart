@@ -36,13 +36,12 @@ class NotificationService {
       tz.TZDateTime.now(tz.local).add(
         const Duration(seconds: 1),
       ),
-       NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           'mychannel',
           "My Channel",
           importance: Importance.max,
           priority: Priority.max,
-          icon: '@mipmap/ic_notification',
           largeIcon: FilePathAndroidBitmap(urlImage),
           channelDescription: "Main Channel Notifiaction",
         ),
@@ -56,7 +55,6 @@ class NotificationService {
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       androidAllowWhileIdle: true,
-      payload: ""
     );
   }
 }

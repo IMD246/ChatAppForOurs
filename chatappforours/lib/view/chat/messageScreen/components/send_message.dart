@@ -6,7 +6,6 @@ import 'package:chatappforours/services/notification/send_notification_message.d
 import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/chat_input_field_message.dart';
 import 'package:flutter/material.dart';
-
 class SendMessage extends StatefulWidget {
   const SendMessage({
     Key? key,

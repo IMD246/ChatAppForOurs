@@ -42,6 +42,17 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     pageController = PageController(initialPage: currentIndex);
     firebaseUserProfile.updateUserPresenceDisconnect(uid: ownerUserID);
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
     tz.initializeTimeZones();
     final noti = NotificationService();
     noti.initNotification();
@@ -75,8 +86,8 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       },
     );
-    FirebaseMessaging.onBackgroundMessage(
-      (event) async {
+    FirebaseMessaging.onMessageOpenedApp.listen(
+      (event) async {g
         if (event.data['messageType'] ==
             TypeNotification.addFriend.toString()) {
           await noti.showNotification(
@@ -130,12 +141,7 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       },
     );
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
+    super.didChangeDependencies();
   }
 
   @override

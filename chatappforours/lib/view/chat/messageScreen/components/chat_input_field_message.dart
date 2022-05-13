@@ -9,6 +9,7 @@ import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
+import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/send_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/upload_image_message.dart';
@@ -84,13 +85,19 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
           context: context,
         ),
       };
+      final urlImage =
+          userProfile.urlImage ?? "https://i.stack.imgur.com/l60Hf.png";
+      final largeIconPath = await UtilsDownloadFile.downloadFile(
+        urlImage,
+        'largeIcon',
+      );
       final Map<String, String> data = {
         'click_action': 'FLUTTER_NOTIFICATION_CLICK',
         'id': widget.chat.idChat,
         'fuType': TypeNotification.chat.toString(),
         "sendById": ownerUserID,
         "sendBy": userProfile.fullName,
-        'image': userProfile.urlImage ?? "https://i.stack.imgur.com/l60Hf.png",
+        'image': largeIconPath,
         'status': 'done',
       };
       sendMessage(
