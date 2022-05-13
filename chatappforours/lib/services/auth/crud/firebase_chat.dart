@@ -121,7 +121,7 @@ class FirebaseChat {
                   },
                 );
               } else {
-                return await null;
+                return null;
               }
             },
           );

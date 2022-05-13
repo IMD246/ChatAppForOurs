@@ -64,8 +64,8 @@ dependencies:
   firebase_messaging_platform_interface: ^3.4.0
   flutter_local_notifications: ^9.5.2
   audioplayers: ^0.20.1
-  flutter_sound: ^9.2.12
   permission_handler: ^9.2.0
+  flutter_sound_lite: ^8.5.0
   http: ^0.13.4
 
 dev_dependencies:

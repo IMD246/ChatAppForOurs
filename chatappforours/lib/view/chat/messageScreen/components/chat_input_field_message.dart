@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/extensions/locallization.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
@@ -11,7 +12,7 @@ import 'package:chatappforours/view/chat/messageScreen/components/send_message.d
 import 'package:chatappforours/view/chat/messageScreen/components/upload_image_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/public/flutter_sound_recorder.dart';
+import 'package:flutter_sound_lite/public/flutter_sound_recorder.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -36,24 +37,23 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   late final FirebaseChatMessage firebaseChatMessage;
   late final FirebaseUserProfile firebaseUserProfile;
   String id = FirebaseAuth.instance.currentUser!.uid;
+  final FirebaseChat firebaseChat = FirebaseChat();
   late final Storage storage;
   final recorder = FlutterSoundRecorder();
   final player = AudioPlayer();
   bool isSelected = false;
   Future record() async {
-    isSelected = true;
     await recorder.startRecorder(toFile: 'audio');
   }
 
   Future stop() async {
-    isSelected = false;
     final path = await recorder.stopRecorder();
 
-    firebaseChatMessage.createAudioMessage(
+    await firebaseChatMessage.createAudioMessage(
       userID: id,
       chatID: widget.chat.idChat,
     );
-    storage.uploadFileAudio(
+    await storage.uploadFileAudio(
       filePath: path!,
       firebaseChatMessage: firebaseChatMessage,
       firebaseUserProfile: firebaseUserProfile,
@@ -63,6 +63,10 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
     final userIDFriend = widget.chat.listUser.first;
     final ownerUserID = id;
     if (userIDFriend.compareTo(ownerUserID) != 0) {
+      final chat = await firebaseChat.getChatByID(
+        idChat: widget.chat.idChat,
+        userChatID: ownerUserID,
+      );
       final userProfile = await firebaseUserProfile.getUserProfile(
         userID: ownerUserID,
       );
@@ -71,7 +75,11 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
       );
       final Map<String, dynamic> notification = {
         'title': userProfile!.fullName,
-        'body': userProfile.fullName,
+        'body': getStringMessageByTypeMessage(
+          typeMessage: chat.typeMessage,
+          value: chat.lastText,
+          context: context,
+        ),
       };
       final Map<String, String> data = {
         'click_action': 'FLUTTER_NOTIFICATION_CLICK',
@@ -79,8 +87,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
         'fuType': TypeNotification.chat.toString(),
         "sendById": ownerUserID,
         "sendBy": userProfile.fullName,
-         'image': userProfile.urlImage ??
-                          "https://i.stack.imgur.com/l60Hf.png",
+        'image': userProfile.urlImage ?? "https://i.stack.imgur.com/l60Hf.png",
         'status': 'done',
       };
       sendMessage(
@@ -96,7 +103,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
     if (status != PermissionStatus.granted) {
       throw 'Microphone permission not granted';
     }
-    await recorder.openRecorder();
+    await recorder.openAudioSession();
   }
 
   @override
@@ -112,7 +119,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   void dispose() {
     textController.clear();
     textController.dispose();
-    recorder.closeRecorder();
+    recorder.closeAudioSession();
     firebaseChatMessage.deleteMessageNotSent(
       ownerUserID: id,
       chatID: widget.chat.idChat,
@@ -147,13 +154,15 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
             IconButton(
               onPressed: () async {
                 await initRecorder();
-                if (recorder.isRecording && isSelected == true) {
+                if (recorder.isRecording && isSelected) {
                   setState(() {
                     stop();
+                    isSelected = false;
                   });
                 } else {
                   setState(() {
                     record();
+                    isSelected = true;
                   });
                 }
               },
@@ -206,7 +215,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                         maxLines: 5,
                         keyboardType: TextInputType.multiline,
                         decoration: InputDecoration(
-                          hintText: recorder.isRecording
+                          hintText: isSelected
                               ? context.loc.recording
                               : context.loc.type_message,
                           hintStyle: TextStyle(
@@ -221,10 +230,15 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                       StreamBuilder<RecordingDisposition>(
                         stream: recorder.onProgress,
                         builder: (context, snapshot) {
-                          final duration = snapshot.hasData
-                              ? snapshot.data!.duration
-                              : Duration.zero;
-                          return Text("${formatTime(duration)} s");
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.active:
+                              final duration =
+                                  snapshot.data?.duration ?? Duration.zero;
+
+                              return Text("${formatTime(duration)} s");
+                            default:
+                              return Text("${formatTime(Duration.zero)} s");
+                          }
                         },
                       )
                     else

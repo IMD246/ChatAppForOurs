@@ -144,12 +144,6 @@ class _AddFriendCardState extends State<AddFriendCard> {
               minWidth: size.width * 0.2,
               press: () async {
                 if (isAdded == false) {
-                  setState(() {
-                    firebaseFriendList.createNewFriendDefault(
-                      ownerUserID: widget.userProfile.idUser!,
-                      userIDFriend: ownerUserID,
-                    );
-                  });
                   final userProfile = await firebaseUserProfile.getUserProfile(
                     userID: ownerUserID,
                   );
@@ -163,7 +157,6 @@ class _AddFriendCardState extends State<AddFriendCard> {
                       "https://i.stack.imgur.com/l60Hf.png";
                   final largeIconPath = await UtilsDownloadFile.downloadFile(
                       urlImage, 'largeIcon');
-
                   if (widget.userProfile.idUser!.compareTo(ownerUserID) != 0) {
                     final Map<String, String> data = {
                       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
@@ -172,12 +165,18 @@ class _AddFriendCardState extends State<AddFriendCard> {
                       'status': 'done',
                       'image': largeIconPath,
                     };
-                    sendMessage(
+                   await sendMessage(
                       notification: notifcation,
                       tokenUserFriend: widget.userProfile.tokenUser!,
                       data: data,
                     );
                   }
+                  setState(() {
+                    firebaseFriendList.createNewFriendDefault(
+                      ownerUserID: widget.userProfile.idUser!,
+                      userIDFriend: ownerUserID,
+                    );
+                  });
                 }
               },
               text: isAdded ? context.loc.added : context.loc.add,

@@ -84,7 +84,7 @@ class _SendMessageState extends State<SendMessage> {
             'image': largeIconPath,
             'status': 'done',
           };
-          sendMessage(
+          await sendMessage(
             notification: notification,
             tokenUserFriend: userProfileFriend!.tokenUser!,
             data: data,

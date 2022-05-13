@@ -205,21 +205,12 @@ class _ContactCardState extends State<ContactCard> {
                                   final largeIconPath =
                                       await UtilsDownloadFile.downloadFile(
                                           urlImage, 'largeIcon');
-                                  await firebaseFriendList.updateRequestFriend(
-                                    ownerUserID: id,
-                                    userID: widget.friend.userID,
-                                  );
-                                  await firebaseChat.createChat(
-                                    typeChat: TypeChat.normal,
-                                    listUserID: [id, widget.friend.userID],
-                                  );
                                   if (widget.friend.userID.compareTo(id) != 0) {
                                     final userProfileFriend =
                                         await firebaseUserProfile
                                             .getUserProfile(
                                       userID: widget.friend.userID,
                                     );
-
                                     final Map<String, String> data = {
                                       'click_action':
                                           'FLUTTER_NOTIFICATION_CLICK',
@@ -237,6 +228,14 @@ class _ContactCardState extends State<ContactCard> {
                                       data: data,
                                     );
                                   }
+                                  await firebaseFriendList.updateRequestFriend(
+                                    ownerUserID: id,
+                                    userID: widget.friend.userID,
+                                  );
+                                  await firebaseChat.createChat(
+                                    typeChat: TypeChat.normal,
+                                    listUserID: [id, widget.friend.userID],
+                                  );
                                 },
                                 text: context.loc.accept,
                               ),

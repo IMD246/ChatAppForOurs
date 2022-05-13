@@ -1,9 +1,12 @@
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
+import 'package:chatappforours/services/notification/utils_download_file.dart';
+import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/chat_input_field_message.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +32,7 @@ class UploadImageMessage extends StatefulWidget {
 }
 
 class _UploadImageMessageState extends State<UploadImageMessage> {
+  final FirebaseChat firebaseChat = FirebaseChat();
   @override
   Widget build(BuildContext context) {
     return IconButton(
@@ -49,55 +53,59 @@ class _UploadImageMessageState extends State<UploadImageMessage> {
             userID: widget.id,
             chatID: widget.widget.chat.idChat,
           );
-          setState(
-            () {
-              widget.storage.uploadMultipleFile(
-                listFile: results.files,
-                idChat: widget.widget.chat.idChat,
-                firebaseChatMessage: widget.firebaseChatMessage,
-                firebaseUserProfile: widget.firebaseUserProfile,
-                lastMessageUserOwner: lastMessageUserOwner,
-                context: context,
-              );
-              if (widget.widget.scroll.isAttached) {
-                widget.widget.scroll.scrollTo(
-                  index: intMaxValue,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeIn,
-                );
-              }
-            },
+
+          await widget.storage.uploadMultipleFile(
+            listFile: results.files,
+            idChat: widget.widget.chat.idChat,
+            firebaseChatMessage: widget.firebaseChatMessage,
+            firebaseUserProfile: widget.firebaseUserProfile,
+            lastMessageUserOwner: lastMessageUserOwner,
+            context: context,
           );
-        }
-        final userIDFriend = widget.widget.chat.listUser.first;
-        final ownerUserID = widget.id;
-        if (userIDFriend.compareTo(ownerUserID) != 0) {
-          final userProfile = await widget.firebaseUserProfile.getUserProfile(
-            userID: ownerUserID,
-          );
-          final userProfileFriend =
-              await widget.firebaseUserProfile.getUserProfile(
-            userID: userIDFriend,
-          );
-          final Map<String, dynamic> notification = {
-            'title': userProfile!.fullName,
-            'body': userProfile.fullName,
-          };
-          final Map<String, String> data = {
-            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-            'id': widget.widget.chat.idChat,
-            'messageType': TypeNotification.chat.toString(),
-            "sendById": ownerUserID,
-            "sendBy": userProfile.fullName,
-             'image': userProfile.urlImage ??
-                          "https://i.stack.imgur.com/l60Hf.png",
-            'status': 'done',
-          };
-          sendMessage(
-            notification: notification,
-            tokenUserFriend: userProfileFriend!.tokenUser!,
-            data: data,
-          );
+          if (widget.widget.scroll.isAttached) {
+            widget.widget.scroll.scrollTo(
+              index: intMaxValue,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeIn,
+            );
+          }
+          final userIDFriend = widget.widget.chat.listUser.first;
+          final ownerUserID = widget.id;
+          if (userIDFriend.compareTo(ownerUserID) != 0) {
+          final chat = await firebaseChat.getChatByID(
+              idChat: widget.widget.chat.idChat, userChatID: ownerUserID);
+            final userProfile = await widget.firebaseUserProfile.getUserProfile(
+              userID: ownerUserID,
+            );
+            final userProfileFriend =
+                await widget.firebaseUserProfile.getUserProfile(
+              userID: userIDFriend,
+            );
+            final Map<String, dynamic> notification = {
+              'title': userProfile!.fullName,
+              'body': handleStringMessageLocalization(chat.lastText, context),
+            };
+            final urlImage =
+                userProfile.urlImage ?? "https://i.stack.imgur.com/l60Hf.png";
+            final largeIconPath = await UtilsDownloadFile.downloadFile(
+              urlImage,
+              'largeIcon',
+            );
+            final Map<String, String> data = {
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': widget.widget.chat.idChat,
+              'messageType': TypeNotification.chat.toString(),
+              "sendById": ownerUserID,
+              "sendBy": userProfile.fullName,
+              'image': largeIconPath,
+              'status': 'done',
+            };
+            await sendMessage(
+              notification: notification,
+              tokenUserFriend: userProfileFriend!.tokenUser!,
+              data: data,
+            );
+          }
         }
       },
       icon: const Icon(Icons.photo),

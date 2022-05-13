@@ -27,7 +27,7 @@ class NotificationService {
     required int id,
     required String title,
     required String body,
-    String? urlImage,
+    String urlImage = "",
   }) async {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       id,
@@ -40,13 +40,13 @@ class NotificationService {
         android: AndroidNotificationDetails(
           'mychannel',
           "My Channel",
-          largeIcon: FilePathAndroidBitmap(urlImage!),
           importance: Importance.max,
           priority: Priority.max,
           icon: '@mipmap/ic_notification',
+          largeIcon: FilePathAndroidBitmap(urlImage),
           channelDescription: "Main Channel Notifiaction",
         ),
-        iOS:const IOSNotificationDetails(
+        iOS: const IOSNotificationDetails(
           sound: 'default.wav',
           presentAlert: true,
           presentBadge: true,
@@ -56,6 +56,7 @@ class NotificationService {
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       androidAllowWhileIdle: true,
+      payload: ""
     );
   }
 }

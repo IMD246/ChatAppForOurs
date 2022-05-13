@@ -63,6 +63,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   body: event.notification!.body!,
                   urlImage: event.data['image'],
                 );
+              } else {
+                noti.showNotification(
+                  id: 1,
+                  title: event.notification!.title!,
+                  body: event.notification!.body!,
+                  urlImage: event.data['image'],
+                );
               }
             }
           },
@@ -71,10 +78,12 @@ class _ChatScreenState extends State<ChatScreen> {
           (event) async {
             if (event.data['messageType'] ==
                 TypeNotification.addFriend.toString()) {
-              noti.showNotification(
+              await noti.showNotification(
                 id: 1,
-                title: event.notification!.title!,
-                body: event.notification!.body!,
+                title: context.loc.request_friend_notification_title,
+                body: context.loc.request_friend_notification_body(
+                  event.notification!.body!,
+                ),
                 urlImage: event.data['image'],
               );
             } else if (event.data['messageType'] ==
@@ -104,7 +113,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   chat.stampTimeUser = stampTimeUser;
                 },
               );
-              noti.showNotification(
+              await noti.showNotification(
                 id: 1,
                 title: event.notification!.title!,
                 body: event.notification!.body!,
@@ -120,55 +129,6 @@ class _ChatScreenState extends State<ChatScreen> {
             }
           },
         );
-        // FirebaseMessaging.onMessageOpenedApp.listen(
-        //   (event) async {
-        //     if (event.notification != null && event.data.isNotEmpty) {
-        //       if (event.data['messageType'] ==
-        //           TypeNotification.chat.toString()) {
-        //         final chat = await firebaseChat.getChatByID(
-        //           idChat: event.data['id'],
-        //           userChatID: event.data['sendById'],
-        //         );
-        //         String body = event.notification!.body!;
-        //         if (chat.typeMessage == TypeMessage.audio) {
-        //           body = context.loc.message_recording;
-        //         }
-        //         if (chat.typeMessage == TypeMessage.image) {
-        //           body =
-        //               handleStringMessageLocalization(chat.lastText, context);
-        //         }
-        //         chat.nameChat = event.data['sendBy'];
-        //         await userPresenceDatabaseReference
-        //             .child(event.data['sendById'])
-        //             .once()
-        //             .then(
-        //           (event) {
-        //             final data =
-        //                 Map<String, dynamic>.from(event.snapshot.value as Map);
-        //             bool isOnline = data['presence'];
-        //             final stampTimeUser =
-        //                 DateTime.tryParse(data['stamp_time'])!;
-        //             chat.presence = isOnline;
-        //             chat.stampTimeUser = stampTimeUser;
-        //           },
-        //         );
-        //         noti.showNotification(
-        //           id: 1,
-        //           title: event.notification!.title!,
-        //           body: body,
-        //           urlImage: event.data['image'],
-        //         );
-        //         Navigator.of(context).push(
-        //           MaterialPageRoute(
-        //             builder: (_) {
-        //               return MesssageScreen(chat: chat);
-        //             },
-        //           ),
-        //         );
-        //       }
-        //     }
-        //   },
-        // );
       },
     );
     super.initState();
