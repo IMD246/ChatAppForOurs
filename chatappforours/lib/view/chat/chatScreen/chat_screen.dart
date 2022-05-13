@@ -37,8 +37,10 @@ class _ChatScreenState extends State<ChatScreen> {
   final userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
   String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
+  late final PageController pageController;
   @override
   void initState() {
+    pageController = PageController(initialPage: currentIndex);
     setState(
       () {
         tz.initializeTimeZones();
@@ -155,9 +157,14 @@ class _ChatScreenState extends State<ChatScreen> {
                   context,
                   userProfile?.urlImage,
                 ),
-                body: currentIndex == 0
-                    ? const BodyChatScreen()
-                    : const BodyContactScreen(),
+                body: PageView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller: pageController,
+                  children: const [
+                    BodyChatScreen(),
+                    BodyContactScreen(),
+                  ],
+                ),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
                     Navigator.of(context).push(
@@ -182,6 +189,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   onTap: (index) {
                     setState(() {
                       currentIndex = index;
+                      pageController.jumpToPage(index);
                     });
                   },
                   items: [

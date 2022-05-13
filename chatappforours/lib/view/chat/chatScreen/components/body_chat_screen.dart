@@ -16,7 +16,7 @@ class BodyChatScreen extends StatefulWidget {
   State<BodyChatScreen> createState() => _BodyChatScreenState();
 }
 
-class _BodyChatScreenState extends State<BodyChatScreen> {
+class _BodyChatScreenState extends State<BodyChatScreen> with AutomaticKeepAliveClientMixin<BodyChatScreen>{
   List<Chat> listChatData = [];
   final FirebaseChat firebaseChatDocs = FirebaseChat();
   final String userID = FirebaseAuth.instance.currentUser!.uid;
@@ -36,9 +36,13 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
   void dispose() {
     super.dispose();
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     Size size = MediaQuery.of(context).size;
     return Column(
       children: [
@@ -127,4 +131,5 @@ class _BodyChatScreenState extends State<BodyChatScreen> {
       ],
     );
   }
+  
 }

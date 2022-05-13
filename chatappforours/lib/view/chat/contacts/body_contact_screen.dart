@@ -19,7 +19,8 @@ class BodyContactScreen extends StatefulWidget {
   State<BodyContactScreen> createState() => _BodyContactScreenState();
 }
 
-class _BodyContactScreenState extends State<BodyContactScreen> {
+class _BodyContactScreenState extends State<BodyContactScreen>
+    with AutomaticKeepAliveClientMixin<BodyContactScreen> {
   bool isFilledRecent = true;
   bool isFilledRequestFriend = false;
   late final FirebaseFriendList firebaseFriendList;
@@ -37,12 +38,11 @@ class _BodyContactScreenState extends State<BodyContactScreen> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         return Column(
