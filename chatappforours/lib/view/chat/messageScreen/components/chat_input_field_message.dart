@@ -63,7 +63,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
       idChat: widget.chat.idChat,
       userOwnerID: id,
     );
-    final userIDFriend = widget.chat.listUser.first;
+    String userIDFriend = widget.chat.listUser.first;
     final ownerUserID = id;
     if (userIDFriend.compareTo(ownerUserID) != 0) {
       final chat = await firebaseChat.getChatByID(

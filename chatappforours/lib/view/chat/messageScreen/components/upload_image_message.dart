@@ -69,11 +69,12 @@ class _UploadImageMessageState extends State<UploadImageMessage> {
               curve: Curves.easeIn,
             );
           }
-          final userIDFriend = widget.widget.chat.listUser.first;
+          String userIDFriend = widget.widget.chat.listUser.first;
+
           final ownerUserID = widget.id;
           if (userIDFriend.compareTo(ownerUserID) != 0) {
-          final chat = await firebaseChat.getChatByID(
-              idChat: widget.widget.chat.idChat, userChatID: ownerUserID);
+            final chat = await firebaseChat.getChatByID(
+                idChat: widget.widget.chat.idChat, userChatID: ownerUserID);
             final userProfile = await widget.firebaseUserProfile.getUserProfile(
               userID: ownerUserID,
             );

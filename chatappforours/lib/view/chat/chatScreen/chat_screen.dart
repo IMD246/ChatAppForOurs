@@ -41,97 +41,93 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     pageController = PageController(initialPage: currentIndex);
-    setState(
-      () {
-        firebaseUserProfile.updateUserPresenceDisconnect(uid: ownerUserID);
-        tz.initializeTimeZones();
-        final noti = NotificationService();
-        noti.initNotification();
-        FirebaseMessaging.onMessage.listen(
-          (event) async {
-            if (event.notification != null && event.data.isNotEmpty) {
-              if (event.data['messageType'] ==
-                  TypeNotification.addFriend.toString()) {
-                noti.showNotification(
-                  id: 1,
-                  title: event.notification!.title!,
-                  body: event.notification!.body!,
-                  urlImage: event.data['image'],
-                );
-              } else if (event.data['messageType'] ==
-                  TypeNotification.acceptFriend.toString()) {
-                noti.showNotification(
-                  id: 1,
-                  title: event.notification!.title!,
-                  body: event.notification!.body!,
-                  urlImage: event.data['image'],
-                );
-              } else {
-                noti.showNotification(
-                  id: 1,
-                  title: event.notification!.title!,
-                  body: event.notification!.body!,
-                  urlImage: event.data['image'],
-                );
-              }
-            }
-          },
-        );
-        FirebaseMessaging.onBackgroundMessage(
-          (event) async {
-            if (event.data['messageType'] ==
-                TypeNotification.addFriend.toString()) {
-              await noti.showNotification(
-                id: 1,
-                title: context.loc.request_friend_notification_title,
-                body: context.loc.request_friend_notification_body(
-                  event.notification!.body!,
-                ),
-                urlImage: event.data['image'],
-              );
-            } else if (event.data['messageType'] ==
-                TypeNotification.acceptFriend.toString()) {
-              noti.showNotification(
-                id: 1,
-                title: event.notification!.title!,
-                body: event.notification!.body!,
-                urlImage: event.data['image'],
-              );
-            } else {
-              final chat = await firebaseChat.getChatByID(
-                idChat: event.data['id'],
-                userChatID: event.data['sendById'],
-              );
-              chat.nameChat = event.data['sendBy'];
-              await userPresenceDatabaseReference
-                  .child(event.data['sendById'])
-                  .once()
-                  .then(
-                (event) {
-                  final data =
-                      Map<String, dynamic>.from(event.snapshot.value as Map);
-                  bool isOnline = data['presence'];
-                  final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
-                  chat.presence = isOnline;
-                  chat.stampTimeUser = stampTimeUser;
-                },
-              );
-              await noti.showNotification(
-                id: 1,
-                title: event.notification!.title!,
-                body: event.notification!.body!,
-                urlImage: event.data['image'],
-              );
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) {
-                    return MesssageScreen(chat: chat);
-                  },
-                ),
-              );
-            }
-          },
-        );
+    firebaseUserProfile.updateUserPresenceDisconnect(uid: ownerUserID);
+    tz.initializeTimeZones();
+    final noti = NotificationService();
+    noti.initNotification();
+    FirebaseMessaging.onMessage.listen(
+      (event) async {
+        if (event.notification != null && event.data.isNotEmpty) {
+          if (event.data['messageType'] ==
+              TypeNotification.addFriend.toString()) {
+            noti.showNotification(
+              id: 1,
+              title: event.notification!.title!,
+              body: event.notification!.body!,
+              urlImage: event.data['image'],
+            );
+          } else if (event.data['messageType'] ==
+              TypeNotification.acceptFriend.toString()) {
+            noti.showNotification(
+              id: 1,
+              title: event.notification!.title!,
+              body: event.notification!.body!,
+              urlImage: event.data['image'],
+            );
+          } else {
+            noti.showNotification(
+              id: 1,
+              title: event.notification!.title!,
+              body: event.notification!.body!,
+              urlImage: event.data['image'],
+            );
+          }
+        }
+      },
+    );
+    FirebaseMessaging.onBackgroundMessage(
+      (event) async {
+        if (event.data['messageType'] ==
+            TypeNotification.addFriend.toString()) {
+          await noti.showNotification(
+            id: 1,
+            title: context.loc.request_friend_notification_title,
+            body: context.loc.request_friend_notification_body(
+              event.notification!.body!,
+            ),
+            urlImage: event.data['image'],
+          );
+        } else if (event.data['messageType'] ==
+            TypeNotification.acceptFriend.toString()) {
+          noti.showNotification(
+            id: 1,
+            title: event.notification!.title!,
+            body: event.notification!.body!,
+            urlImage: event.data['image'],
+          );
+        } else {
+          final chat = await firebaseChat.getChatByID(
+            idChat: event.data['id'],
+            userChatID: event.data['sendById'],
+          );
+          chat.nameChat = event.data['sendBy'];
+          await userPresenceDatabaseReference
+              .child(event.data['sendById'])
+              .once()
+              .then(
+            (event) {
+              final data =
+                  Map<String, dynamic>.from(event.snapshot.value as Map);
+              bool isOnline = data['presence'];
+              final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
+              chat.presence = isOnline;
+              chat.stampTimeUser = stampTimeUser;
+            },
+          );
+          await noti.showNotification(
+            id: 1,
+            title: event.notification!.title!,
+            body: event.notification!.body!,
+            urlImage: event.data['image'],
+          );
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) {
+                return MesssageScreen(chat: chat);
+              },
+            ),
+          );
+        }
       },
     );
     super.initState();

@@ -5,7 +5,6 @@ import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
 import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/chat_input_field_message.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SendMessage extends StatefulWidget {
@@ -28,7 +27,6 @@ class SendMessage extends StatefulWidget {
 
 class _SendMessageState extends State<SendMessage> {
   final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-  final String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   @override
   Widget build(BuildContext context) {
     return IconButton(
@@ -56,7 +54,7 @@ class _SendMessageState extends State<SendMessage> {
           },
         );
         // Push notification to others in chat
-        final userIDFriend = widget.widget.chat.listUser.first;
+        String userIDFriend = widget.widget.chat.listUser.first;
         final ownerUserID = widget.id;
         if (userIDFriend.compareTo(ownerUserID) != 0) {
           final userProfile = await firebaseUserProfile.getUserProfile(

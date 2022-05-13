@@ -40,10 +40,7 @@ class _ChatListViewState extends State<ChatListView> {
         ownerUserID: ownerUserID,
       );
       late final String userIDFriend;
-      if (chat.listUser[0] == chat.listUser[1]) {
-        userIDFriend = chat.listUser.elementAt(0);
-        chat.listUser.removeAt(1);
-      } else {
+      if (chat.listUser.length > 1) {
         chat.listUser.remove(ownerUserID);
         userIDFriend = chat.listUser.first;
       }

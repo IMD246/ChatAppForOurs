@@ -16,7 +16,8 @@ class BodyChatScreen extends StatefulWidget {
   State<BodyChatScreen> createState() => _BodyChatScreenState();
 }
 
-class _BodyChatScreenState extends State<BodyChatScreen> with AutomaticKeepAliveClientMixin<BodyChatScreen>{
+class _BodyChatScreenState extends State<BodyChatScreen>
+    with AutomaticKeepAliveClientMixin<BodyChatScreen> {
   List<Chat> listChatData = [];
   final FirebaseChat firebaseChatDocs = FirebaseChat();
   final String userID = FirebaseAuth.instance.currentUser!.uid;
@@ -26,9 +27,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> with AutomaticKeepAlive
 
   @override
   void initState() {
-    setState(() {
-      stream = firebaseChatDocs.getAllChat(ownerUserID: userID);
-    });
+    stream = firebaseChatDocs.getAllChat(ownerUserID: userID);
     super.initState();
   }
 
@@ -36,7 +35,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> with AutomaticKeepAlive
   void dispose() {
     super.dispose();
   }
-  
+
   @override
   bool get wantKeepAlive => true;
 
@@ -91,9 +90,7 @@ class _BodyChatScreenState extends State<BodyChatScreen> with AutomaticKeepAlive
             child: RefreshIndicator(
               strokeWidth: 1,
               onRefresh: () async {
-                setState(() {
-                  stream = firebaseChatDocs.getAllChat(ownerUserID: userID);
-                });
+                stream = firebaseChatDocs.getAllChat(ownerUserID: userID);
               },
               child: StreamBuilder(
                 stream: stream,
@@ -131,5 +128,4 @@ class _BodyChatScreenState extends State<BodyChatScreen> with AutomaticKeepAlive
       ],
     );
   }
-  
 }
