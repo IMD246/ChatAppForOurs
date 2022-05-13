@@ -85,6 +85,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
             children: [
               if (widget.userProfile.urlImage != null)
                 CircleAvatar(
+                  backgroundColor: Colors.cyan[100],
                   radius: 20,
                   child: ClipOval(
                     child: SizedBox.fromSize(
@@ -101,8 +102,9 @@ class _AddFriendCardState extends State<AddFriendCard> {
                   ),
                 ),
               if (widget.userProfile.urlImage == null)
-                const CircleAvatar(
-                  backgroundImage: AssetImage(
+                CircleAvatar(
+                  backgroundColor: Colors.cyan[100],
+                  backgroundImage: const AssetImage(
                     "assets/images/defaultImage.png",
                   ),
                 ),
@@ -165,7 +167,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
                       'status': 'done',
                       'image': largeIconPath,
                     };
-                   await sendMessage(
+                    await sendMessage(
                       notification: notifcation,
                       tokenUserFriend: widget.userProfile.tokenUser!,
                       data: data,
