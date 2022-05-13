@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/extensions/locallization.dart';
@@ -12,7 +14,7 @@ import 'package:chatappforours/view/chat/messageScreen/components/send_message.d
 import 'package:chatappforours/view/chat/messageScreen/components/upload_image_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound_lite/public/flutter_sound_recorder.dart';
+import 'package:flutter_sound_lite/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -42,6 +44,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
   final recorder = FlutterSoundRecorder();
   final player = AudioPlayer();
   bool isSelected = false;
+  String? recordTxt;
   Future record() async {
     await recorder.startRecorder(toFile: 'audio');
   }
@@ -104,6 +107,9 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
       throw 'Microphone permission not granted';
     }
     await recorder.openAudioSession();
+    await recorder.setSubscriptionDuration(
+      const Duration(milliseconds: 500),
+    );
   }
 
   @override
@@ -230,15 +236,11 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                       StreamBuilder<RecordingDisposition>(
                         stream: recorder.onProgress,
                         builder: (context, snapshot) {
-                          switch (snapshot.connectionState) {
-                            case ConnectionState.active:
-                              final duration =
-                                  snapshot.data?.duration ?? Duration.zero;
+                          final duration = snapshot.hasData
+                              ? snapshot.data!.duration
+                              : Duration.zero;
 
-                              return Text("${formatTime(duration)} s");
-                            default:
-                              return Text("${formatTime(Duration.zero)} s");
-                          }
+                          return Text("${formatTime(duration)} s");
                         },
                       )
                     else
