@@ -81,58 +81,56 @@ class _WelcomePageState extends State<WelcomePage> {
         } else if (state is AuthStateForgotPassWord) {
           return const ForgotPassword();
         } else {
-          return SafeArea(
-            child: Scaffold(
-              backgroundColor: Colors.white,
-              body: Column(
-                children: [
-                  const Spacer(flex: 1),
-                  if (!isKeyboard)
-                    Image.asset(
-                      "assets/images/welcome_image.png",
-                      height: size.height * 0.45,
-                      width: size.width,
-                    ),
-                  const Spacer(flex: 2),
-                  Text(
-                    context.loc.welcome,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: textColorMode(ThemeMode.light),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                    ),
+          return Scaffold(
+            backgroundColor: Colors.white,
+            body: Column(
+              children: [
+                const Spacer(flex: 1),
+                if (!isKeyboard)
+                  Image.asset(
+                    "assets/images/welcome_image.png",
+                    height: size.height * 0.45,
+                    width: size.width,
                   ),
-                  const Spacer(),
-                  FittedBox(
-                    child: TextButton(
-                      onPressed: () {
-                        context.read<AuthBloc>().add(
-                              const AuthEventInitialize(),
-                            );
-                      },
-                      child: Row(
-                        children: [
-                          Text(
-                            context.loc.skip,
-                            style: TextStyle(
-                              color: textColorMode(ThemeMode.light)
-                                  .withOpacity(0.8),
-                              fontSize: 24,
-                            ),
-                          ),
-                          Icon(
-                            Icons.arrow_forward_ios_outlined,
+                const Spacer(flex: 2),
+                Text(
+                  context.loc.welcome,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: textColorMode(ThemeMode.light),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
+                ),
+                const Spacer(),
+                FittedBox(
+                  child: TextButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                            const AuthEventInitialize(),
+                          );
+                    },
+                    child: Row(
+                      children: [
+                        Text(
+                          context.loc.skip,
+                          style: TextStyle(
                             color:
-                                textColorMode(ThemeMode.light).withOpacity(0.7),
+                                textColorMode(ThemeMode.light).withOpacity(0.8),
+                            fontSize: 24,
                           ),
-                        ],
-                      ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios_outlined,
+                          color:
+                              textColorMode(ThemeMode.light).withOpacity(0.7),
+                        ),
+                      ],
                     ),
                   ),
-                  const Spacer(),
-                ],
-              ),
+                ),
+                const Spacer(),
+              ],
             ),
           );
         }

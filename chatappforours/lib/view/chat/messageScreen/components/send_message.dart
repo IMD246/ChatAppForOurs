@@ -3,6 +3,7 @@ import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
+import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/chat_input_field_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -57,15 +58,21 @@ class _SendMessageState extends State<SendMessage> {
         // Push notification to others in chat
         final userIDFriend = widget.widget.chat.listUser.first;
         final ownerUserID = widget.id;
-        if (userIDFriend.compareTo(ownerUserID) == 0) {
+        if (userIDFriend.compareTo(ownerUserID) != 0) {
           final userProfile = await firebaseUserProfile.getUserProfile(
             userID: widget.id,
           );
           final userProfileFriend = await firebaseUserProfile.getUserProfile(
             userID: userIDFriend,
           );
+          final urlImage =
+              userProfile!.urlImage ?? "https://i.stack.imgur.com/l60Hf.png";
+          final largeIconPath = await UtilsDownloadFile.downloadFile(
+            urlImage,
+            'largeIcon',
+          );
           final Map<String, dynamic> notification = {
-            'title': userProfile!.fullName,
+            'title': userProfile.fullName,
             'body': message,
           };
           final Map<String, String> data = {
@@ -74,8 +81,7 @@ class _SendMessageState extends State<SendMessage> {
             'messageType': TypeNotification.chat.toString(),
             "sendById": ownerUserID,
             "sendBy": userProfile.fullName,
-            'image':
-                userProfile.urlImage ?? "https://i.stack.imgur.com/l60Hf.png",
+            'image': largeIconPath,
             'status': 'done',
           };
           sendMessage(

@@ -27,7 +27,7 @@ class NotificationService {
     required int id,
     required String title,
     required String body,
-    required String urlImage,
+    String? urlImage,
   }) async {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       id,
@@ -40,7 +40,7 @@ class NotificationService {
         android: AndroidNotificationDetails(
           'mychannel',
           "My Channel",
-          largeIcon: FilePathAndroidBitmap(urlImage),
+          largeIcon: FilePathAndroidBitmap(urlImage!),
           importance: Importance.max,
           priority: Priority.max,
           icon: '@mipmap/ic_notification',

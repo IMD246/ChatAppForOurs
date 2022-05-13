@@ -11,6 +11,7 @@ import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
+import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
@@ -188,6 +189,22 @@ class _ContactCardState extends State<ContactCard> {
                             children: [
                               FillOutlineButton(
                                 press: () async {
+                                  final userProfile =
+                                      await firebaseUserProfile.getUserProfile(
+                                    userID: id,
+                                  );
+                                  final Map<String, dynamic> notification = {
+                                    'title': context
+                                        .loc.accept_friend_notification_title,
+                                    'body': context.loc
+                                        .accept_friend_notification_body(
+                                            userProfile!.fullName),
+                                  };
+                                  final urlImage = userProfile.urlImage ??
+                                      "https://i.stack.imgur.com/l60Hf.png";
+                                  final largeIconPath =
+                                      await UtilsDownloadFile.downloadFile(
+                                          urlImage, 'largeIcon');
                                   await firebaseFriendList.updateRequestFriend(
                                     ownerUserID: id,
                                     userID: widget.friend.userID,
@@ -197,29 +214,20 @@ class _ContactCardState extends State<ContactCard> {
                                     listUserID: [id, widget.friend.userID],
                                   );
                                   if (widget.friend.userID.compareTo(id) != 0) {
-                                    final userProfile =
-                                        await firebaseUserProfile
-                                            .getUserProfile(
-                                      userID: id,
-                                    );
                                     final userProfileFriend =
                                         await firebaseUserProfile
                                             .getUserProfile(
                                       userID: widget.friend.userID,
                                     );
-                                    final Map<String, dynamic> notification = {
-                                      'title': id,
-                                      'body': userProfile!.fullName
-                                    };
+
                                     final Map<String, String> data = {
                                       'click_action':
                                           'FLUTTER_NOTIFICATION_CLICK',
                                       'id': '1',
-                                      'image': userProfile.urlImage ??
-                                          "https://i.stack.imgur.com/l60Hf.png",
                                       'messageType': TypeNotification
                                           .acceptFriend
                                           .toString(),
+                                      'image': largeIconPath,
                                       'status': 'done',
                                     };
                                     sendMessage(

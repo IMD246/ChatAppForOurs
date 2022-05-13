@@ -6,6 +6,7 @@ import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
+import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -144,28 +145,32 @@ class _AddFriendCardState extends State<AddFriendCard> {
               press: () async {
                 if (isAdded == false) {
                   setState(() {
-                    isAdded = true;
-                  });
-                  await firebaseFriendList.createNewFriendDefault(
-                    ownerUserID: widget.userProfile.idUser!,
-                    userIDFriend: ownerUserID,
-                  );
-                  if (widget.userProfile.idUser!.compareTo(ownerUserID) != 0) {
-                    final userProfile =
-                        await firebaseUserProfile.getUserProfile(
-                      userID: ownerUserID,
+                    firebaseFriendList.createNewFriendDefault(
+                      ownerUserID: widget.userProfile.idUser!,
+                      userIDFriend: ownerUserID,
                     );
-                    final notifcation = <String, dynamic>{
-                      'body': userProfile!.fullName,
-                      'title': userProfile.idUser,
-                    };
+                  });
+                  final userProfile = await firebaseUserProfile.getUserProfile(
+                    userID: ownerUserID,
+                  );
+                  final notifcation = <String, dynamic>{
+                    'title': context.loc.request_friend_notification_title,
+                    'body': context.loc.request_friend_notification_body(
+                      userProfile!.fullName,
+                    ),
+                  };
+                  final urlImage = userProfile.urlImage ??
+                      "https://i.stack.imgur.com/l60Hf.png";
+                  final largeIconPath = await UtilsDownloadFile.downloadFile(
+                      urlImage, 'largeIcon');
+
+                  if (widget.userProfile.idUser!.compareTo(ownerUserID) != 0) {
                     final Map<String, String> data = {
                       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
                       'id': '1',
                       'messageType': TypeNotification.addFriend.toString(),
                       'status': 'done',
-                      'image': userProfile.urlImage ??
-                          "https://i.stack.imgur.com/l60Hf.png",
+                      'image': largeIconPath,
                     };
                     sendMessage(
                       notification: notifcation,

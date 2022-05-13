@@ -8,8 +8,6 @@ import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/notification.dart';
-import 'package:chatappforours/services/notification/utils_download_file.dart';
-import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/addFriend/add_friend_screen.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
@@ -51,84 +49,126 @@ class _ChatScreenState extends State<ChatScreen> {
             if (event.notification != null && event.data.isNotEmpty) {
               if (event.data['messageType'] ==
                   TypeNotification.addFriend.toString()) {
-                final largeIconPath = await UtilsDownloadFile.downloadFile(
-                    event.data['image'], 'largeIcon');
-                noti.showNotification(
-                  id: 1,
-                  title: context.loc.request_friend_notification_title,
-                  body: context.loc.request_friend_notification_body(
-                    event.notification!.body!,
-                  ),
-                  urlImage: largeIconPath,
-                );
-              } else if (event.data['messageType'] ==
-                  TypeNotification.acceptFriend.toString()) {
-                final largeIconPath = await UtilsDownloadFile.downloadFile(
-                    event.data['image'], 'largeIcon');
-                noti.showNotification(
-                  id: 1,
-                  title: context.loc.accept_friend_notification_title,
-                  body: context.loc.accept_friend_notification_body(
-                    event.notification!.body!,
-                  ),
-                  urlImage: largeIconPath,
-                );
-              }
-            }
-          },
-        );
-        FirebaseMessaging.onMessageOpenedApp.listen(
-          (event) async {
-            if (event.notification != null && event.data.isNotEmpty) {
-              if (event.data['messageType'] ==
-                  TypeNotification.chat.toString()) {
-                final chat = await firebaseChat.getChatByID(
-                  idChat: event.data['id'],
-                  userChatID: event.data['sendById'],
-                );
-                final largeIconPath = await UtilsDownloadFile.downloadFile(
-                    event.data['image'], 'largeIcon');
-                String body = event.notification!.body!;
-
-                if (chat.typeMessage == TypeMessage.audio) {
-                  body = context.loc.message_recording;
-                }
-                if (chat.typeMessage == TypeMessage.image) {
-                  body =
-                      handleStringMessageLocalization(chat.lastText, context);
-                }
-                chat.nameChat = event.data['sendBy'];
-                await userPresenceDatabaseReference
-                    .child(event.data['sendById'])
-                    .once()
-                    .then(
-                  (event) {
-                    final data =
-                        Map<String, dynamic>.from(event.snapshot.value as Map);
-                    bool isOnline = data['presence'];
-                    final stampTimeUser =
-                        DateTime.tryParse(data['stamp_time'])!;
-                    chat.presence = isOnline;
-                    chat.stampTimeUser = stampTimeUser;
-                  },
-                );
                 noti.showNotification(
                   id: 1,
                   title: event.notification!.title!,
-                  body: body,
-                  urlImage: largeIconPath,
+                  body: event.notification!.body!,
+                  urlImage: event.data['image'],
                 );
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) {
-                      return MesssageScreen(chat: chat);
-                    },
-                  ),
+              } else if (event.data['messageType'] ==
+                  TypeNotification.acceptFriend.toString()) {
+                noti.showNotification(
+                  id: 1,
+                  title: event.notification!.title!,
+                  body: event.notification!.body!,
+                  urlImage: event.data['image'],
                 );
               }
             }
           },
         );
+        FirebaseMessaging.onBackgroundMessage(
+          (event) async {
+            if (event.data['messageType'] ==
+                TypeNotification.addFriend.toString()) {
+              noti.showNotification(
+                id: 1,
+                title: event.notification!.title!,
+                body: event.notification!.body!,
+                urlImage: event.data['image'],
+              );
+            } else if (event.data['messageType'] ==
+                TypeNotification.acceptFriend.toString()) {
+              noti.showNotification(
+                id: 1,
+                title: event.notification!.title!,
+                body: event.notification!.body!,
+                urlImage: event.data['image'],
+              );
+            } else {
+              final chat = await firebaseChat.getChatByID(
+                idChat: event.data['id'],
+                userChatID: event.data['sendById'],
+              );
+              chat.nameChat = event.data['sendBy'];
+              await userPresenceDatabaseReference
+                  .child(event.data['sendById'])
+                  .once()
+                  .then(
+                (event) {
+                  final data =
+                      Map<String, dynamic>.from(event.snapshot.value as Map);
+                  bool isOnline = data['presence'];
+                  final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
+                  chat.presence = isOnline;
+                  chat.stampTimeUser = stampTimeUser;
+                },
+              );
+              noti.showNotification(
+                id: 1,
+                title: event.notification!.title!,
+                body: event.notification!.body!,
+                urlImage: event.data['image'],
+              );
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) {
+                    return MesssageScreen(chat: chat);
+                  },
+                ),
+              );
+            }
+          },
+        );
+        // FirebaseMessaging.onMessageOpenedApp.listen(
+        //   (event) async {
+        //     if (event.notification != null && event.data.isNotEmpty) {
+        //       if (event.data['messageType'] ==
+        //           TypeNotification.chat.toString()) {
+        //         final chat = await firebaseChat.getChatByID(
+        //           idChat: event.data['id'],
+        //           userChatID: event.data['sendById'],
+        //         );
+        //         String body = event.notification!.body!;
+        //         if (chat.typeMessage == TypeMessage.audio) {
+        //           body = context.loc.message_recording;
+        //         }
+        //         if (chat.typeMessage == TypeMessage.image) {
+        //           body =
+        //               handleStringMessageLocalization(chat.lastText, context);
+        //         }
+        //         chat.nameChat = event.data['sendBy'];
+        //         await userPresenceDatabaseReference
+        //             .child(event.data['sendById'])
+        //             .once()
+        //             .then(
+        //           (event) {
+        //             final data =
+        //                 Map<String, dynamic>.from(event.snapshot.value as Map);
+        //             bool isOnline = data['presence'];
+        //             final stampTimeUser =
+        //                 DateTime.tryParse(data['stamp_time'])!;
+        //             chat.presence = isOnline;
+        //             chat.stampTimeUser = stampTimeUser;
+        //           },
+        //         );
+        //         noti.showNotification(
+        //           id: 1,
+        //           title: event.notification!.title!,
+        //           body: body,
+        //           urlImage: event.data['image'],
+        //         );
+        //         Navigator.of(context).push(
+        //           MaterialPageRoute(
+        //             builder: (_) {
+        //               return MesssageScreen(chat: chat);
+        //             },
+        //           ),
+        //         );
+        //       }
+        //     }
+        //   },
+        // );
       },
     );
     super.initState();
@@ -137,11 +177,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
   }
 
   @override
