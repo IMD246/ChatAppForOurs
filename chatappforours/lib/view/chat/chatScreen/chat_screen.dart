@@ -42,9 +42,9 @@ class _ChatScreenState extends State<ChatScreen> {
   late final PageController pageController;
   @override
   void initState() {
+    FirebaseMessaging.instance.requestPermission();
     pageController = PageController(initialPage: currentIndex);
     firebaseUserProfile.updateUserPresenceDisconnect(uid: ownerUserID);
-
     super.initState();
   }
 

@@ -4,23 +4,15 @@ import 'package:chatappforours/services/auth/crud/firebase_auth_provider.dart';
 import 'package:chatappforours/utilities/theme/theme_data.dart';
 import 'package:chatappforours/view/welcome/welcome_page.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 
-Future<void> _firebaseMessagingBackgroundHandler(
-    RemoteMessage remoteMessage) async {
-  await Firebase.initializeApp();
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseMessaging.instance.requestPermission();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const StartApp());
 }
 
