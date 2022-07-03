@@ -176,7 +176,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
-                          return const AddFriendScreen();
+                          return AddFriendScreen(ownerUserProfile: widget.userProfile,);
                         },
                       ),
                     );

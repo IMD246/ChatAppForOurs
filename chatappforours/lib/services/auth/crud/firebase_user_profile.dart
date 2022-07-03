@@ -26,6 +26,49 @@ class FirebaseUserProfile {
     );
   }
 
+
+   Stream<Iterable<UserProfile>?> getAllUserProfileBySearchText(
+      String ownerUserID, String? searchText) {
+    if (searchText?.isEmpty == true) {
+      final listUserProfile = userProfilePath.limit(20).snapshots().map(
+        (event) {
+          if (event.docs.isNotEmpty) {
+            return event.docs.map(
+              (e) {
+                return UserProfile.fromSnapshot(e);
+              },
+            );
+          } else {
+            return null;
+          }
+        },
+      );
+      return listUserProfile;
+    } else {
+      final String text = searchText! + "\uf8ff";
+      final listUserProfile = userProfilePath
+          .where(fullNameField, isGreaterThanOrEqualTo: searchText)
+          .where(fullNameField, isLessThanOrEqualTo: text)
+          .orderBy(fullNameField, descending: true)
+          .limit(20)
+          .snapshots()
+          .map(
+        (event) {
+          if (event.docs.isNotEmpty) {
+            return event.docs.map(
+              (e) {
+                return UserProfile.fromSnapshot(e);
+              },
+            );
+          } else {
+            return null;
+          }
+        },
+      );
+      return listUserProfile;
+    }
+  }
+
   Future<UserProfile?> getUserProfile({
     required String? userID,
   }) async {

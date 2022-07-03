@@ -289,17 +289,21 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                 },
               )
             else
-              IconButton(
-                onPressed: () async {
-                  await SystemChannels.textInput.invokeMethod('TextInput.hide');
-                  await Future.delayed(const Duration(milliseconds: 50));
-                  setState(() {
-                    emojiShowing = !emojiShowing;
-                  });
-                },
-                icon: Icon(
-                  Icons.sentiment_satisfied_alt,
-                  color: Theme.of(context).primaryColor,
+              SizedBox(
+                width: kDefaultPadding * 1.1,
+                child: IconButton(
+                  onPressed: () async {
+                    await SystemChannels.textInput
+                        .invokeMethod('TextInput.hide');
+                    await Future.delayed(const Duration(milliseconds: 50));
+                    setState(() {
+                      emojiShowing = !emojiShowing;
+                    });
+                  },
+                  icon: Icon(
+                    Icons.sentiment_satisfied_alt,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
               ),
           ],

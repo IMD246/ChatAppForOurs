@@ -155,10 +155,13 @@ class _AddFriendCardState extends State<AddFriendCard> {
                       userProfile!.fullName,
                     ),
                   };
-                  final urlImage = userProfile.urlImage.isNotEmpty ? userProfile.urlImage:
-                      "https://i.stack.imgur.com/l60Hf.png";
+                  final urlImage = userProfile.urlImage.isNotEmpty
+                      ? userProfile.urlImage
+                      : "https://i.stack.imgur.com/l60Hf.png";
                   final largeIconPath = await UtilsDownloadFile.downloadFile(
-                      urlImage, 'largeIcon',);
+                    urlImage,
+                    'largeIcon',
+                  );
                   if (widget.userProfile.idUser!.compareTo(ownerUserID) != 0) {
                     final Map<String, String> data = {
                       'click_action': 'FLUTTER_NOTIFICATION_CLICK',

@@ -1,17 +1,16 @@
 import 'package:chatappforours/constants/constants.dart';
-import 'package:chatappforours/constants/user_profile_constant_field.dart';
 import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
-import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/view/chat/addFriend/components/add_friend_card.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class BodyAddFriend extends StatefulWidget {
-  const BodyAddFriend({Key? key}) : super(key: key);
+  const BodyAddFriend({Key? key, required this.ownerUserProfile})
+      : super(key: key);
+  final UserProfile ownerUserProfile;
   @override
   State<BodyAddFriend> createState() => _BodyAddFriendState();
 }
@@ -19,58 +18,26 @@ class BodyAddFriend extends StatefulWidget {
 class _BodyAddFriendState extends State<BodyAddFriend> {
   final TextEditingController searchTextController = TextEditingController();
   late final FirebaseUserProfile firebaseUserProfile;
-  late final FirebaseFriendList firebaseFriendList;
-  Iterable<UserProfile> listUserProfile = [];
-  List<UserProfile> resultListUserProfile = [];
+  late final FocusNode focusNode;
   bool isSelectedSearch = false;
-  getUserProfileStreamSnapshot() async {
-    var data = await FirebaseFirestore.instance
-        .collection('UserProfile')
-        .where(isEmailVerifiedField, isEqualTo: true)
-        .get()
-        .then(
-          (value) => value.docs.map(
-            (e) => UserProfile.fromSnapshot(e),
-          ),
-        );
-    setState(() {
-      listUserProfile = data;
-      resultListUserProfile = List.from(listUserProfile);
-    });
-  }
-
-  _onsearchChange(String val) {
-    resultListUserProfile = [];
-    if (val != "") {
-      for (var userProfile in listUserProfile) {
-        String fullName = userProfile.fullName.toLowerCase();
-        if (fullName.contains(val.toLowerCase())) {
-          resultListUserProfile.add(userProfile);
-        }
-      }
-    } else {
-      resultListUserProfile = List.from(listUserProfile);
-    }
-  }
 
   @override
   void initState() {
     firebaseUserProfile = FirebaseUserProfile();
-    _onsearchChange("");
+    focusNode = FocusNode();
     super.initState();
   }
 
   @override
   void dispose() {
-    listUserProfile = [];
-    resultListUserProfile = [];
+    focusNode.unfocus();
+    focusNode.dispose();
     super.dispose();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    getUserProfileStreamSnapshot();
   }
 
   @override
@@ -100,15 +67,33 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
             ),
           ),
         ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: resultListUserProfile.length,
-            itemBuilder: (context, index) {
-              return AddFriendCard(
-                userProfile: resultListUserProfile.elementAt(index),
-              );
-            },
+        StreamBuilder<Iterable<UserProfile>?>(
+          stream: firebaseUserProfile.getAllUserProfileBySearchText(
+            widget.ownerUserProfile.idUser!,
+            searchTextController.text,
           ),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.active:
+                if (snapshot.hasData) {
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        return AddFriendCard(
+                          userProfile: snapshot.data!.elementAt(index),
+                        );
+                      },
+                    ),
+                  );
+                } else {
+                  return const Text("");
+                }
+
+              default:
+                return const CircularProgressIndicator();
+            }
+          },
         ),
       ],
     );
@@ -119,11 +104,10 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
     bool isDarkTheme,
   ) {
     return TextField(
+      focusNode: focusNode,
       controller: searchTextController,
       onChanged: (val) {
-        setState(() {
-          _onsearchChange(val);
-        });
+        setState(() {});
       },
       decoration: InputDecoration(
         hintText: context.loc.search,
@@ -165,7 +149,6 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
               setState(
                 () {
                   searchTextController.clear();
-                  _onsearchChange(searchTextController.text);
                 },
               );
             },
