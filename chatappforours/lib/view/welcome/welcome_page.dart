@@ -69,7 +69,7 @@ class _WelcomePageState extends State<WelcomePage> {
             builder: (context, snapShot) {
               if (snapShot.hasData) {
                 return ChatScreen(
-                  countFriend: snapShot.data!,
+                  countFriend: snapShot.data!, userProfile: state.userProfile,
                 );
               } else {
                 return const Scaffold();

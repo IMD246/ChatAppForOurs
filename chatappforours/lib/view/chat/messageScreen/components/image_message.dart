@@ -44,8 +44,7 @@ class _ImageMessageState extends State<ImageMessage> {
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: list.length <= 1 ? 0.5 : 3 / 2,
-              mainAxisSpacing: 2,
+              childAspectRatio: list.length <= 1 ? 0.5 : 1,
               crossAxisSpacing: 2,
             ),
             itemBuilder: (BuildContext context, int index) {

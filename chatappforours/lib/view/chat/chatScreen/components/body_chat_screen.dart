@@ -4,13 +4,15 @@ import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/chat_list_view.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class BodyChatScreen extends StatefulWidget {
-  const BodyChatScreen({Key? key}) : super(key: key);
+  const BodyChatScreen({Key? key, required this.ownerUserProfile})
+      : super(key: key);
+  final UserProfile ownerUserProfile;
 
   @override
   State<BodyChatScreen> createState() => _BodyChatScreenState();
@@ -18,17 +20,13 @@ class BodyChatScreen extends StatefulWidget {
 
 class _BodyChatScreenState extends State<BodyChatScreen>
     with AutomaticKeepAliveClientMixin<BodyChatScreen> {
-  List<Chat> listChatData = [];
-  final FirebaseChat firebaseChatDocs = FirebaseChat();
-  final String userID = FirebaseAuth.instance.currentUser!.uid;
   bool isFilledRecent = true;
   bool isFilledActive = false;
-  late Stream<Iterable<Chat>?> stream;
-
+  late final FirebaseChat firebaseChat;
   @override
   void initState() {
-    stream = firebaseChatDocs.getAllChat(ownerUserID: userID);
     super.initState();
+    firebaseChat = FirebaseChat();
   }
 
   @override
@@ -42,7 +40,6 @@ class _BodyChatScreenState extends State<BodyChatScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    Size size = MediaQuery.of(context).size;
     return Column(
       children: [
         Container(
@@ -90,35 +87,30 @@ class _BodyChatScreenState extends State<BodyChatScreen>
             child: RefreshIndicator(
               strokeWidth: 1,
               onRefresh: () async {
-                stream = firebaseChatDocs.getAllChat(ownerUserID: userID);
+                setState(() {
+                  // stream = firebaseChatDocs.getAllChat(ownerUserID: userID);
+                });
               },
-              child: StreamBuilder(
-                stream: stream,
+              child: StreamBuilder<Iterable<Future<Chat>>?>(
+                stream: firebaseChat.getAllChat(
+                  ownerUserProfile: widget.ownerUserProfile,
+                  context: context,
+                ),
                 builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.active:
-                      if (snapshot.hasData) {
-                        final allChat = snapshot.data as Iterable<Chat>;
-                        return ChatListView(
-                          allChat: allChat,
-                          isFilledActive: isFilledActive,
-                        );
-                      } else {
-                        return Center(
-                          child: Text(
-                            context.loc.dont_have_any_chat,
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                        );
-                      }
-                    default:
-                      return Center(
-                        child: SizedBox(
-                          height: size.height * 0.5,
-                          width: size.width * 0.8,
-                          child: const CircularProgressIndicator(),
-                        ),
-                      );
+                  if (snapshot.hasData) {
+                    final allChat = snapshot.data as Iterable<Future<Chat>>;
+                    return ChatListView(
+                      allChat: allChat,
+                      isFilledActive: isFilledActive,
+                      ownerUserProfile: widget.ownerUserProfile,
+                    );
+                  } else {
+                    return Center(
+                      child: Text(
+                        context.loc.dont_have_any_chat,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    );
                   }
                 },
               ),

@@ -1,5 +1,6 @@
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/constants/user_profile_constant_field.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_presence.dart';
 import 'package:chatappforours/services/auth/models/auth_exception.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,8 +30,14 @@ class FirebaseUserProfile {
     required String? userID,
   }) async {
     try {
-      final userProfile = await userProfilePath.doc(userID).get();
-      return UserProfile.fromSnapshot(userProfile);
+      final doc = await userProfilePath.doc(userID).get();
+      final userProfile = UserProfile.fromSnapshot(doc);
+      final firebaseUserPresence = FirebaseUserPresence();
+      final userPresence =
+          await firebaseUserPresence.getUserPresence(userID: userID!);
+      userProfile.presence = userPresence.presence;
+      userProfile.stampTime = userPresence.stampTime;
+      return userProfile;
     } on FirebaseException catch (e) {
       if (e.code == 'user-not-found') {
         throw UserNotFoundAuthException();
@@ -92,17 +99,17 @@ class FirebaseUserProfile {
       await userProfilePath.doc(userID).update(mapUser);
     }
   }
-Future<void> updateTokenUserProfile({
+
+  Future<void> updateTokenUserProfile({
     required String? token,
     required String? userID,
   }) async {
     if (userID != null) {
-      Map<String, dynamic> mapUser = <String, dynamic>{
-        tokenUserField:token
-      };
+      Map<String, dynamic> mapUser = <String, dynamic>{tokenUserField: token};
       await userProfilePath.doc(userID).update(mapUser);
     }
   }
+
   Future<void> updateUserIsEmailVerified({
     required String? userID,
   }) async {

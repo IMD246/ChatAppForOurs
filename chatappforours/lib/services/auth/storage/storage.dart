@@ -1,8 +1,11 @@
+// ignore_for_file: unused_import
+
 import 'dart:io';
 
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +17,8 @@ class Storage {
       required String fileName,
       required BuildContext context,
       required String userID,
-      required FirebaseUserProfile firebaseUserProfile}) async {
+      required FirebaseUserProfile firebaseUserProfile
+      }) async {
     File file = File(filePath);
     try {
       await storage
@@ -61,7 +65,7 @@ class Storage {
       required FirebaseChatMessage firebaseChatMessage,
       required FirebaseUserProfile firebaseUserProfile,
       required String idChat,
-      BuildContext? context,
+      required BuildContext? context,
       required String userOwnerID}) async {
     File file = File(filePath);
     try {
@@ -79,13 +83,10 @@ class Storage {
         (p0) async {
           final urlAudio = await getDownloadURLAudio(
               fileName: lastMessageAudioOwnerUser.idMessage);
-          final userProfile = await firebaseUserProfile.getUserProfile(
-              userID: lastMessageAudioOwnerUser.userID);
           await firebaseChatMessage.uploadAudioMessageNotSent(
             chatID: idChat,
             lastMessageUserOwner: lastMessageAudioOwnerUser,
             urlAudio: urlAudio ?? "",
-            nameSender: userProfile!.fullName,
           );
         },
       );
@@ -106,7 +107,7 @@ class Storage {
     BuildContext? context,
     required FirebaseChatMessage firebaseChatMessage,
     required ChatMessage lastMessageUserOwner,
-    required FirebaseUserProfile firebaseUserProfile,
+    required UserProfile ownerUserProfile,
     required String idChat,
   }) async {
     try {
@@ -123,13 +124,11 @@ class Storage {
             final urlImage = await getDownloadURL(fileName: fileName);
             listUrlImage.add(urlImage!);
             if (listUrlImage.length == listFile.length) {
-              final userProfile = await firebaseUserProfile.getUserProfile(
-                  userID: lastMessageUserOwner.userID);
               await firebaseChatMessage.uploadImageMessageNotSent(
                 chatID: idChat,
                 lastMessageUserOwner: lastMessageUserOwner,
                 listUrlImage: listUrlImage,
-                nameSender: userProfile!.fullName,
+                nameSender: ownerUserProfile.fullName,
               );
             }
           },

@@ -7,11 +7,13 @@ class UserProfile {
   final String? idUser;
   final String email;
   final String fullName;
-  final String? urlImage;
+  final String urlImage;
   final String language;
   final String? tokenUser;
   bool? isEmailVerified = false;
   bool isDarkMode = false;
+  bool presence = false;
+  DateTime stampTime = DateTime.now();
   UserProfile({
     required this.tokenUser,
     required this.language,

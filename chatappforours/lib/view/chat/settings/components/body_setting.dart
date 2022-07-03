@@ -103,7 +103,7 @@ class _BodySettingState extends State<BodySetting> {
                                       "assets/images/defaultImage.png",
                                     ),
                                   ),
-                                if (userProfile!.urlImage != null)
+                                if (userProfile!.urlImage.isNotEmpty)
                                   CircleAvatar(
                                     backgroundColor: Colors.cyan[100],
                                     radius: 60,
@@ -111,7 +111,7 @@ class _BodySettingState extends State<BodySetting> {
                                       child: SizedBox.fromSize(
                                         size: const Size.fromRadius(60),
                                         child: CachedNetworkImage(
-                                          imageUrl: userProfile.urlImage!,
+                                          imageUrl: userProfile.urlImage,
                                           fit: BoxFit.cover,
                                           placeholder: (context, url) =>
                                               const CircularProgressIndicator(),

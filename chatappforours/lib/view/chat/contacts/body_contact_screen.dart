@@ -4,6 +4,7 @@ import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/friend_list.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/view/chat/contacts/components/contact_list_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,8 +14,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class BodyContactScreen extends StatefulWidget {
   const BodyContactScreen({
     Key? key,
+    required this.ownerUserProfile,
   }) : super(key: key);
-
+  final UserProfile ownerUserProfile;
   @override
   State<BodyContactScreen> createState() => _BodyContactScreenState();
 }
@@ -135,7 +137,10 @@ class _BodyContactScreenState extends State<BodyContactScreen>
                 ],
               ),
             ),
-            ContactListView(filledRequestFriend: isFilledRequestFriend),
+            ContactListView(
+              filledRequestFriend: isFilledRequestFriend,
+              ownerUserProfile: widget.ownerUserProfile,
+            ),
           ],
         );
       },

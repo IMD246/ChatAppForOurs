@@ -354,7 +354,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               final userProfile = UserProfile(
                 email: user.email!,
                 fullName: user.displayName!,
-                urlImage: user.photoURL,
+                urlImage: user.photoURL!,
                 isEmailVerified: true,
                 isDarkMode: false,
                 language: Platform.localeName.substring(0, 2).toString(),

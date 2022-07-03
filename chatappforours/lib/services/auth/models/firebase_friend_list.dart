@@ -88,7 +88,7 @@ class FirebaseFriendList {
         .delete();
   }
 
-  Stream<Iterable<FriendList>?> getAllFriendIsAccepted({required ownerUserID}) {
+  Stream<Iterable<FriendList>?> getAllFriendIsAccepted({required String ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
         .doc(ownerUserID)

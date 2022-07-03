@@ -2,10 +2,16 @@ import 'package:chatappforours/constants/chat_constant_field.dart';
 import 'package:chatappforours/constants/message_chat_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_presence.dart';
+import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/crud/firebase_users_join_chat.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
+import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class FirebaseChat {
   final firebaseChat = FirebaseFirestore.instance.collection('chat');
@@ -56,7 +62,6 @@ class FirebaseChat {
             typeChat: typeChat,
           );
           await firebaseChatMessage.createFirstTextMessage(
-            userID: "",
             chatID: listUserID[0] + listUserID[1],
           );
         },
@@ -94,6 +99,8 @@ class FirebaseChat {
     final chat = await firebaseChat.doc(idChat).get();
     return Chat.fromSnapshot(
       docs: chat,
+      userPresence: null,
+      userProfile: null,
     );
   }
 
@@ -105,7 +112,8 @@ class FirebaseChat {
         if (value.exists) {
           return await firebaseChat.doc(value.id).get().then(
             (value) {
-              return Chat.fromSnapshot(docs: value);
+              return Chat.fromSnapshot(
+                  docs: value, userPresence: null, userProfile: null);
             },
           );
         } else {
@@ -117,7 +125,8 @@ class FirebaseChat {
               if (value.exists) {
                 return await firebaseChat.doc(value.id).get().then(
                   (value) {
-                    return Chat.fromSnapshot(docs: value);
+                    return Chat.fromSnapshot(
+                        docs: value, userPresence: null, userProfile: null);
                   },
                 );
               } else {
@@ -130,11 +139,14 @@ class FirebaseChat {
     );
   }
 
-  Stream<Iterable<Chat>?> getAllChat({
-    required String ownerUserID,
+  Stream<Iterable<Future<Chat>>?> getAllChat({
+    required UserProfile ownerUserProfile,
+    required BuildContext context,
   }) {
+    final firebaseUserProfile = FirebaseUserProfile();
+    final firebaseUserPresence = FirebaseUserPresence();
     return firebaseChat
-        .where(listUserField, arrayContains: ownerUserID)
+        .where(listUserField, arrayContains: ownerUserProfile.idUser)
         .where(isActiveField, isEqualTo: true)
         .orderBy(timeLastChatField, descending: true)
         .snapshots()
@@ -142,10 +154,44 @@ class FirebaseChat {
       (event) {
         if (event.docs.isNotEmpty) {
           return event.docs.map(
-            (e) {
-              return Chat.fromSnapshot(
+            (e) async {
+              final chat = Chat.fromSnapshot(
                 docs: e,
+                userPresence: null,
+                userProfile: null,
               );
+              final idUserFriendChat = handleListUserIDChat(
+                chat,
+                ownerUserProfile,
+              );
+              final userProfileChat = await firebaseUserProfile.getUserProfile(
+                userID: idUserFriendChat,
+              );
+              final userPresenceChat =
+                  await firebaseUserPresence.getUserPresence(
+                userID: idUserFriendChat,
+              );
+              chat.nameChat = userProfileChat!.fullName;
+              chat.presenceUserChat = userPresenceChat.presence;
+              chat.stampTimeUser = userPresenceChat.stampTime;
+              chat.urlImage = userProfileChat.urlImage;
+              final firebaseChatMessage = FirebaseChatMessage();
+              final chatMessage =
+                  await firebaseChatMessage.getLastMessageOfAChat(
+                chatID: chat.idChat,
+                ownerUserID: ownerUserProfile.idUser!,
+              );
+              String textNameUserSendMessage = userProfileChat.fullName;
+              if (chatMessage!.isSender!) {
+                textNameUserSendMessage = context.loc.you;
+              }
+              String lastText = getStringMessageByTypeMessage(
+                typeMessage: chat.typeMessage,
+                value: chat.lastText,
+                context: context,
+              );
+              chat.lastText = textNameUserSendMessage + ": $lastText";
+              return chat;
             },
           );
         } else {

@@ -1,40 +1,34 @@
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
-import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
 import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
-import 'package:chatappforours/view/chat/messageScreen/components/chat_input_field_message.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class UploadImageMessage extends StatefulWidget {
+class UploadImageMessage extends StatelessWidget {
   const UploadImageMessage({
     Key? key,
-    required this.firebaseChatMessage,
-    required this.id,
-    required this.storage,
-    required this.widget,
-    required this.firebaseUserProfile,
+    required this.chat,
+    required this.ownerUserProfile,
+    required this.scroll,
   }) : super(key: key);
 
-  final FirebaseChatMessage firebaseChatMessage;
-  final String id;
-  final Storage storage;
-  final ChatInputFieldMessage widget;
-  final FirebaseUserProfile firebaseUserProfile;
+  final Chat chat;
+  final UserProfile ownerUserProfile;
+  final ItemScrollController scroll;
 
-  @override
-  State<UploadImageMessage> createState() => _UploadImageMessageState();
-}
-
-class _UploadImageMessageState extends State<UploadImageMessage> {
-  final FirebaseChat firebaseChat = FirebaseChat();
   @override
   Widget build(BuildContext context) {
+    final Storage storage = Storage();
+    final FirebaseChatMessage firebaseChatMessage = FirebaseChatMessage();
+    final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
     return IconButton(
       onPressed: () async {
         final results = await FilePicker.platform.pickFiles(
@@ -42,52 +36,48 @@ class _UploadImageMessageState extends State<UploadImageMessage> {
           type: FileType.custom,
           allowedExtensions: ['jpg', 'jpeg', 'png'],
         );
-        if (results == null) {
-        } else {
-          await widget.firebaseChatMessage.createImageMessage(
-            userID: widget.id,
-            chatID: widget.widget.chat.idChat,
+        if (results != null) {
+          await firebaseChatMessage.createImageMessage(
+            ownerUserProfile: ownerUserProfile,
+            context: context,
+            chatID: chat.idChat,
           );
           final lastMessageUserOwner =
-              await widget.firebaseChatMessage.getImageMessageNotSentOwnerUser(
-            userID: widget.id,
-            chatID: widget.widget.chat.idChat,
+              await firebaseChatMessage.getImageMessageNotSentOwnerUser(
+            userID: ownerUserProfile.idUser!,
+            chatID: chat.idChat,
           );
-
-          await widget.storage.uploadMultipleFile(
-            listFile: results.files,
-            idChat: widget.widget.chat.idChat,
-            firebaseChatMessage: widget.firebaseChatMessage,
-            firebaseUserProfile: widget.firebaseUserProfile,
-            lastMessageUserOwner: lastMessageUserOwner,
-            context: context,
-          );
-          if (widget.widget.scroll.isAttached) {
-            widget.widget.scroll.scrollTo(
+          await storage.uploadMultipleFile(
+              listFile: results.files,
+              idChat: chat.idChat,
+              firebaseChatMessage: firebaseChatMessage,
+              lastMessageUserOwner: lastMessageUserOwner,
+              context: context,
+              ownerUserProfile: ownerUserProfile);
+          if (scroll.isAttached) {
+            scroll.scrollTo(
               index: intMaxValue,
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeIn,
             );
           }
-          String userIDFriend = widget.widget.chat.listUser.first;
-
-          final ownerUserID = widget.id;
+          String userIDFriend = handleListUserIDChat(chat, ownerUserProfile);
+          final ownerUserID = ownerUserProfile.idUser!;
           if (userIDFriend.compareTo(ownerUserID) != 0) {
-            final chat = await firebaseChat.getChatByID(
-                idChat: widget.widget.chat.idChat, userChatID: ownerUserID);
-            final userProfile = await widget.firebaseUserProfile.getUserProfile(
-              userID: ownerUserID,
-            );
-            final userProfileFriend =
-                await widget.firebaseUserProfile.getUserProfile(
+            final userProfile = ownerUserProfile;
+            final userProfileFriend = await firebaseUserProfile.getUserProfile(
               userID: userIDFriend,
             );
             final Map<String, dynamic> notification = {
-              'title': userProfile!.fullName,
-              'body': handleStringMessageLocalization(chat.lastText, context),
+              'title': userProfile.fullName,
+              'body': handleStringMessageLocalization(
+                chat.lastText,
+                context,
+              ),
             };
-            final urlImage =
-                userProfile.urlImage ?? "https://i.stack.imgur.com/l60Hf.png";
+            final urlImage = userProfile.urlImage.isNotEmpty
+                ? userProfile.urlImage
+                : "https://i.stack.imgur.com/l60Hf.png";
             final largeIconPath = await UtilsDownloadFile.downloadFile(
               urlImage,
               'largeIcon',
@@ -99,9 +89,9 @@ class _UploadImageMessageState extends State<UploadImageMessage> {
               "sendById": ownerUserID,
               "sendBy": userProfile.fullName,
               "chat": <String, dynamic>{
-                "idChat": widget.widget.chat.idChat,
-                "presence": widget.widget.chat.presence,
-                "stampTimeUser": widget.widget.chat.stampTimeUser.toString(),
+                "idChat": chat.idChat,
+                "presence": chat.presenceUserChat,
+                "stampTimeUser": chat.stampTimeUser.toString(),
               },
               'image': largeIconPath,
               'status': 'done',

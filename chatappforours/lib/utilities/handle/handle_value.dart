@@ -1,6 +1,7 @@
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:flutter/material.dart';
 
 String differenceInCalendarDays(DateTime earlier, BuildContext? context) {
@@ -191,7 +192,7 @@ String getStringMessageByTypeMessage(
       context,
     );
   } else if (typeMessage == TypeMessage.audio) {
-    return value + " ${context.loc.message_recording}";
+    return context.loc.message_recording;
   }
   return value;
 }
@@ -218,11 +219,23 @@ String getStringMessageStatus(
   }
 }
 
-String handleNameChat(
-    String ownerUserID, String userIDChat, Chat chat, BuildContext context) {
-  if (ownerUserID == userIDChat) {
-    return context.loc.only_you;
+String handleListUserIDChat(Chat chat, UserProfile ownerUserProfile) {
+  int count = 0;
+  for (var element in chat.listUser) {
+    if (element == ownerUserProfile.idUser) {
+      if (count >= 2) {
+        continue;
+      }
+      count++;
+    }
+  }
+  if (count >= 2) {
+    return ownerUserProfile.idUser!;
   } else {
-    return chat.nameChat ?? "";
+    return chat.listUser
+        .where(
+          (element) => element != ownerUserProfile.idUser!,
+        )
+        .first;
   }
 }

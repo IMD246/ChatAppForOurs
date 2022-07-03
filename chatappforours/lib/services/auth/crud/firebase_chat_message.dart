@@ -1,21 +1,20 @@
 import 'package:chatappforours/constants/message_chat_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
+import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:flutter/material.dart';
 class FirebaseChatMessage {
   final firebaseChatMessageDocument = FirebaseFirestore.instance.collection(
     'chatMessage',
   );
   Future<void> createFirstTextMessage({
-    required userID,
-    required chatID,
-    String? text,
+    required String chatID,
   }) async {
     Map<String, dynamic> map = {
       idSenderField: '',
@@ -30,21 +29,21 @@ class FirebaseChatMessage {
         .collection('message')
         .get()
         .then(
-      (value) {
+      (value) async {
         if (value.docs.isNotEmpty) {
-          firebaseChatMessageDocument
+          await firebaseChatMessageDocument
               .doc(chatID)
               .collection('message')
-              .where(idSenderField, isEqualTo: userID)
+              .where(idSenderField, isEqualTo: "")
               .where(
                 messageStatusField,
                 isEqualTo: MessageStatus.notSent.toString(),
               )
               .get()
               .then(
-            (value) {
+            (value) async {
               if (value.docs.isNotEmpty) {
-                firebaseChatMessageDocument
+                await firebaseChatMessageDocument
                     .doc(chatID)
                     .collection('message')
                     .doc(value.docs.first.id)
@@ -53,7 +52,7 @@ class FirebaseChatMessage {
             },
           );
         } else {
-          firebaseChatMessageDocument
+          await firebaseChatMessageDocument
               .doc(chatID)
               .collection('message')
               .doc()
@@ -80,15 +79,38 @@ class FirebaseChatMessage {
         .set(map);
   }
 
-  Future<void> createImageMessage({
-    required userID,
-    required chatID,
-  }) async {
+  Future<void> createLikeMessage(
+      {required UserProfile userProfile, required chatID}) async {
+    Map<String, dynamic> map = {
+      idSenderField: userProfile.idUser,
+      hasSenderField: true,
+      messageField: "👍",
+      typeMessageField: TypeMessage.like.toString(),
+      messageStatusField: MessageStatus.sent.toString(),
+      stampTimeField: DateTime.now(),
+    };
+    final firebaseChat = FirebaseChat();
+    await firebaseChatMessageDocument
+        .doc(chatID)
+        .collection('message')
+        .doc()
+        .set(map);
+    await firebaseChat.updateChatLastText(
+      text: "👍",
+      chatID: chatID,
+      typeMessage: TypeMessage.like,
+    );
+  }
+
+  Future<void> createImageMessage(
+      {required UserProfile ownerUserProfile,
+      required chatID,
+      required BuildContext context}) async {
     List<String> list = ["."];
     Map<String, dynamic> map = {
-      idSenderField: userID,
+      idSenderField: ownerUserProfile.idUser,
       hasSenderField: true,
-      messageField: ". . .",
+      messageField: "a",
       listURLImageField: list,
       typeMessageField: TypeMessage.image.toString(),
       messageStatusField: MessageStatus.notSent.toString(),
@@ -102,13 +124,15 @@ class FirebaseChatMessage {
   }
 
   Future<void> createAudioMessage({
-    required userID,
+    required UserProfile ownerUserProfile,
     required chatID,
+    required BuildContext context,
   }) async {
+    final String message = context.loc.message_recording;
     Map<String, dynamic> map = {
-      idSenderField: userID,
+      idSenderField: ownerUserProfile.idUser!,
       hasSenderField: true,
-      messageField: ". . .",
+      messageField: message,
       urlAudioField: ".",
       typeMessageField: TypeMessage.audio.toString(),
       messageStatusField: MessageStatus.notSent.toString(),
@@ -143,8 +167,8 @@ class FirebaseChatMessage {
   }
 
   Future<ChatMessage> getImageMessageNotSentOwnerUser({
-    required userID,
-    required chatID,
+    required String userID,
+    required String chatID,
   }) async {
     return await firebaseChatMessageDocument
         .doc(chatID)
@@ -168,9 +192,10 @@ class FirebaseChatMessage {
     required ChatMessage lastMessageUserOwner,
   }) async {
     final firebaseChat = FirebaseChat();
+    final String message = "sent ${listUrlImage.length} photo";
     Map<String, dynamic> map = {
       listURLImageField: listUrlImage,
-      messageField: "n",
+      messageField: message,
       typeMessageField: TypeMessage.image.toString(),
       messageStatusField: MessageStatus.sent.toString(),
     };
@@ -180,7 +205,7 @@ class FirebaseChatMessage {
         .doc(lastMessageUserOwner.idMessage)
         .update(map);
     await firebaseChat.updateChatLastText(
-      text: "$nameSender sent ${listUrlImage.length} photo",
+      text: message,
       chatID: chatID,
       typeMessage: TypeMessage.image,
     );
@@ -189,7 +214,6 @@ class FirebaseChatMessage {
   Future<void> uploadAudioMessageNotSent({
     required String chatID,
     required String urlAudio,
-    required String nameSender,
     required ChatMessage lastMessageUserOwner,
   }) async {
     final firebaseChat = FirebaseChat();
@@ -204,7 +228,7 @@ class FirebaseChatMessage {
         .doc(lastMessageUserOwner.idMessage)
         .update(map);
     await firebaseChat.updateChatLastText(
-      text: nameSender,
+      text: lastMessageUserOwner.value,
       chatID: chatID,
       typeMessage: TypeMessage.audio,
     );
@@ -269,12 +293,6 @@ class FirebaseChatMessage {
         .collection('message')
         .doc()
         .set(mapCreate);
-    if (chat.isActive == false) {
-      await firebaseChat.updateChatToActive(
-        idChat: chat.idChat,
-        ownerUserID: ownerUserID,
-      );
-    }
     await firebaseChat.updateChatLastText(
       text: text,
       chatID: chat.idChat,
@@ -307,7 +325,7 @@ class FirebaseChatMessage {
       },
     );
     if (lastMessage) {
-      return userProfile.getUserProfile(userID: userIDFriend);
+      return userProfile.getUserProfile(userID:userIDFriend);
     } else {
       return null;
     }
@@ -417,8 +435,10 @@ class FirebaseChatMessage {
     );
   }
 
-  Stream<Iterable<ChatMessage>> getAllMessage(
-      {required String chatID, required String ownerUserID}) {
+  Stream<Iterable<ChatMessage>> getAllMessage({
+    required String chatID,
+    required String ownerUserID,
+  }) {
     final allMessage = firebaseChatMessageDocument
         .doc(chatID)
         .collection('message')

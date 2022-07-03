@@ -1,25 +1,29 @@
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat_message.dart';
-import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
+import 'package:chatappforours/services/auth/models/chat_message.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/chat_input_field_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/message_card.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+
 class BodyMessage extends StatefulWidget {
-  const BodyMessage({Key? key, required this.chat}) : super(key: key);
+  const BodyMessage(
+      {Key? key, required this.chat, required this.ownerUserProfile})
+      : super(key: key);
   final Chat chat;
+  final UserProfile ownerUserProfile;
   @override
   State<BodyMessage> createState() => _BodyMessageState();
 }
 
 class _BodyMessageState extends State<BodyMessage> {
   late final FirebaseChatMessage firebaseChatMessage;
-  String id = FirebaseAuth.instance.currentUser!.uid;
   late final ItemScrollController scrollController;
+  
 
   @override
   void initState() {
@@ -40,7 +44,7 @@ class _BodyMessageState extends State<BodyMessage> {
         StreamBuilder(
           stream: firebaseChatMessage.getAllMessage(
             chatID: widget.chat.idChat,
-            ownerUserID: id,
+            ownerUserID: widget.ownerUserProfile.idUser!,
           ),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
@@ -71,7 +75,7 @@ class _BodyMessageState extends State<BodyMessage> {
                               index: index,
                               beforeIndex: index - 1,
                               chat: widget.chat,
-                              scrollController: scrollController,
+                              scrollController: scrollController, ownerUserProfile: widget.ownerUserProfile,
                             ),
                           );
                         } else {
@@ -81,7 +85,7 @@ class _BodyMessageState extends State<BodyMessage> {
                             index: index,
                             beforeIndex: index - 1,
                             chat: widget.chat,
-                            scrollController: scrollController,
+                            scrollController: scrollController, ownerUserProfile: widget.ownerUserProfile,
                           );
                         }
                       } else {
@@ -108,9 +112,9 @@ class _BodyMessageState extends State<BodyMessage> {
           },
         ),
         ChatInputFieldMessage(
+          ownerUserProfile: widget.ownerUserProfile,
           chat: widget.chat,
           scroll: scrollController,
-          userIDFriend: widget.chat.listUser[0],
         ),
       ],
     );

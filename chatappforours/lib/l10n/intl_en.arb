@@ -95,6 +95,7 @@
     "sent_text_image" : "sent",
     "not_sent" : "Not sent",
     "ago" : "ago",
+    "you" : "You",
     "seconds" : "seconds",
     "minutes" : "minutes",
     "days" : "days",
@@ -104,7 +105,7 @@
     "photo" : "photo",
     "recording" : "Recording...",
     "no_any_chat_ative": "No any chat active",
-    "message_recording" : "sent 1 audio message",
+    "message_recording" : "sent an audio message",
     "request_friend_notification_title": "Request Friend Notification",
     "request_friend_notification_body": "You Have Request Friend From {friendProfile}",
     "@request_friend_notification_body":{

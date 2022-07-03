@@ -32,8 +32,6 @@ class _FullScreenImageState extends State<FullScreenImage> {
                 width: size.width,
                 height: size.height,
                 imageUrl: widget.urlImage,
-                placeholder: (context, url) =>
-                    const CircularProgressIndicator(),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
               Visibility(

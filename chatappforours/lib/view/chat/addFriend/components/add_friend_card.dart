@@ -83,7 +83,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
         return ListTile(
           leading: Stack(
             children: [
-              if (widget.userProfile.urlImage != null)
+              if (widget.userProfile.urlImage.isNotEmpty)
                 CircleAvatar(
                   backgroundColor: Colors.cyan[100],
                   radius: 20,
@@ -91,7 +91,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
                     child: SizedBox.fromSize(
                       size: const Size.fromRadius(60),
                       child: CachedNetworkImage(
-                        imageUrl: widget.userProfile.urlImage!,
+                        imageUrl: widget.userProfile.urlImage,
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
                             const CircularProgressIndicator(),
@@ -101,7 +101,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
                     ),
                   ),
                 ),
-              if (widget.userProfile.urlImage == null)
+              if (widget.userProfile.urlImage.isEmpty)
                 CircleAvatar(
                   backgroundColor: Colors.cyan[100],
                   backgroundImage: const AssetImage(
@@ -155,10 +155,10 @@ class _AddFriendCardState extends State<AddFriendCard> {
                       userProfile!.fullName,
                     ),
                   };
-                  final urlImage = userProfile.urlImage ??
+                  final urlImage = userProfile.urlImage.isNotEmpty ? userProfile.urlImage:
                       "https://i.stack.imgur.com/l60Hf.png";
                   final largeIconPath = await UtilsDownloadFile.downloadFile(
-                      urlImage, 'largeIcon');
+                      urlImage, 'largeIcon',);
                   if (widget.userProfile.idUser!.compareTo(ownerUserID) != 0) {
                     final Map<String, String> data = {
                       'click_action': 'FLUTTER_NOTIFICATION_CLICK',

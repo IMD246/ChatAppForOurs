@@ -8,6 +8,7 @@ import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
+import 'package:chatappforours/services/auth/crud/user_presence_field.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/notification.dart';
 import 'package:chatappforours/view/chat/addFriend/add_friend_screen.dart';
@@ -26,8 +27,10 @@ class ChatScreen extends StatefulWidget {
   const ChatScreen({
     Key? key,
     required this.countFriend,
+    required this.userProfile,
   }) : super(key: key);
   final int countFriend;
+  final UserProfile userProfile;
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -115,7 +118,7 @@ class _ChatScreenState extends State<ChatScreen> {
             userChatID: event.data['sendById'],
           );
           chat.nameChat = event.data['sendBy'];
-          chat.presence = temp['presence'];
+          chat.presenceUserChat = temp[presenceField];
           chat.stampTimeUser = DateTime.parse(temp['stampTimeUser']);
           chat.listUser.remove(event.data['sendById']);
           await noti.showNotification(
@@ -127,7 +130,10 @@ class _ChatScreenState extends State<ChatScreen> {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) {
-                return MesssageScreen(chat: chat);
+                return MesssageScreen(
+                  chat: chat,
+                  ownerUserProfile: widget.userProfile,
+                );
               },
             ),
           );
@@ -144,8 +150,8 @@ class _ChatScreenState extends State<ChatScreen> {
         return FutureBuilder<UserProfile?>(
           future: firebaseUserProfile.getUserProfile(userID: ownerUserID),
           builder: (context, snapshot) {
-            final userProfile = snapshot.data;
             if (snapshot.hasData) {
+              final userProfile = snapshot.data;
               return Scaffold(
                 appBar: buildAppbar(
                   currentIndex,
@@ -156,9 +162,13 @@ class _ChatScreenState extends State<ChatScreen> {
                 body: PageView(
                   physics: const NeverScrollableScrollPhysics(),
                   controller: pageController,
-                  children: const [
-                    BodyChatScreen(),
-                    BodyContactScreen(),
+                  children: [
+                    BodyChatScreen(
+                      ownerUserProfile: widget.userProfile,
+                    ),
+                    BodyContactScreen(
+                      ownerUserProfile: widget.userProfile,
+                    ),
                   ],
                 ),
                 floatingActionButton: FloatingActionButton(
@@ -183,10 +193,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 bottomNavigationBar: BottomNavigationBar(
                   currentIndex: currentIndex,
                   onTap: (index) {
-                    setState(() {
-                      currentIndex = index;
-                      pageController.jumpToPage(index);
-                    });
+                    if (currentIndex != index) {
+                      setState(
+                        () {
+                          currentIndex = index;
+                          pageController.jumpToPage(index);
+                        },
+                      );
+                    }
                   },
                   items: [
                     BottomNavigationBarItem(
@@ -201,13 +215,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               );
             } else {
-              return const Scaffold(
-                body: Center(
-                  child: SizedBox(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-              );
+              return const Scaffold();
             }
           },
         );
