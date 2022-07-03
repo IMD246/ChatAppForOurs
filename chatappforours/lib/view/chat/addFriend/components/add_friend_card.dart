@@ -32,13 +32,12 @@ class _AddFriendCardState extends State<AddFriendCard> {
   final DatabaseReference userPresenceDatabaseReference =
       FirebaseDatabase.instance.ref('userPresence');
   String? stampTimeUserFormated;
-  String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
 
   Future<void> setUserProfile({required UserProfile? userProfile}) async {
     final friend = await firebaseFriendList.getIDFriendListDocument(
       ownerUserID: userProfile!.idUser!,
-      userID: ownerUserID,
+      userID: widget.userProfile.idUser!,
     );
     if (userProfile.idUser != null) {
       await userPresenceDatabaseReference
@@ -147,7 +146,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
               press: () async {
                 if (isAdded == false) {
                   final userProfile = await firebaseUserProfile.getUserProfile(
-                    userID: ownerUserID,
+                    userID: widget.userProfile.idUser!,
                   );
                   final notifcation = <String, dynamic>{
                     'title': context.loc.request_friend_notification_title,
@@ -162,7 +161,9 @@ class _AddFriendCardState extends State<AddFriendCard> {
                     urlImage,
                     'largeIcon',
                   );
-                  if (widget.userProfile.idUser!.compareTo(ownerUserID) != 0) {
+                  if (widget.userProfile.idUser!
+                          .compareTo(widget.userProfile.idUser!) !=
+                      0) {
                     final Map<String, String> data = {
                       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
                       'id': '1',
@@ -179,7 +180,7 @@ class _AddFriendCardState extends State<AddFriendCard> {
                   setState(() {
                     firebaseFriendList.createNewFriendDefault(
                       ownerUserID: widget.userProfile.idUser!,
-                      userIDFriend: ownerUserID,
+                      userIDFriend: widget.userProfile.idUser!,
                     );
                   });
                 }
