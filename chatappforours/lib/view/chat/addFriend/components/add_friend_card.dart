@@ -8,62 +8,29 @@ import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
 import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
-import 'package:chatappforours/utilities/handle/handle_value.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class AddFriendCard extends StatefulWidget {
   const AddFriendCard({
     Key? key,
     required this.userProfile,
+    required this.ownerUserProfile,
   }) : super(key: key);
-  final UserProfile userProfile;
+  final Future<UserProfile> userProfile;
+  final UserProfile ownerUserProfile;
   @override
   State<AddFriendCard> createState() => _AddFriendCardState();
 }
 
 class _AddFriendCardState extends State<AddFriendCard> {
-  bool isAdded = false;
-  bool? isCheckPress;
-  bool isUserPresence = false;
+  late final FirebaseUserProfile firebaseUserProfile;
 
   late final FirebaseFriendList firebaseFriendList;
-  final DatabaseReference userPresenceDatabaseReference =
-      FirebaseDatabase.instance.ref('userPresence');
-  String? stampTimeUserFormated;
-  final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-
-  Future<void> setUserProfile({required UserProfile? userProfile}) async {
-    final friend = await firebaseFriendList.getIDFriendListDocument(
-      ownerUserID: userProfile!.idUser!,
-      userID: widget.userProfile.idUser!,
-    );
-    if (userProfile.idUser != null) {
-      await userPresenceDatabaseReference
-          .child(widget.userProfile.idUser!)
-          .once()
-          .then(
-        (event) async {
-          if (friend != null) {
-            isCheckPress = true;
-            isAdded = true;
-          } else {
-            isCheckPress = false;
-            isAdded = false;
-          }
-          final data = Map<String, dynamic>.from(event.snapshot.value as Map);
-          final isOnline = data['presence'];
-          final stampTimeUser = DateTime.tryParse(data['stamp_time'])!;
-          stampTimeUserFormated = differenceInCalendarPresence(stampTimeUser);
-          isUserPresence = isOnline;
-        },
-      );
-    }
-  }
 
   @override
   void initState() {
     firebaseFriendList = FirebaseFriendList();
+    firebaseUserProfile = FirebaseUserProfile();
     super.initState();
   }
 
@@ -75,121 +42,132 @@ class _AddFriendCardState extends State<AddFriendCard> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return FutureBuilder<void>(
-      future: setUserProfile(userProfile: widget.userProfile),
+    return FutureBuilder<UserProfile?>(
+      future: widget.userProfile,
       builder: (context, snapshot) {
-        return ListTile(
-          leading: Stack(
-            children: [
-              if (widget.userProfile.urlImage.isNotEmpty)
-                CircleAvatar(
-                  backgroundColor: Colors.cyan[100],
-                  radius: 20,
-                  child: ClipOval(
-                    child: SizedBox.fromSize(
-                      size: const Size.fromRadius(60),
-                      child: CachedNetworkImage(
-                        imageUrl: widget.userProfile.urlImage,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            const CircularProgressIndicator(),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                      ),
-                    ),
+        if (snapshot.hasData) {
+          final userProfile = snapshot.data!;
+          return FutureBuilder<String?>(
+              future: firebaseFriendList.getIDFriendListDocument(
+                ownerUserID: widget.ownerUserProfile.idUser!,
+                userID: userProfile.idUser!,
+              ),
+              builder: (context, snapshot) {
+                bool isAdded = snapshot.hasData ? true : false;
+                return ListTile(
+                  leading: Stack(
+                    children: [
+                      if (userProfile.urlImage.isNotEmpty)
+                        CircleAvatar(
+                          backgroundColor: Colors.cyan[100],
+                          radius: 20,
+                          child: ClipOval(
+                            child: SizedBox.fromSize(
+                              size: const Size.fromRadius(60),
+                              child: CachedNetworkImage(
+                                imageUrl: userProfile.urlImage,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) =>
+                                    const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error),
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (userProfile.urlImage.isEmpty)
+                        CircleAvatar(
+                          backgroundColor: Colors.cyan[100],
+                          backgroundImage: const AssetImage(
+                            "assets/images/defaultImage.png",
+                          ),
+                        ),
+                      if (userProfile.presence)
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            height: 16,
+                            width: 16,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: kPrimaryColor,
+                              border: Border.all(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                width: 3,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-              if (widget.userProfile.urlImage.isEmpty)
-                CircleAvatar(
-                  backgroundColor: Colors.cyan[100],
-                  backgroundImage: const AssetImage(
-                    "assets/images/defaultImage.png",
+                  title: Text(
+                    userProfile.fullName,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              if (isUserPresence == true)
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    height: 16,
-                    width: 16,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: kPrimaryColor,
-                      border: Border.all(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        width: 3,
-                      ),
-                    ),
+                  trailing: FillOutlineButton(
+                    minWidth: size.width * 0.2,
+                    press: () async {
+                      if (isAdded == false) {
+                        final ownerUserProfile = widget.ownerUserProfile;
+                        final notifcation = <String, dynamic>{
+                          'title':
+                              context.loc.request_friend_notification_title,
+                          'body': context.loc.request_friend_notification_body(
+                            userProfile.fullName,
+                          ),
+                        };
+                        final urlImage = ownerUserProfile.urlImage.isNotEmpty
+                            ? ownerUserProfile.urlImage
+                            : "https://i.stack.imgur.com/l60Hf.png";
+                        final largeIconPath =
+                            await UtilsDownloadFile.downloadFile(
+                          urlImage,
+                          'largeIcon',
+                        );
+                        if (userProfile.idUser!
+                                .compareTo(ownerUserProfile.idUser!) !=
+                            0) {
+                          final Map<String, String> data = {
+                            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                            'id': '1',
+                            'messageType':
+                                TypeNotification.addFriend.toString(),
+                            'status': 'done',
+                            'image': largeIconPath,
+                          };
+                          await sendMessage(
+                            notification: notifcation,
+                            tokenUserFriend: userProfile.tokenUser!,
+                            data: data,
+                          );
+                        }
+                        setState(
+                          () {
+                            firebaseFriendList.createNewFriend(
+                              ownerUserID: ownerUserProfile.idUser!,
+                              userIDFriend: userProfile.idUser!,
+                              isRequest: false,
+                            );
+                            firebaseFriendList.createNewFriend(
+                              ownerUserID: userProfile.idUser!,
+                              userIDFriend: ownerUserProfile.idUser!,
+                              isRequest: false,
+                            );
+                          },
+                        );
+                      }
+                    },
+                    text: isAdded ? context.loc.added : context.loc.add,
+                    isFilled: !isAdded,
+                    isCheckAdded: isAdded,
                   ),
-                ),
-              if (isUserPresence == false)
-                Positioned(
-                  bottom: -2,
-                  right: 0,
-                  child: Text(
-                    stampTimeUserFormated != null ? stampTimeUserFormated! : "",
-                    style: const TextStyle(fontSize: 11),
-                  ),
-                ),
-            ],
-          ),
-          title: Text(
-            widget.userProfile.fullName,
-            overflow: TextOverflow.ellipsis,
-          ),
-          trailing: Visibility(
-            visible: isCheckPress != null,
-            child: FillOutlineButton(
-              minWidth: size.width * 0.2,
-              press: () async {
-                if (isAdded == false) {
-                  final userProfile = await firebaseUserProfile.getUserProfile(
-                    userID: widget.userProfile.idUser!,
-                  );
-                  final notifcation = <String, dynamic>{
-                    'title': context.loc.request_friend_notification_title,
-                    'body': context.loc.request_friend_notification_body(
-                      userProfile!.fullName,
-                    ),
-                  };
-                  final urlImage = userProfile.urlImage.isNotEmpty
-                      ? userProfile.urlImage
-                      : "https://i.stack.imgur.com/l60Hf.png";
-                  final largeIconPath = await UtilsDownloadFile.downloadFile(
-                    urlImage,
-                    'largeIcon',
-                  );
-                  if (widget.userProfile.idUser!
-                          .compareTo(widget.userProfile.idUser!) !=
-                      0) {
-                    final Map<String, String> data = {
-                      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-                      'id': '1',
-                      'messageType': TypeNotification.addFriend.toString(),
-                      'status': 'done',
-                      'image': largeIconPath,
-                    };
-                    await sendMessage(
-                      notification: notifcation,
-                      tokenUserFriend: widget.userProfile.tokenUser!,
-                      data: data,
-                    );
-                  }
-                  setState(() {
-                    firebaseFriendList.createNewFriendDefault(
-                      ownerUserID: widget.userProfile.idUser!,
-                      userIDFriend: widget.userProfile.idUser!,
-                    );
-                  });
-                }
-              },
-              text: isAdded ? context.loc.added : context.loc.add,
-              isFilled: !isAdded,
-              isCheckAdded: isAdded,
-            ),
-          ),
-        );
+                );
+              });
+        } else {
+          return const Text("");
+        }
       },
     );
   }

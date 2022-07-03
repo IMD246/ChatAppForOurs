@@ -26,16 +26,20 @@ class FirebaseUserProfile {
     );
   }
 
-
-   Stream<Iterable<UserProfile>?> getAllUserProfileBySearchText(
+  Stream<Iterable<Future<UserProfile>>?> getAllUserProfileBySearchText(
       String ownerUserID, String? searchText) {
+                final firebaseUserProfile = FirebaseUserProfile();
     if (searchText?.isEmpty == true) {
       final listUserProfile = userProfilePath.limit(20).snapshots().map(
         (event) {
           if (event.docs.isNotEmpty) {
             return event.docs.map(
-              (e) {
-                return UserProfile.fromSnapshot(e);
+              (e) async {
+                final userProfile = UserProfile.fromSnapshot(e);
+                final getUserProfile = await firebaseUserProfile.getUserProfile(
+                  userID: userProfile.idUser,
+                );
+                return getUserProfile!;
               },
             );
           } else {
@@ -56,8 +60,12 @@ class FirebaseUserProfile {
         (event) {
           if (event.docs.isNotEmpty) {
             return event.docs.map(
-              (e) {
-                return UserProfile.fromSnapshot(e);
+              (e) async{
+                  final userProfile = UserProfile.fromSnapshot(e);
+                final getUserProfile = await firebaseUserProfile.getUserProfile(
+                  userID: userProfile.idUser,
+                );
+                return getUserProfile!;
               },
             );
           } else {

@@ -24,7 +24,8 @@ class ContactListView extends StatelessWidget {
       builder: (context, state) {
         return Expanded(
           child: StreamBuilder(
-            stream: firebaseFriendList.getAllFriendIsAccepted(ownerUserID: ownerUserProfile.idUser!),
+            stream: firebaseFriendList.getAllFriend(
+                ownerUserID: ownerUserProfile.idUser!),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final listFriend = snapshot.data as Iterable<FriendList>;
@@ -32,8 +33,10 @@ class ContactListView extends StatelessWidget {
                     ? listFriend
                         .where((element) => element.isRequest! == false)
                         .toList()
-                    : listFriend.toList();
-                if (listFilter.isNotEmpty){
+                    : listFriend
+                        .where((element) => element.isRequest! == true)
+                        .toList();
+                if (listFilter.isNotEmpty) {
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: listFilter.length,

@@ -24,22 +24,6 @@ class FirebaseFriendList {
         .set(map);
   }
 
-  Future<void> createNewFriendDefault({
-    required String ownerUserID,
-    required String userIDFriend,
-  }) async {
-    Map<String, dynamic> map = <String, dynamic>{
-      userIDField: userIDFriend,
-      isRequestField: false,
-      stampTimeField: DateTime.now(),
-    };
-    await friendListDocumentDefault
-        .doc(ownerUserID)
-        .collection('friend')
-        .doc(userIDFriend)
-        .set(map);
-  }
-
   Future<String?> getIDFriendListDocument(
       {required String ownerUserID,
       required String userID,
@@ -48,14 +32,17 @@ class FirebaseFriendList {
         .doc(ownerUserID)
         .collection('friend')
         .where(userIDField, isEqualTo: userID)
+        .limit(1)
         .get()
-        .then((value) {
-      if (value.docs.isNotEmpty) {
-        return value.docs.first.id;
-      } else {
-        return null;
-      }
-    });
+        .then(
+      (value) {
+        if (value.docs.isNotEmpty) {
+          return value.docs.first.id;
+        } else {
+          return null;
+        }
+      },
+    );
     return id;
   }
 
@@ -88,7 +75,8 @@ class FirebaseFriendList {
         .delete();
   }
 
-  Stream<Iterable<FriendList>?> getAllFriendIsAccepted({required String ownerUserID}) {
+  Stream<Iterable<FriendList>?> getAllFriendIsAccepted(
+      {required String ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
         .doc(ownerUserID)
@@ -115,6 +103,27 @@ class FirebaseFriendList {
         .doc(ownerUserID)
         .collection('friend')
         .where(isRequestField, isEqualTo: false)
+        .orderBy(stampTimeField, descending: true)
+        .snapshots()
+        .map(
+      (event) {
+        if (event.docs.isNotEmpty) {
+          return event.docs.map(
+            (e) => FriendList.fromSnapshot(snapshot: e),
+          );
+        } else {
+          return null;
+        }
+      },
+    );
+    return friendList;
+  }
+
+  Stream<Iterable<FriendList>?> getAllFriend({required String ownerUserID}) {
+    final friendList = friendListDocument
+        .collection('friendList')
+        .doc(ownerUserID)
+        .collection('friend')
         .orderBy(stampTimeField, descending: true)
         .snapshots()
         .map(

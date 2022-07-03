@@ -67,7 +67,7 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
             ),
           ),
         ),
-        StreamBuilder<Iterable<UserProfile>?>(
+        StreamBuilder<Iterable<Future<UserProfile>>?>(
           stream: firebaseUserProfile.getAllUserProfileBySearchText(
             widget.ownerUserProfile.idUser!,
             searchTextController.text,
@@ -82,6 +82,7 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
                       itemBuilder: (context, index) {
                         return AddFriendCard(
                           userProfile: snapshot.data!.elementAt(index),
+                          ownerUserProfile:widget.ownerUserProfile,
                         );
                       },
                     ),

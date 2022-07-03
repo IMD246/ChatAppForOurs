@@ -337,8 +337,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
     on<AuthEventSignInWithGoogle>(
       (event, emit) async {
-        final userProfileFirebase = FirebaseUserProfile();
-        final user = await authProvider.createUserWithGoogle();
         emit(
           const AuthStateLoggedOut(
             isLoading: true,
@@ -346,6 +344,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           ),
         );
         try {
+          final user = await authProvider.createUserWithGoogle();
+          final userProfileFirebase = FirebaseUserProfile();
           if (user.email != null) {
             final getUserProfileVerify = await userProfileFirebase
                 .getUserProfileByEmail(email: user.email);
