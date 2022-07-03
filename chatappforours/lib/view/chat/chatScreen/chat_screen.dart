@@ -47,7 +47,6 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     FirebaseMessaging.instance.requestPermission();
     pageController = PageController(initialPage: currentIndex);
-    firebaseUserProfile.updateUserPresenceDisconnect(uid: ownerUserID);
     super.initState();
   }
 
@@ -59,6 +58,11 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void didChangeDependencies() {
     tz.initializeTimeZones();
+    setState(
+      () {
+        firebaseUserProfile.updateUserPresenceDisconnect(uid: ownerUserID);
+      },
+    );
     final noti = NotificationService();
     noti.initNotification();
     FirebaseMessaging.onMessage.listen(
@@ -176,7 +180,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
-                          return AddFriendScreen(ownerUserProfile: widget.userProfile,);
+                          return AddFriendScreen(
+                            ownerUserProfile: widget.userProfile,
+                          );
                         },
                       ),
                     );

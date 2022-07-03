@@ -1,7 +1,6 @@
 import 'package:chatappforours/services/auth/models/auth_exception.dart';
 import 'package:chatappforours/services/auth/models/auth_provider.dart';
 import 'package:chatappforours/services/auth/models/auth_user.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -45,31 +44,25 @@ class FirebaseAuthProvider implements AuthProvider {
   @override
   Future<AuthUser> logIn(
       {required String email, required String password}) async {
-    final connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult == ConnectivityResult.mobile &&
-        connectivityResult == ConnectivityResult.wifi) {
-      try {
-        await FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: email, password: password);
-        final user = currentUser;
-        if (user != null) {
-          return user;
-        } else {
-          throw UserNotLoggedInAuthException();
-        }
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          throw UserNotFoundAuthException();
-        } else if (e.code == 'wrong-password') {
-          throw WrongPasswordAuthException();
-        } else {
-          throw GenericAuthException();
-        }
-      } catch (_) {
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      final user = currentUser;
+      if (user != null) {
+        return user;
+      } else {
+        throw UserNotLoggedInAuthException();
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw UserNotFoundAuthException();
+      } else if (e.code == 'wrong-password') {
+        throw WrongPasswordAuthException();
+      } else {
         throw GenericAuthException();
       }
-    } else {
-      throw UserNotTurnOnInternet();
+    } catch (_) {
+      throw GenericAuthException();
     }
   }
 

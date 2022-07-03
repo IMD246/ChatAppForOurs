@@ -18,4 +18,3 @@ class AuthEmailNeedsVefiricationException implements Exception {}
 class GenericAuthException implements Exception {}
 
 class UserNotLoggedInAuthException implements Exception {}
-class UserNotTurnOnInternet implements Exception {}
