@@ -11,6 +11,7 @@ import 'package:chatappforours/view/ForgotPassword/forgot_password.dart';
 import 'package:chatappforours/view/chat/chatScreen/chat_screen.dart';
 import 'package:chatappforours/view/signInOrSignUp/signIn/sign_in.dart';
 import 'package:chatappforours/view/signInOrSignUp/signUp/sign_up.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,101 +37,133 @@ class _WelcomePageState extends State<WelcomePage> {
     Size size = MediaQuery.of(context).size;
     final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
     themeChanger.setContext(context: context);
-    return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) async {
-        if (state is AuthStateLoggedIn) {
-          final userProfile = state.userProfile;
-          final String? token = await FirebaseMessaging.instance.getToken();
-          await firebaseUserProfile.updateTokenUserProfile(
-            token: token,
-            userID: state.userProfile.idUser,
-          );
-          themeChanger.setTheme(
-            userProfile.isDarkMode,
-          );
-          themeChanger.setLanguge(userProfile.language);
-        }
-        if (state.isLoading) {
-          LoadingScreen().show(
-            context: context,
-            text: state.loadingText ?? context.loc.please_wait_a_moment,
-          );
-        } else {
-          LoadingScreen().hide();
-        }
-      },
-      builder: (context, state) {
-        if (state is AuthStateLoggedOut) {
-          return const SignIn();
-        } else if (state is AuthStateLoggedIn) {
-          return FutureBuilder<int>(
-            future: firebaseFriendList.countAllFriendIsRequested(
-                ownerUserID: state.userProfile.idUser!),
-            builder: (context, snapShot) {
-              if (snapShot.hasData) {
-                return ChatScreen(
-                  countFriend: snapShot.data!, userProfile: state.userProfile,
+    return StreamBuilder<ConnectivityResult>(
+      stream: Connectivity().onConnectivityChanged,
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data! == ConnectivityResult.wifi) {
+          return BlocConsumer<AuthBloc, AuthState>(
+            listener: (context, state) async {
+              if (state is AuthStateLoggedIn) {
+                final userProfile = state.userProfile;
+                final String? token =
+                    await FirebaseMessaging.instance.getToken();
+                await firebaseUserProfile.updateTokenUserProfile(
+                  token: token,
+                  userID: state.userProfile.idUser,
+                );
+                themeChanger.setTheme(
+                  userProfile.isDarkMode,
+                );
+                themeChanger.setLanguge(userProfile.language);
+              }
+              if (state.isLoading) {
+                LoadingScreen().show(
+                  context: context,
+                  text: state.loadingText ?? context.loc.please_wait_a_moment,
                 );
               } else {
-                return const Scaffold();
+                LoadingScreen().hide();
+              }
+            },
+            builder: (context, state) {
+              if (state is AuthStateLoggedOut) {
+                return const SignIn();
+              } else if (state is AuthStateLoggedIn) {
+                return FutureBuilder<int>(
+                  future: firebaseFriendList.countAllFriendIsRequested(
+                      ownerUserID: state.userProfile.idUser!),
+                  builder: (context, snapShot) {
+                    if (snapShot.hasData) {
+                      return ChatScreen(
+                        countFriend: snapShot.data!,
+                        userProfile: state.userProfile,
+                      );
+                    } else {
+                      return const Scaffold();
+                    }
+                  },
+                );
+              } else if (state is AuthStateRegistering) {
+                return const SignUp();
+              } else if (state is AuthStateForgotPassWord) {
+                return const ForgotPassword();
+              } else {
+                return Scaffold(
+                  backgroundColor: Colors.white,
+                  body: Column(
+                    children: [
+                      const Spacer(flex: 1),
+                      if (!isKeyboard)
+                        Image.asset(
+                          "assets/images/welcome_image.png",
+                          height: size.height * 0.45,
+                          width: size.width,
+                        ),
+                      const Spacer(flex: 2),
+                      Text(
+                        context.loc.welcome,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: textColorMode(ThemeMode.light),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
+                      ),
+                      const Spacer(),
+                      FittedBox(
+                        child: TextButton(
+                          onPressed: () async {
+                            context.read<AuthBloc>().add(
+                                  const AuthEventInitialize(),
+                                );
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                context.loc.skip,
+                                style: TextStyle(
+                                  color: textColorMode(ThemeMode.light)
+                                      .withOpacity(0.8),
+                                  fontSize: 24,
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios_outlined,
+                                color: textColorMode(ThemeMode.light)
+                                    .withOpacity(0.7),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                );
               }
             },
           );
-        } else if (state is AuthStateRegistering) {
-          return const SignUp();
-        } else if (state is AuthStateForgotPassWord) {
-          return const ForgotPassword();
         } else {
           return Scaffold(
-            backgroundColor: Colors.white,
-            body: Column(
-              children: [
-                const Spacer(flex: 1),
-                if (!isKeyboard)
-                  Image.asset(
-                    "assets/images/welcome_image.png",
-                    height: size.height * 0.45,
-                    width: size.width,
-                  ),
-                const Spacer(flex: 2),
-                Text(
-                  context.loc.welcome,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: textColorMode(ThemeMode.light),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-                ),
-                const Spacer(),
-                FittedBox(
-                  child: TextButton(
-                    onPressed: () {
-                      context.read<AuthBloc>().add(
-                            const AuthEventInitialize(),
-                          );
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          context.loc.skip,
-                          style: TextStyle(
-                            color:
-                                textColorMode(ThemeMode.light).withOpacity(0.8),
-                            fontSize: 24,
-                          ),
-                        ),
-                        Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          color:
-                              textColorMode(ThemeMode.light).withOpacity(0.7),
-                        ),
-                      ],
+            body: Center(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.4,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.2,
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: const CircularProgressIndicator(),
                     ),
-                  ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      context.loc.please_check_internet,
+                    ),
+                  ],
                 ),
-                const Spacer(),
-              ],
+              ),
             ),
           );
         }

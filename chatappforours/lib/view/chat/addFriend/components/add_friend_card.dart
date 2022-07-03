@@ -9,7 +9,6 @@ import 'package:chatappforours/services/notification/send_notification_message.d
 import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 

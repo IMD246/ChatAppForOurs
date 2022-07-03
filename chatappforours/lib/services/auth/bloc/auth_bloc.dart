@@ -13,7 +13,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(AuthProvider authProvider)
-      : super(const AuthStateLoading(isLoading: false)) {
+      : super(
+          const AuthStateLoading(
+            isLoading: false,
+          ),
+        ) {
     on<AuthEventShouldRegister>((event, emit) {
       emit(
         const AuthStateRegistering(
@@ -24,7 +28,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
     on<AuthEventInitialize>(
       (event, emit) async {
-        emit(const AuthStateLoggedOut(exception: null, isLoading: true));
+        emit(
+          const AuthStateLoggedOut(
+            exception: null,
+            isLoading: true,
+          ),
+        );
+
         FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
         final user = authProvider.currentUser;
         try {
@@ -34,25 +44,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             emit(
               const AuthStateLoggedOut(exception: null, isLoading: false),
             );
-          } else {
-            if (user != null && userProfile != null) {
-              if (user.isEmailVerified == true) {
-                await firebaseUserProfile.updateUserPresenceDisconnect(
-                    uid: user.id!);
-                emit(
-                  AuthStateLoggedIn(userProfile: userProfile, isLoading: false),
-                );
-              } else {
-                await FirebaseAuth.instance.currentUser?.delete();
-                emit(
-                  const AuthStateLoggedOut(exception: null, isLoading: false),
-                );
-              }
+          } else if (user != null && userProfile != null) {
+            if (user.isEmailVerified == true) {
+              await firebaseUserProfile.updateUserPresenceDisconnect(
+                  uid: user.id!);
+              emit(
+                AuthStateLoggedIn(userProfile: userProfile, isLoading: false),
+              );
             } else {
+              await FirebaseAuth.instance.currentUser?.delete();
               emit(
                 const AuthStateLoggedOut(exception: null, isLoading: false),
               );
             }
+          } else {
+            emit(
+              const AuthStateLoggedOut(exception: null, isLoading: false),
+            );
           }
         } on Exception catch (e) {
           emit(
@@ -76,6 +84,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             email: email,
             password: password,
           );
+
           if (user.isEmailVerified == false) {
             emit(
               AuthStateLoggedOut(

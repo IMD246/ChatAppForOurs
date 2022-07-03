@@ -50,7 +50,9 @@ class _MaterialState extends State<Material> {
     final language = themeChanger.langugage.substring(0, 2).toString();
     final String defaultLocale = Platform.localeName.substring(0, 2).toString();
     return BlocProvider<AuthBloc>(
-      create: (context) => AuthBloc(FirebaseAuthProvider()),
+      create: (context) => AuthBloc(
+        FirebaseAuthProvider(),
+      ),
       child: MaterialApp(
         supportedLocales: AppLocalizations.supportedLocales,
         locale: language.compareTo(defaultLocale) == 0

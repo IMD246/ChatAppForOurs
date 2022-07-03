@@ -104,6 +104,7 @@
     "years" : "years",
     "photo" : "photo",
     "recording" : "Recording...",
+    "please_check_internet" : "Please check your internet connection",
     "no_any_chat_ative": "No any chat active",
     "message_recording" : "sent an audio message",
     "request_friend_notification_title": "Request Friend Notification",

@@ -58,6 +58,7 @@ class AuthStateRegistering extends AuthState {
       {required this.exception, required bool isLoading, this.email})
       : super(isLoading: isLoading);
 }
+
 class AuthStateSignInWithFacebook extends AuthState {
   final Exception? exception;
   const AuthStateSignInWithFacebook(
