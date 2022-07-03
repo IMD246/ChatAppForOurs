@@ -16,6 +16,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 // ignore: unused_import
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -325,7 +326,11 @@ class _BodySettingState extends State<BodySetting> {
                     child: PrimaryButton(
                         text: context.loc.sign_out,
                         color: Colors.white,
-                        press: () {
+                        press: () async {
+                          final GoogleSignIn googleSignIn = GoogleSignIn();
+                          await googleSignIn.isSignedIn() == true
+                              ? await googleSignIn.signOut()
+                              : "";
                           context.read<AuthBloc>().add(
                                 const AuthEventLogOut(),
                               );

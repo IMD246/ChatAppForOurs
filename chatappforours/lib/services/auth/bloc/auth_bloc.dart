@@ -9,7 +9,6 @@ import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(AuthProvider authProvider)
@@ -193,20 +192,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             bool: false,
             uid: authProvider.currentUser?.id,
           );
-          final userProfile = await firebaseUserProfile.getUserProfile(
-              userID: authProvider.currentUser?.id);
-          if (userProfile != null) {
-            await FirebaseFirestore.instance.clearPersistence();
-            final GoogleSignIn googleSignIn = GoogleSignIn();
-            await googleSignIn.signOut();
+          if (authProvider.currentUser?.id != null) {
             await authProvider.logOut();
-            emit(
-              const AuthStateLoggedOut(
-                exception: null,
-                isLoading: false,
-              ),
-            );
           }
+          await FirebaseFirestore.instance.clearPersistence();
           emit(
             const AuthStateLoggedOut(
               exception: null,

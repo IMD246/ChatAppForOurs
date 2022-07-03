@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-sendMessage({
+Future<void> sendMessage({
   required Map<String, dynamic> notification,
   required String tokenUserFriend,
   required Map<String,dynamic> data,
