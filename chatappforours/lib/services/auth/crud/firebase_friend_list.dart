@@ -1,7 +1,7 @@
 import 'package:chatappforours/constants/list_friend_constant_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/constants/user_profile_constant_field.dart';
-import 'package:chatappforours/services/auth/models/friend_list.dart';
+import 'package:chatappforours/services/auth/models/friend.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseFriendList {
@@ -11,10 +11,9 @@ class FirebaseFriendList {
   Future<void> createNewFriend(
       {required String ownerUserID,
       required String userIDFriend,
-      required bool isRequest}) async {
+      }) async {
     Map<String, dynamic> map = <String, dynamic>{
       userIDField: userIDFriend,
-      isRequestField: isRequest,
       stampTimeField: DateTime.now(),
     };
     await friendListDocumentDefault
@@ -45,23 +44,6 @@ class FirebaseFriendList {
     );
     return id;
   }
-
-  Future<void> updateRequestFriend(
-      {required String ownerUserID, required String userID}) async {
-    await createNewFriend(
-      ownerUserID: ownerUserID,
-      userIDFriend: userID,
-      isRequest: true,
-    );
-    if (ownerUserID != userID) {
-      await createNewFriend(
-        ownerUserID: userID,
-        userIDFriend: ownerUserID,
-        isRequest: true,
-      );
-    }
-  }
-
   Future<void> deleteFriend(
       {required String ownerUserID, required String userID}) async {
     String? id = await getIDFriendListDocument(
@@ -75,7 +57,7 @@ class FirebaseFriendList {
         .delete();
   }
 
-  Stream<Iterable<FriendList>?> getAllFriendIsAccepted(
+  Stream<Iterable<Friend>?> getAllFriendIsAccepted(
       {required String ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
@@ -87,7 +69,7 @@ class FirebaseFriendList {
         .map((event) {
       if (event.docs.isNotEmpty) {
         return event.docs.map(
-          (e) => FriendList.fromSnapshot(snapshot: e),
+          (e) => Friend.fromSnapshot(snapshot: e),
         );
       } else {
         return null;
@@ -96,7 +78,7 @@ class FirebaseFriendList {
     return friendList;
   }
 
-  Stream<Iterable<FriendList>?> getAllFriendIsRequested(
+  Stream<Iterable<Friend>?> getAllFriendIsRequested(
       {required String ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
@@ -109,7 +91,7 @@ class FirebaseFriendList {
       (event) {
         if (event.docs.isNotEmpty) {
           return event.docs.map(
-            (e) => FriendList.fromSnapshot(snapshot: e),
+            (e) => Friend.fromSnapshot(snapshot: e),
           );
         } else {
           return null;
@@ -119,7 +101,7 @@ class FirebaseFriendList {
     return friendList;
   }
 
-  Stream<Iterable<FriendList>?> getAllFriend({required String ownerUserID}) {
+  Stream<Iterable<Friend>?> getAllFriend({required String ownerUserID}) {
     final friendList = friendListDocument
         .collection('friendList')
         .doc(ownerUserID)
@@ -130,7 +112,7 @@ class FirebaseFriendList {
       (event) {
         if (event.docs.isNotEmpty) {
           return event.docs.map(
-            (e) => FriendList.fromSnapshot(snapshot: e),
+            (e) => Friend.fromSnapshot(snapshot: e),
           );
         } else {
           return null;
@@ -140,17 +122,19 @@ class FirebaseFriendList {
     return friendList;
   }
 
-  Future<int> countAllFriendIsRequested({required String ownerUserID}) async {
+  Future<int?> countAllFriend({required String ownerUserID}) async {
     final friendRequestCount = await friendListDocument
         .collection('friendList')
         .doc(ownerUserID)
         .collection('friend')
-        .where(isRequestField, isEqualTo: false)
         .get()
         .then((value) {
-      return value.size;
-    });
-
+      if (value.docs.isNotEmpty && value.size > 0) {
+        return value.size;
+      } else {
+        return null;
+      }
+    },);
     return friendRequestCount;
   }
 }

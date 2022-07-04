@@ -1,24 +1,22 @@
-import 'package:chatappforours/constants/list_friend_constant_field.dart';
 import 'package:chatappforours/constants/user_profile_constant_field.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FriendList {
-  final String idFriendList;
+class RequestFriend {
+  final String idRequestFriend;
   final String userID;
-  final bool? isRequest;
   String? stampTimeUser;
   bool presence;
-  FriendList( {required this.idFriendList,
+  RequestFriend({
+    required this.idRequestFriend,
     required this.userID,
-    required this.isRequest,
     this.stampTimeUser,
     this.presence = false,
   });
-  factory FriendList.fromSnapshot(
+  factory RequestFriend.fromSnapshot(
       {required QueryDocumentSnapshot<Map<String, dynamic>> snapshot}) {
-    return FriendList(
+    return RequestFriend(
       userID: snapshot.get(userIDField),
-      isRequest: snapshot.get(isRequestField), idFriendList: snapshot.id,
+      idRequestFriend: snapshot.id,
     );
   }
 }

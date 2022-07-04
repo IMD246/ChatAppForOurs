@@ -2,8 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/extensions/locallization.dart';
+import 'package:chatappforours/services/auth/crud/firebase_request_friend.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
-import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
+import 'package:chatappforours/services/auth/crud/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
 import 'package:chatappforours/services/notification/utils_download_file.dart';
@@ -26,11 +27,13 @@ class _AddFriendCardState extends State<AddFriendCard> {
   late final FirebaseUserProfile firebaseUserProfile;
 
   late final FirebaseFriendList firebaseFriendList;
-
+  late final FirebaseRequestFriend firebaseRequestFriend;
+  bool isAdded = false;
   @override
   void initState() {
     firebaseFriendList = FirebaseFriendList();
     firebaseUserProfile = FirebaseUserProfile();
+    firebaseRequestFriend = FirebaseRequestFriend();
     super.initState();
   }
 
@@ -48,123 +51,119 @@ class _AddFriendCardState extends State<AddFriendCard> {
         if (snapshot.hasData) {
           final userProfile = snapshot.data!;
           return FutureBuilder<String?>(
-              future: firebaseFriendList.getIDFriendListDocument(
-                ownerUserID: widget.ownerUserProfile.idUser!,
-                userID: userProfile.idUser!,
-              ),
-              builder: (context, snapshot) {
-                bool isAdded = snapshot.hasData ? true : false;
-                return ListTile(
-                  leading: Stack(
-                    children: [
-                      if (userProfile.urlImage.isNotEmpty)
-                        CircleAvatar(
-                          backgroundColor: Colors.cyan[100],
-                          radius: 20,
-                          child: ClipOval(
-                            child: SizedBox.fromSize(
-                              size: const Size.fromRadius(60),
-                              child: CachedNetworkImage(
-                                imageUrl: userProfile.urlImage,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) =>
-                                    const CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error),
-                              ),
+            future: firebaseFriendList.getIDFriendListDocument(
+              ownerUserID: widget.ownerUserProfile.idUser!,
+              userID: userProfile.idUser!,
+            ),
+            builder: (context, snapshot) {
+              isAdded = snapshot.hasData ? true : false;
+              return ListTile(
+                leading: Stack(
+                  children: [
+                    if (userProfile.urlImage.isNotEmpty)
+                      CircleAvatar(
+                        backgroundColor: Colors.cyan[100],
+                        radius: 20,
+                        child: ClipOval(
+                          child: SizedBox.fromSize(
+                            size: const Size.fromRadius(60),
+                            child: CachedNetworkImage(
+                              imageUrl: userProfile.urlImage,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) =>
+                                  const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
                             ),
                           ),
                         ),
-                      if (userProfile.urlImage.isEmpty)
-                        CircleAvatar(
-                          backgroundColor: Colors.cyan[100],
-                          backgroundImage: const AssetImage(
-                            "assets/images/defaultImage.png",
-                          ),
+                      ),
+                    if (userProfile.urlImage.isEmpty)
+                      CircleAvatar(
+                        backgroundColor: Colors.cyan[100],
+                        backgroundImage: const AssetImage(
+                          "assets/images/defaultImage.png",
                         ),
-                      if (userProfile.presence)
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            height: 16,
-                            width: 16,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: kPrimaryColor,
-                              border: Border.all(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                width: 3,
-                              ),
+                      ),
+                    if (userProfile.presence)
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          height: 16,
+                          width: 16,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: kPrimaryColor,
+                            border: Border.all(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              width: 3,
                             ),
                           ),
                         ),
-                    ],
-                  ),
-                  title: Text(
-                    userProfile.fullName,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: FillOutlineButton(
-                    minWidth: size.width * 0.2,
-                    press: () async {
-                      if (isAdded == false) {
-                        final ownerUserProfile = widget.ownerUserProfile;
-                        final notifcation = <String, dynamic>{
-                          'title':
-                              context.loc.request_friend_notification_title,
-                          'body': context.loc.request_friend_notification_body(
-                            userProfile.fullName,
-                          ),
+                      ),
+                  ],
+                ),
+                title: Text(
+                  userProfile.fullName,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: FillOutlineButton(
+                  minWidth: size.width * 0.2,
+                  press: () async {
+                    if (snapshot.hasData && isAdded) {
+                      final ownerUserProfile = widget.ownerUserProfile;
+                      final notifcation = <String, dynamic>{
+                        'title': context.loc.request_friend_notification_title,
+                        'body': context.loc.request_friend_notification_body(
+                          userProfile.fullName,
+                        ),
+                      };
+                      final urlImage = ownerUserProfile.urlImage.isNotEmpty
+                          ? ownerUserProfile.urlImage
+                          : "https://i.stack.imgur.com/l60Hf.png";
+                      final largeIconPath =
+                          await UtilsDownloadFile.downloadFile(
+                        urlImage,
+                        'largeIcon',
+                      );
+                      if (userProfile.idUser!
+                              .compareTo(ownerUserProfile.idUser!) !=
+                          0) {
+                        final Map<String, String> data = {
+                          'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                          'id': '1',
+                          'messageType': TypeNotification.addFriend.toString(),
+                          'status': 'done',
+                          'image': largeIconPath,
                         };
-                        final urlImage = ownerUserProfile.urlImage.isNotEmpty
-                            ? ownerUserProfile.urlImage
-                            : "https://i.stack.imgur.com/l60Hf.png";
-                        final largeIconPath =
-                            await UtilsDownloadFile.downloadFile(
-                          urlImage,
-                          'largeIcon',
-                        );
-                        if (userProfile.idUser!
-                                .compareTo(ownerUserProfile.idUser!) !=
-                            0) {
-                          final Map<String, String> data = {
-                            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-                            'id': '1',
-                            'messageType':
-                                TypeNotification.addFriend.toString(),
-                            'status': 'done',
-                            'image': largeIconPath,
-                          };
-                          await sendMessage(
-                            notification: notifcation,
-                            tokenUserFriend: userProfile.tokenUser!,
-                            data: data,
-                          );
-                        }
-                        setState(
-                          () {
-                            firebaseFriendList.createNewFriend(
-                              ownerUserID: ownerUserProfile.idUser!,
-                              userIDFriend: userProfile.idUser!,
-                              isRequest: false,
-                            );
-                            firebaseFriendList.createNewFriend(
-                              ownerUserID: userProfile.idUser!,
-                              userIDFriend: ownerUserProfile.idUser!,
-                              isRequest: false,
-                            );
-                          },
+                        await sendMessage(
+                          notification: notifcation,
+                          tokenUserFriend: userProfile.tokenUser!,
+                          data: data,
                         );
                       }
-                    },
-                    text: isAdded ? context.loc.added : context.loc.add,
-                    isFilled: !isAdded,
-                    isCheckAdded: isAdded,
-                  ),
-                );
-              });
+                      setState(
+                        () {
+                          firebaseFriendList.createNewFriend(
+                            ownerUserID: ownerUserProfile.idUser!,
+                            userIDFriend: userProfile.idUser!,
+                          );
+                          firebaseRequestFriend.createNewRequestFriend(
+                            ownerUserID: userProfile.idUser!,
+                            userIDFriend: ownerUserProfile.idUser!,
+                          );
+                        },
+                      );
+                    }
+                  },
+                  text: isAdded ? context.loc.added : context.loc.add,
+                  isFilled: !isAdded,
+                  isCheckAdded: isAdded,
+                ),
+              );
+            },
+          );
         } else {
           return const Text("");
         }

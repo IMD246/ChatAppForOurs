@@ -1,21 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
-import 'package:chatappforours/enum/enum.dart';
-import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_presence.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
-import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
-import 'package:chatappforours/services/auth/models/friend_list.dart';
+import 'package:chatappforours/services/auth/crud/firebase_friend_list.dart';
+import 'package:chatappforours/services/auth/models/friend.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
-import 'package:chatappforours/services/notification/send_notification_message.dart';
-import 'package:chatappforours/services/notification/utils_download_file.dart';
-import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -23,19 +17,15 @@ class ContactCard extends StatefulWidget {
   const ContactCard({
     Key? key,
     required this.friend,
-    required this.requestFriend,
     required this.ownerUserProfile,
   }) : super(key: key);
-  final FriendList friend;
-  final bool requestFriend;
+  final Friend friend;
   final UserProfile ownerUserProfile;
   @override
   State<ContactCard> createState() => _ContactCardState();
 }
 
 class _ContactCardState extends State<ContactCard> {
-  final userPresenceDatabaseReference =
-      FirebaseDatabase.instance.ref('userPresence');
   late final FirebaseUserProfile firebaseUserProfile;
   late final FirebaseChat firebaseChat;
   late final FirebaseUserPresence firebaseUserPresence;
@@ -46,10 +36,6 @@ class _ContactCardState extends State<ContactCard> {
     firebaseChat = FirebaseChat();
     firebaseUserPresence = FirebaseUserPresence();
     firebaseFriendList = FirebaseFriendList();
-    setState(() {
-      firebaseUserProfile.updateUserPresence(
-          uid: widget.ownerUserProfile.idUser, bool: true);
-    });
     super.initState();
   }
 
@@ -59,36 +45,35 @@ class _ContactCardState extends State<ContactCard> {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         return FutureBuilder<UserProfile?>(
-          future:
-              firebaseUserProfile.getUserProfile(userID: widget.friend.userID),
+          future: firebaseUserProfile.getUserProfile(
+            userID: widget.friend.userID,
+          ),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               final userProfileFriend = snapshot.data!;
               return InkWell(
                 onTap: () async {
-                  if (!widget.requestFriend) {
-                    final chat = await firebaseChat.getChatByListIDUser(
-                      listUserID: [
-                        widget.ownerUserProfile.idUser!,
-                        widget.friend.userID
-                      ],
+                  final chat = await firebaseChat.getChatByListIDUser(
+                    listUserID: [
+                      widget.ownerUserProfile.idUser!,
+                      widget.friend.userID
+                    ],
+                  );
+                  if (chat != null) {
+                    chat.presenceUserChat = userProfileFriend.presence;
+                    chat.stampTimeUser = userProfileFriend.stampTime;
+                    chat.urlImage = userProfileFriend.urlImage;
+                    chat.nameChat = userProfileFriend.fullName;
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) {
+                          return MesssageScreen(
+                            chat: chat,
+                            ownerUserProfile: widget.ownerUserProfile,
+                          );
+                        },
+                      ),
                     );
-                    if (chat != null) {
-                      chat.presenceUserChat = userProfileFriend.presence;
-                      chat.stampTimeUser = userProfileFriend.stampTime;
-                      chat.urlImage = userProfileFriend.urlImage;
-                      chat.nameChat = userProfileFriend.fullName;
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) {
-                            return MesssageScreen(
-                              chat: chat,
-                              ownerUserProfile: widget.ownerUserProfile,
-                            );
-                          },
-                        ),
-                      );
-                    }
                   }
                 },
                 child: Padding(
@@ -147,11 +132,9 @@ class _ContactCardState extends State<ContactCard> {
                               bottom: 0,
                               right: 0,
                               child: Text(
-                                widget.friend.stampTimeUser != null
-                                    ? differenceInCalendarPresence(
-                                        userProfileFriend.stampTime,
-                                      )
-                                    : "",
+                                differenceInCalendarPresence(
+                                  userProfileFriend.stampTime,
+                                ),
                                 style: const TextStyle(fontSize: 13),
                               ),
                             ),
@@ -163,9 +146,7 @@ class _ContactCardState extends State<ContactCard> {
                             horizontal: kDefaultPadding / 2),
                         child: Text(
                           userProfileFriend.fullName,
-                          overflow: widget.requestFriend
-                              ? TextOverflow.ellipsis
-                              : null,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 14,
@@ -173,78 +154,6 @@ class _ContactCardState extends State<ContactCard> {
                         ),
                       ),
                       const Spacer(),
-                      Visibility(
-                        visible: widget.requestFriend,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            FillOutlineButton(
-                              press: () async {
-                                final userProfile = widget.ownerUserProfile;
-
-                                final Map<String, dynamic> notification = {
-                                  'title': context
-                                      .loc.accept_friend_notification_title,
-                                  'body': context.loc
-                                      .accept_friend_notification_body(
-                                          userProfile.fullName),
-                                };
-                                final urlImage = userProfile.urlImage.isEmpty
-                                    ? userProfile.urlImage
-                                    : "https://i.stack.imgur.com/l60Hf.png";
-                                final largeIconPath =
-                                    await UtilsDownloadFile.downloadFile(
-                                        urlImage, 'largeIcon');
-                                if (widget.friend.userID
-                                        .compareTo(userProfile.idUser!) !=
-                                    0) {
-                                  final Map<String, String> data = {
-                                    'click_action':
-                                        'FLUTTER_NOTIFICATION_CLICK',
-                                    'id': '1',
-                                    'messageType': TypeNotification.acceptFriend
-                                        .toString(),
-                                    'image': largeIconPath,
-                                    'status': 'done',
-                                  };
-                                  sendMessage(
-                                    notification: notification,
-                                    tokenUserFriend:
-                                        userProfileFriend.tokenUser!,
-                                    data: data,
-                                  );
-                                }
-                                await firebaseFriendList.updateRequestFriend(
-                                  ownerUserID: userProfile.idUser!,
-                                  userID: widget.friend.userID,
-                                );
-                                await firebaseChat.createChat(
-                                  typeChat: TypeChat.normal,
-                                  listUserID: [
-                                    userProfile.idUser!,
-                                    widget.friend.userID
-                                  ],
-                                );
-                              },
-                              text: context.loc.accept,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: kDefaultPadding * 0.2),
-                              child: FillOutlineButton(
-                                press: () async {
-                                  await firebaseFriendList.deleteFriend(
-                                    ownerUserID:
-                                        widget.ownerUserProfile.idUser!,
-                                    userID: widget.friend.userID,
-                                  );
-                                },
-                                text: context.loc.cancel,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ),

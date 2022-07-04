@@ -4,8 +4,8 @@ import 'package:chatappforours/services/Theme/theme_changer.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_event.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
+import 'package:chatappforours/services/auth/crud/firebase_request_friend.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
-import 'package:chatappforours/services/auth/models/firebase_friend_list.dart';
 import 'package:chatappforours/utilities/loading/loading_screen.dart';
 import 'package:chatappforours/view/ForgotPassword/forgot_password.dart';
 import 'package:chatappforours/view/chat/chatScreen/chat_screen.dart';
@@ -25,7 +25,7 @@ class WelcomePage extends StatefulWidget {
 
 class _WelcomePageState extends State<WelcomePage> {
   final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
-  final FirebaseFriendList firebaseFriendList = FirebaseFriendList();
+  final FirebaseRequestFriend firebaseRequestFriend = FirebaseRequestFriend();
   @override
   void initState() {
     super.initState();
@@ -69,18 +69,16 @@ class _WelcomePageState extends State<WelcomePage> {
               if (state is AuthStateLoggedOut) {
                 return const SignIn();
               } else if (state is AuthStateLoggedIn) {
-                return FutureBuilder<int>(
-                  future: firebaseFriendList.countAllFriendIsRequested(
-                      ownerUserID: state.userProfile.idUser!),
+                return FutureBuilder<int?>(
+                  future: firebaseRequestFriend.countAllRequestFriend(
+                    ownerUserID: state.userProfile.idUser!,
+                  ),
                   builder: (context, snapShot) {
-                    if (snapShot.hasData) {
-                      return ChatScreen(
-                        countFriend: snapShot.data!,
-                        userProfile: state.userProfile,
-                      );
-                    } else {
-                      return const Scaffold();
-                    }
+                    int countFriend = snapShot.hasData ? snapShot.data! : 0;
+                    return ChatScreen(
+                      countFriend: countFriend,
+                      userProfile: state.userProfile,
+                    );
                   },
                 );
               } else if (state is AuthStateRegistering) {
