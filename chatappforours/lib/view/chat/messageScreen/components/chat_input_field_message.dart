@@ -74,7 +74,6 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
     if (userIDFriend.compareTo(ownerUserID) != 0) {
       final chat = await firebaseChat.getChatByID(
         idChat: widget.chat.idChat,
-        userChatID: ownerUserID,
       );
       final userProfileFriend = await firebaseUserProfile.getUserProfile(
         userID: userIDFriend,
@@ -96,11 +95,14 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
         'messageType': TypeNotification.chat.toString(),
         "sendById": ownerUserID,
         "sendBy": widget.ownerUserProfile.fullName,
-        "mapChat": <String, Chat>{
-          "chat": chat,
+        "chat": <String, dynamic>{
+          "idChat": widget.chat.idChat,
+          "nameChat": widget.chat.nameChat,
+          "urlImage": widget.chat.urlImage,
+          "presence": widget.chat.presenceUserChat,
         },
-        "mapOwnerUserProfile": <String, UserProfile>{
-          "ownerUserProfile": widget.ownerUserProfile,
+        "userProfile": <String, dynamic>{
+          "idUser": widget.ownerUserProfile.idUser,
         },
         'image': urlImage,
         'status': 'done',

@@ -88,8 +88,12 @@ class _SendMessageState extends State<SendMessage> {
               "sendBy": userProfile.fullName,
               "chat": <String, dynamic>{
                 "idChat": widget.chat.idChat,
+                "nameChat": widget.chat.nameChat,
+                "urlImage": widget.chat.urlImage,
                 "presence": widget.chat.presenceUserChat,
-                "stampTimeUser": widget.chat.stampTimeUser.toString(),
+              },
+              "userProfile": <String, dynamic>{
+                "idUser": widget.ownerUserProfile.idUser,
               },
               'image': urlImage,
               'status': 'done',
@@ -130,11 +134,14 @@ class _SendMessageState extends State<SendMessage> {
               'messageType': TypeNotification.chat.toString(),
               "sendById": ownerUserID,
               "sendBy": userProfile.fullName,
-              "mapChat": <String, Chat>{
-                "chat": widget.chat,
+              "chat": <String, dynamic>{
+                "idChat": widget.chat.idChat,
+                "nameChat": widget.chat.nameChat,
+                "urlImage": widget.chat.urlImage,
+                "presence": widget.chat.presenceUserChat,
               },
-              "mapOwnerUserProfile": <String, UserProfile>{
-                "ownerUserProfile": widget.ownerUserProfile,
+              "userProfile": <String, dynamic>{
+                "idUser": widget.ownerUserProfile.idUser,
               },
               'image': urlImage,
               'status': 'done',

@@ -93,7 +93,6 @@ class FirebaseChat {
 
   Future<Chat> getChatByID({
     required String idChat,
-    required String userChatID,
   }) async {
     final chat = await firebaseChat.doc(idChat).get();
     return Chat.fromSnapshot(

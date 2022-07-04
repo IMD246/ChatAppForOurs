@@ -8,7 +8,6 @@ import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
-import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/notification.dart';
 import 'package:chatappforours/services/notification/utils_download_file.dart';
@@ -17,8 +16,6 @@ import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
 import 'package:chatappforours/view/chat/messageScreen/message_screen.dart';
 import 'package:chatappforours/view/chat/settings/setting_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,9 +37,6 @@ class _ChatScreenState extends State<ChatScreen> {
   int currentIndex = 0;
   final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
   final FirebaseChat firebaseChat = FirebaseChat();
-  final userPresenceDatabaseReference =
-      FirebaseDatabase.instance.ref('userPresence');
-  String ownerUserID = FirebaseAuth.instance.currentUser!.uid;
   late final PageController pageController;
   @override
   void initState() {
@@ -64,7 +58,8 @@ class _ChatScreenState extends State<ChatScreen> {
     noti.initNotification();
     setState(
       () {
-        firebaseUserProfile.updateUserPresenceDisconnect(uid: ownerUserID);
+        firebaseUserProfile.updateUserPresenceDisconnect(
+            uid: widget.userProfile.idUser!);
       },
     );
     FirebaseMessaging.onMessage.listen(
@@ -94,33 +89,11 @@ class _ChatScreenState extends State<ChatScreen> {
               urlImage: largeIconPath,
             );
           } else {
-            Map<String, dynamic> temp = jsonDecode(event.data['mapChat']);
-            final Chat chat = temp['chat'] as Chat;
-            Map<String, dynamic> tempUserProfile =
-                jsonDecode(event.data['mapOwnerUserProfile']);
-            final UserProfile ownerUserProfile =
-                tempUserProfile['ownerUserProfile'];
             await noti.showNotification(
               id: 1,
               title: event.notification!.title!,
               body: event.notification!.body!,
               urlImage: largeIconPath,
-            );
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) {
-                  return MesssageScreen(
-                    chat: chat,
-                    ownerUserProfile: ownerUserProfile,
-                  );
-                },
-              ),
-            );
-            noti.showNotification(
-              id: 1,
-              title: event.notification!.title!,
-              body: event.notification!.body!,
-              urlImage: event.data['image'],
             );
           }
         }
@@ -155,12 +128,13 @@ class _ChatScreenState extends State<ChatScreen> {
               urlImage: largeIconPath,
             );
           } else {
-            Map<String, Chat> temp = jsonDecode(event.data['mapChat']);
-            final Chat chat = temp['chat'] as Chat;
-            Map<String, UserProfile> tempUserProfile =
-                jsonDecode(event.data['mapOwnerUserProfile']);
-            final UserProfile ownerUserProfile =
-                tempUserProfile['ownerUserProfile'] as UserProfile;
+            Map<String, dynamic> mapChat = jsonDecode(event.data['chat']);
+            final chat =
+                await firebaseChat.getChatByID(idChat: mapChat['idChat']);
+            chat.presenceUserChat = mapChat['presence'];
+            chat.nameChat = mapChat['nameChat'];
+            chat.urlImage = mapChat['urlImage'];
+            final userProfile = widget.userProfile;
             await noti.showNotification(
               id: 1,
               title: event.notification!.title!,
@@ -172,7 +146,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 builder: (_) {
                   return MesssageScreen(
                     chat: chat,
-                    ownerUserProfile: ownerUserProfile,
+                    ownerUserProfile: userProfile,
                   );
                 },
               ),
@@ -186,84 +160,71 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        return FutureBuilder<UserProfile?>(
-          future: firebaseUserProfile.getUserProfile(userID: ownerUserID),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final userProfile = snapshot.data;
-              return Scaffold(
-                appBar: buildAppbar(
-                  currentIndex,
-                  ThemeMode.light,
-                  context,
-                  userProfile?.urlImage,
-                ),
-                body: PageView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  controller: pageController,
-                  children: [
-                    BodyChatScreen(
-                      ownerUserProfile: widget.userProfile,
-                    ),
-                    BodyContactScreen(
-                      ownerUserProfile: widget.userProfile,
-                    ),
-                  ],
-                ),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return AddFriendScreen(
-                            ownerUserProfile: widget.userProfile,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                  child: const Icon(
-                    Icons.person_add_alt_1,
-                    color: Colors.white,
-                  ),
-                  backgroundColor:
-                      Theme.of(context).brightness == Brightness.light
-                          ? kPrimaryColor
-                          : Theme.of(context).scaffoldBackgroundColor,
-                ),
-                bottomNavigationBar: BottomNavigationBar(
-                  currentIndex: currentIndex,
-                  onTap: (index) {
-                    if (currentIndex != index) {
-                      setState(
-                        () {
-                          currentIndex = index;
-                          pageController.jumpToPage(index);
-                        },
-                      );
-                    }
-                  },
-                  items: [
-                    BottomNavigationBarItem(
-                      icon: const Icon(Icons.messenger),
-                      label: context.loc.chat,
-                    ),
-                    BottomNavigationBarItem(
-                      icon: const Icon(Icons.people),
-                      label: context.loc.contacts,
-                    ),
-                  ],
-                ),
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+      return Scaffold(
+        appBar: buildAppbar(
+          currentIndex,
+          ThemeMode.light,
+          context,
+          widget.userProfile.urlImage,
+        ),
+        body: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: pageController,
+          children: [
+            BodyChatScreen(
+              ownerUserProfile: widget.userProfile,
+            ),
+            BodyContactScreen(
+              ownerUserProfile: widget.userProfile,
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) {
+                  return AddFriendScreen(
+                    ownerUserProfile: widget.userProfile,
+                  );
+                },
+              ),
+            );
+          },
+          child: const Icon(
+            Icons.person_add_alt_1,
+            color: Colors.white,
+          ),
+          backgroundColor: Theme.of(context).brightness == Brightness.light
+              ? kPrimaryColor
+              : Theme.of(context).scaffoldBackgroundColor,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: currentIndex,
+          onTap: (index) {
+            if (currentIndex != index) {
+              setState(
+                () {
+                  currentIndex = index;
+                  pageController.jumpToPage(index);
+                },
               );
-            } else {
-              return const Scaffold();
             }
           },
-        );
-      },
-    );
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.messenger),
+              label: context.loc.chat,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.people),
+              label: context.loc.contacts,
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   AppBar buildAppbar(int currentIndex, ThemeMode themeMode,

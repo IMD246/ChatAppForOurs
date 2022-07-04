@@ -83,11 +83,14 @@ class UploadImageMessage extends StatelessWidget {
               'messageType': TypeNotification.chat.toString(),
               "sendById": ownerUserID,
               "sendBy": userProfile.fullName,
-              "mapChat": <String, Chat>{
-                "chat": chat,
+              "chat": <String, dynamic>{
+                "idChat": chat.idChat,
+                "nameChat": chat.nameChat,
+                "urlImage": chat.urlImage,
+                "presence": chat.presenceUserChat,
               },
-              "mapOwnerUserProfile": <String, UserProfile>{
-                "ownerUserProfile": ownerUserProfile,
+              "userProfile": <String, dynamic>{
+                "idUser": ownerUserProfile.idUser,
               },
               'image': urlImage,
               'status': 'done',
