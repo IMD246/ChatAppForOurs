@@ -99,6 +99,7 @@
     "seconds" : "seconds",
     "minutes" : "minutes",
     "days" : "days",
+    "refuse" : "Refuse",
     "hours" : "hours",
     "months" : "months",
     "years" : "years",

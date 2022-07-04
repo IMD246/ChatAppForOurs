@@ -57,11 +57,12 @@ class _BodyContactScreenState extends State<BodyContactScreen>
               color: kPrimaryColor,
               child: Row(
                 children: [
-                  FutureBuilder<int?>(
-                    future: firebaseFriendList.countAllFriend(
-                        ownerUserID: widget.ownerUserProfile.idUser!),
+                  StreamBuilder<int?>(
+                    stream: firebaseFriendList.countAllFriend(
+                      ownerUserID: widget.ownerUserProfile.idUser!,
+                    ),
                     builder: (context, snapshot) {
-                      int lengthText = snapshot.hasData ? snapshot.data! : 0;
+                      int countFriend = snapshot.hasData ? snapshot.data! : 0;
                       return FillOutlineButton(
                         press: () {
                           if (isFilledRecent == false) {
@@ -71,18 +72,19 @@ class _BodyContactScreenState extends State<BodyContactScreen>
                           }
                         },
                         text:
-                            "${context.loc.recent_friend}(${lengthText.toString()})",
+                            "${context.loc.recent_friend}(${countFriend.toString()})",
                         isFilled: isFilledRecent,
                       );
                     },
                   ),
                   const SizedBox(width: kDefaultPadding * 0.7),
-                  FutureBuilder<int?>(
-                    future: firebaseRequestFriend.countAllRequestFriend(
+                  StreamBuilder<int?>(
+                    stream: firebaseRequestFriend.countAllRequestFriend(
                       ownerUserID: widget.ownerUserProfile.idUser!,
                     ),
                     builder: (context, snapshot) {
-                      int lengthText = snapshot.hasData ? snapshot.data! : 0;
+                      int countRequestFriend =
+                          snapshot.hasData ? snapshot.data! : 0;
                       return FillOutlineButton(
                         press: () {
                           if (isFilledRecent == true) {
@@ -91,8 +93,8 @@ class _BodyContactScreenState extends State<BodyContactScreen>
                             });
                           }
                         },
-                        text:
-                            "${context.loc.request_friend}(${lengthText.toString()})",
+                        text: context.loc.request_friend +
+                            "(${countRequestFriend.toString()})",
                         isFilled: !isFilledRecent,
                       );
                     },

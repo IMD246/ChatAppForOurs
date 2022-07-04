@@ -80,9 +80,18 @@ class _BodyAddFriendState extends State<BodyAddFriend> {
                     child: ListView.builder(
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
-                        return AddFriendCard(
-                          userProfile: snapshot.data!.elementAt(index),
-                          ownerUserProfile:widget.ownerUserProfile,
+                        return FutureBuilder<UserProfile?>(
+                          future: snapshot.data!.elementAt(index),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return AddFriendCard(
+                                userProfile: snapshot.data!,
+                                ownerUserProfile: widget.ownerUserProfile,
+                              );
+                            } else {
+                              return const Text("");
+                            }
+                          },
                         );
                       },
                     ),

@@ -1,1 +1,1 @@
-const isRequestField = 'is_request';
+const String isAcceptedField = 'is_accepted';

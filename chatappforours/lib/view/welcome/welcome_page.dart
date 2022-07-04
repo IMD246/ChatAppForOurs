@@ -70,7 +70,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 return const SignIn();
               } else if (state is AuthStateLoggedIn) {
                 return FutureBuilder<int?>(
-                  future: firebaseRequestFriend.countAllRequestFriend(
+                  future: firebaseRequestFriend.countAllRequestFriendFuture(
                     ownerUserID: state.userProfile.idUser!,
                   ),
                   builder: (context, snapShot) {

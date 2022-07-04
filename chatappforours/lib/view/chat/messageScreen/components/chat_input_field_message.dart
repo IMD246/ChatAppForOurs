@@ -9,7 +9,6 @@ import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
-import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/emoji_picker_text_field.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/send_message.dart';
@@ -58,7 +57,7 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
     final path = await recorder.stopRecorder();
 
     await firebaseChatMessage.createAudioMessage(
-      chatID: widget.chat.idChat,
+      chat: widget.chat,
       context: context,
       ownerUserProfile: widget.ownerUserProfile,
     );
@@ -91,28 +90,26 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
       final urlImage = widget.ownerUserProfile.urlImage.isNotEmpty
           ? widget.ownerUserProfile.urlImage
           : "https://i.stack.imgur.com/l60Hf.png";
-      final largeIconPath = await UtilsDownloadFile.downloadFile(
-        urlImage,
-        'largeIcon',
-      );
       final Map<String, dynamic> data = {
         'click_action': 'FLUTTER_NOTIFICATION_CLICK',
         'id': 1,
         'messageType': TypeNotification.chat.toString(),
         "sendById": ownerUserID,
         "sendBy": widget.ownerUserProfile.fullName,
-        "chat": <String, dynamic>{
-          "idChat": widget.chat.idChat,
-          "presence": widget.chat.presenceUserChat,
-          "stampTimeUser": widget.chat.stampTimeUser.toString(),
+        "mapChat": <String, Chat>{
+          "chat": chat,
         },
-        'image': largeIconPath,
+        "mapOwnerUserProfile": <String, UserProfile>{
+          "ownerUserProfile": widget.ownerUserProfile,
+        },
+        'image': urlImage,
         'status': 'done',
       };
       sendMessage(
         notification: notification,
         tokenUserFriend: userProfileFriend!.tokenUser!,
         data: data,
+        tokenOwnerUser: widget.ownerUserProfile.tokenUser!,
       );
     }
   }

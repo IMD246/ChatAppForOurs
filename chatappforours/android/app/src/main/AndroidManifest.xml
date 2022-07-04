@@ -16,7 +16,6 @@
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
 
-
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
    	<meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
     
@@ -34,8 +33,6 @@
             <data android:scheme="@string/fb_login_protocol_scheme" />
         </intent-filter>
     </activity>
-
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -63,5 +60,12 @@
             android:name="com.google.firebase.messaging.default_notification_channel1_id"
             android:value="mychannel"
             />
+       <service
+            android:name="com.google.firebase.messaging.FirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>

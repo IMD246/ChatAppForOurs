@@ -1,6 +1,5 @@
 import 'package:chatappforours/constants/chat_constant_field.dart';
 import 'package:chatappforours/constants/message_chat_field.dart';
-import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/models/user_presence.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
@@ -9,11 +8,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Chat {
   final String idChat;
   final DateTime stampTime;
-  final DateTime stampTimeChat;
   String lastText;
   String nameChat = "";
   String? urlImage;
-  String? time;
   bool presenceUserChat = false;
   DateTime stampTimeUser;
   final bool isActive;
@@ -28,8 +25,6 @@ class Chat {
     required this.nameChat,
     required this.urlImage,
     required this.presenceUserChat,
-    required this.stampTimeChat,
-    this.time,
     required this.stampTimeUser,
     required this.listUser,
   });
@@ -48,7 +43,6 @@ class Chat {
         listUser: List<String>.from(
           docs.get(listUserField) as List,
         ),
-        stampTimeChat: docs.get(stampTimeField).toDate(),
         isActive: docs.get(isActiveField),
         typeMessage: docs.data()?[typeMessageField] != null
             ? getTypeMessage(value: docs.get(typeMessageField).toString())

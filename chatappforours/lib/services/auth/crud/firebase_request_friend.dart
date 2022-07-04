@@ -4,10 +4,12 @@ import 'package:chatappforours/services/auth/models/request_friend.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseRequestFriend {
-  final requestListFriendDoc = FirebaseFirestore.instance.collection(
+  final requestListFriendDoc = "requestFriendList";
+  final requestFriendDoc = "requestFriend";
+  final requestListFriendCol = FirebaseFirestore.instance.collection(
     'requestFriendList',
   );
-  final requestFriendDoc =
+  final requestFriendCol =
       FirebaseFirestore.instance.collection('requestFriend');
   Future<void> createNewRequestFriend({
     required String ownerUserID,
@@ -17,9 +19,9 @@ class FirebaseRequestFriend {
       userIDField: userIDFriend,
       stampTimeField: DateTime.now(),
     };
-    await requestFriendDoc
+    await requestFriendCol
         .doc(ownerUserID)
-        .collection('requestFriendList')
+        .collection(requestListFriendDoc)
         .doc(userIDFriend)
         .set(map);
   }
@@ -28,18 +30,56 @@ class FirebaseRequestFriend {
     required String ownerUserID,
     required String idUserRequestFriend,
   }) async {
-    await requestFriendDoc
+    await requestFriendCol
         .doc(ownerUserID)
-        .collection('friend')
+        .collection(requestListFriendDoc)
         .doc(idUserRequestFriend)
         .delete();
   }
 
+  Future<String?> getIDRequestFriend({
+    required String ownerUserID,
+    required String idUserRequestFriend,
+  }) async {
+    return await requestFriendCol
+        .doc(ownerUserID)
+        .collection(requestListFriendDoc)
+        .doc(idUserRequestFriend)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        return value.id;
+      } else {
+        return null;
+      }
+    });
+  }
+
+  Future<bool> checkIfIDRequestFriendExist({
+    required String ownerUserID,
+    required String idUserRequestFriend,
+  }) {
+    return requestFriendCol
+        .doc(ownerUserID)
+        .collection(requestListFriendDoc)
+        .doc(idUserRequestFriend)
+        .get()
+        .then(
+      (value) {
+        if (value.exists) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    );
+  }
+
   Stream<Iterable<RequestFriend>?> getAllRequestFriend(
       {required String ownerUserID}) {
-    final friendList = requestListFriendDoc
+    final friendList = requestFriendCol
         .doc(ownerUserID)
-        .collection('friend')
+        .collection(requestListFriendDoc)
         .orderBy(stampTimeField, descending: true)
         .snapshots()
         .map(
@@ -56,22 +96,37 @@ class FirebaseRequestFriend {
     return friendList;
   }
 
-  Future<int?> countAllRequestFriend({
+  Future<int?> countAllRequestFriendFuture({
     required String ownerUserID,
   }) async {
-    final friendRequestCount = await requestFriendDoc
+    return requestFriendCol
         .doc(ownerUserID)
-        .collection('requestFriendList')
+        .collection(requestListFriendDoc)
         .get()
-        .then(
-      (value) {
-        if (value.docs.isNotEmpty && value.size >= 1) {
-          return value.size;
+        .then((value) {
+      if (value.docs.isNotEmpty) {
+        return value.docs.length;
+      } else {
+        return null;
+      }
+    });
+  }
+
+  Stream<int?> countAllRequestFriend({
+    required String ownerUserID,
+  }) {
+    return requestFriendCol
+        .doc(ownerUserID)
+        .collection(requestListFriendDoc)
+        .snapshots()
+        .map(
+      (event) {
+        if (event.docs.isNotEmpty) {
+          return event.docs.length;
         } else {
           return null;
         }
       },
     );
-    return friendRequestCount;
   }
 }

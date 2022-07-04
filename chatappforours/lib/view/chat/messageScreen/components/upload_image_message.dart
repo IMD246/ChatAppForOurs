@@ -6,7 +6,6 @@ import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/auth/storage/storage.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
-import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +39,7 @@ class UploadImageMessage extends StatelessWidget {
           await firebaseChatMessage.createImageMessage(
             ownerUserProfile: ownerUserProfile,
             context: context,
-            chatID: chat.idChat,
+            chat: chat,
           );
           final lastMessageUserOwner =
               await firebaseChatMessage.getImageMessageNotSentOwnerUser(
@@ -78,28 +77,26 @@ class UploadImageMessage extends StatelessWidget {
             final urlImage = userProfile.urlImage.isNotEmpty
                 ? userProfile.urlImage
                 : "https://i.stack.imgur.com/l60Hf.png";
-            final largeIconPath = await UtilsDownloadFile.downloadFile(
-              urlImage,
-              'largeIcon',
-            );
             final Map<String, dynamic> data = {
               'click_action': 'FLUTTER_NOTIFICATION_CLICK',
               'id': 1,
               'messageType': TypeNotification.chat.toString(),
               "sendById": ownerUserID,
               "sendBy": userProfile.fullName,
-              "chat": <String, dynamic>{
-                "idChat": chat.idChat,
-                "presence": chat.presenceUserChat,
-                "stampTimeUser": chat.stampTimeUser.toString(),
+              "mapChat": <String, Chat>{
+                "chat": chat,
               },
-              'image': largeIconPath,
+              "mapOwnerUserProfile": <String, UserProfile>{
+                "ownerUserProfile": ownerUserProfile,
+              },
+              'image': urlImage,
               'status': 'done',
             };
-            await sendMessage(
+            sendMessage(
               notification: notification,
               tokenUserFriend: userProfileFriend!.tokenUser!,
               data: data,
+              tokenOwnerUser: ownerUserProfile.tokenUser!,
             );
           }
         }

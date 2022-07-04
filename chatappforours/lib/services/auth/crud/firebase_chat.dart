@@ -30,16 +30,16 @@ class FirebaseChat {
       timeLastChatField: DateTime.now(),
       stampTimeField: DateTime.now(),
     };
-    final check1 = await firebaseChat
-        .doc(listUserID[0] + listUserID[1])
-        .get()
-        .then((value) {
-      if (value.exists) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+    final check1 =
+        await firebaseChat.doc(listUserID[0] + listUserID[1]).get().then(
+      (value) {
+        if (value.exists) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    );
     final check2 = await firebaseChat
         .doc(listUserID[1] + listUserID[0])
         .get()
@@ -84,7 +84,6 @@ class FirebaseChat {
 
   Future<void> updateChatToActive({
     required String idChat,
-    required String ownerUserID,
   }) async {
     Map<String, dynamic> map = <String, dynamic>{
       isActiveField: true,

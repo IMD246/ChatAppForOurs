@@ -5,13 +5,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Friend {
   final String idFriendList;
   final String userID;
-  final bool? isRequest;
+  final bool isAccepted;
   String? stampTimeUser;
   bool presence;
   Friend({
     required this.idFriendList,
     required this.userID,
-    required this.isRequest,
+    required this.isAccepted,
     this.stampTimeUser,
     this.presence = false,
   });
@@ -19,8 +19,10 @@ class Friend {
       {required QueryDocumentSnapshot<Map<String, dynamic>> snapshot}) {
     return Friend(
       userID: snapshot.get(userIDField),
-      isRequest: snapshot.get(isRequestField),
       idFriendList: snapshot.id,
+      isAccepted: snapshot.data()[isAcceptedField] != null
+          ? snapshot.get(isAcceptedField)
+          : false,
     );
   }
 }

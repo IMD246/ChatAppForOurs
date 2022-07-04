@@ -5,7 +5,6 @@ import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
-import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -77,10 +76,6 @@ class _SendMessageState extends State<SendMessage> {
             final urlImage = userProfile.urlImage.isNotEmpty
                 ? userProfile.urlImage
                 : "https://i.stack.imgur.com/l60Hf.png";
-            final largeIconPath = await UtilsDownloadFile.downloadFile(
-              urlImage,
-              'largeIcon',
-            );
             final Map<String, dynamic> notification = {
               'title': userProfile.fullName,
               'body': message,
@@ -96,13 +91,14 @@ class _SendMessageState extends State<SendMessage> {
                 "presence": widget.chat.presenceUserChat,
                 "stampTimeUser": widget.chat.stampTimeUser.toString(),
               },
-              'image': largeIconPath,
+              'image': urlImage,
               'status': 'done',
             };
             await sendMessage(
               notification: notification,
               tokenUserFriend: userProfileFriend!.tokenUser!,
               data: data,
+              tokenOwnerUser: widget.ownerUserProfile.tokenUser!,
             );
           }
         },
@@ -111,12 +107,50 @@ class _SendMessageState extends State<SendMessage> {
       );
     } else {
       return InkWell(
-        onTap: () {
+        onTap: () async {
+          // Push notification to others in chat
+          String userIDFriend =
+              handleListUserIDChat(widget.chat, widget.ownerUserProfile);
+          final ownerUserID = widget.ownerUserProfile.idUser!;
+          if (userIDFriend.compareTo(ownerUserID) != 0) {
+            final userProfile = widget.ownerUserProfile;
+            final userProfileFriend = await firebaseUserProfile.getUserProfile(
+              userID: userIDFriend,
+            );
+            final urlImage = userProfile.urlImage.isNotEmpty
+                ? userProfile.urlImage
+                : "https://i.stack.imgur.com/l60Hf.png";
+            final Map<String, dynamic> notification = {
+              'title': userProfile.fullName,
+              'body': "👍",
+            };
+            final Map<String, dynamic> data = {
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': 1,
+              'messageType': TypeNotification.chat.toString(),
+              "sendById": ownerUserID,
+              "sendBy": userProfile.fullName,
+              "mapChat": <String, Chat>{
+                "chat": widget.chat,
+              },
+              "mapOwnerUserProfile": <String, UserProfile>{
+                "ownerUserProfile": widget.ownerUserProfile,
+              },
+              'image': urlImage,
+              'status': 'done',
+            };
+            await sendMessage(
+              notification: notification,
+              tokenUserFriend: userProfileFriend!.tokenUser!,
+              data: data,
+              tokenOwnerUser: widget.ownerUserProfile.tokenUser!,
+            );
+          }
           setState(
             () {
               firebaseChatMessage.createLikeMessage(
                 userProfile: widget.ownerUserProfile,
-                chatID: widget.chat.idChat,
+                chat: widget.chat,
               );
             },
           );

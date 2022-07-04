@@ -8,9 +8,10 @@ import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
-import 'package:chatappforours/services/auth/crud/user_presence_field.dart';
+import 'package:chatappforours/services/auth/models/chat.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/notification.dart';
+import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/view/chat/addFriend/add_friend_screen.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';
@@ -47,6 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     FirebaseMessaging.instance.requestPermission();
     pageController = PageController(initialPage: currentIndex);
+
     super.initState();
   }
 
@@ -58,15 +60,22 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void didChangeDependencies() {
     tz.initializeTimeZones();
+    final noti = NotificationService();
+    noti.initNotification();
     setState(
       () {
         firebaseUserProfile.updateUserPresenceDisconnect(uid: ownerUserID);
       },
     );
-    final noti = NotificationService();
-    noti.initNotification();
     FirebaseMessaging.onMessage.listen(
       (event) async {
+        String largeIconPath = "";
+        if (event.data.containsKey('image') == true) {
+          largeIconPath = await UtilsDownloadFile.downloadFile(
+            event.data['image'],
+            'largeIcon',
+          );
+        }
         if (event.notification != null && event.data.isNotEmpty) {
           if (event.data['messageType'] ==
               TypeNotification.addFriend.toString()) {
@@ -74,7 +83,7 @@ class _ChatScreenState extends State<ChatScreen> {
               id: 1,
               title: event.notification!.title!,
               body: event.notification!.body!,
-              urlImage: event.data['image'],
+              urlImage: largeIconPath,
             );
           } else if (event.data['messageType'] ==
               TypeNotification.acceptFriend.toString()) {
@@ -82,9 +91,31 @@ class _ChatScreenState extends State<ChatScreen> {
               id: 1,
               title: event.notification!.title!,
               body: event.notification!.body!,
-              urlImage: event.data['image'],
+              urlImage: largeIconPath,
             );
           } else {
+            Map<String, dynamic> temp = jsonDecode(event.data['mapChat']);
+            final Chat chat = temp['chat'] as Chat;
+            Map<String, dynamic> tempUserProfile =
+                jsonDecode(event.data['mapOwnerUserProfile']);
+            final UserProfile ownerUserProfile =
+                tempUserProfile['ownerUserProfile'];
+            await noti.showNotification(
+              id: 1,
+              title: event.notification!.title!,
+              body: event.notification!.body!,
+              urlImage: largeIconPath,
+            );
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) {
+                  return MesssageScreen(
+                    chat: chat,
+                    ownerUserProfile: ownerUserProfile,
+                  );
+                },
+              ),
+            );
             noti.showNotification(
               id: 1,
               title: event.notification!.title!,
@@ -97,50 +128,56 @@ class _ChatScreenState extends State<ChatScreen> {
     );
     FirebaseMessaging.onMessageOpenedApp.listen(
       (event) async {
-        if (event.data['messageType'] ==
-            TypeNotification.addFriend.toString()) {
-          await noti.showNotification(
-            id: 1,
-            title: context.loc.request_friend_notification_title,
-            body: context.loc.request_friend_notification_body(
-              event.notification!.body!,
-            ),
-            urlImage: event.data['image'],
-          );
-        } else if (event.data['messageType'] ==
-            TypeNotification.acceptFriend.toString()) {
-          noti.showNotification(
-            id: 1,
-            title: event.notification!.title!,
-            body: event.notification!.body!,
-            urlImage: event.data['image'],
-          );
-        } else {
-          Map<String, dynamic> temp = jsonDecode(event.data['chat']);
-          final chat = await firebaseChat.getChatByID(
-            idChat: temp['idChat'],
-            userChatID: event.data['sendById'],
-          );
-          chat.nameChat = event.data['sendBy'];
-          chat.presenceUserChat = temp[presenceField];
-          chat.stampTimeUser = DateTime.parse(temp['stampTimeUser']);
-          chat.listUser.remove(event.data['sendById']);
-          await noti.showNotification(
-            id: 1,
-            title: event.notification!.title!,
-            body: event.notification!.body!,
-            urlImage: event.data['image'],
-          );
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) {
-                return MesssageScreen(
-                  chat: chat,
-                  ownerUserProfile: widget.userProfile,
-                );
-              },
-            ),
-          );
+        if (event.data.isNotEmpty) {
+          String largeIconPath = "";
+          if (event.data.containsKey('image') == true) {
+            largeIconPath = await UtilsDownloadFile.downloadFile(
+              event.data['image'],
+              'largeIcon',
+            );
+          }
+          if (event.data['messageType'] ==
+              TypeNotification.addFriend.toString()) {
+            await noti.showNotification(
+              id: 1,
+              title: context.loc.request_friend_notification_title,
+              body: context.loc.request_friend_notification_body(
+                event.notification!.body!,
+              ),
+              urlImage: largeIconPath,
+            );
+          } else if (event.data['messageType'] ==
+              TypeNotification.acceptFriend.toString()) {
+            noti.showNotification(
+              id: 1,
+              title: event.notification!.title!,
+              body: event.notification!.body!,
+              urlImage: largeIconPath,
+            );
+          } else {
+            Map<String, Chat> temp = jsonDecode(event.data['mapChat']);
+            final Chat chat = temp['chat'] as Chat;
+            Map<String, UserProfile> tempUserProfile =
+                jsonDecode(event.data['mapOwnerUserProfile']);
+            final UserProfile ownerUserProfile =
+                tempUserProfile['ownerUserProfile'] as UserProfile;
+            await noti.showNotification(
+              id: 1,
+              title: event.notification!.title!,
+              body: event.notification!.body!,
+              urlImage: largeIconPath,
+            );
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) {
+                  return MesssageScreen(
+                    chat: chat,
+                    ownerUserProfile: ownerUserProfile,
+                  );
+                },
+              ),
+            );
+          }
         }
       },
     );

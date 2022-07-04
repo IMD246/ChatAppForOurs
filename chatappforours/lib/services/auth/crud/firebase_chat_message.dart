@@ -9,6 +9,7 @@ import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 class FirebaseChatMessage {
   final firebaseChatMessageDocument = FirebaseFirestore.instance.collection(
     'chatMessage',
@@ -79,8 +80,10 @@ class FirebaseChatMessage {
         .set(map);
   }
 
-  Future<void> createLikeMessage(
-      {required UserProfile userProfile, required chatID}) async {
+  Future<void> createLikeMessage({
+    required UserProfile userProfile,
+    required Chat chat,
+  }) async {
     Map<String, dynamic> map = {
       idSenderField: userProfile.idUser,
       hasSenderField: true,
@@ -91,21 +94,27 @@ class FirebaseChatMessage {
     };
     final firebaseChat = FirebaseChat();
     await firebaseChatMessageDocument
-        .doc(chatID)
+        .doc(chat.idChat)
         .collection('message')
         .doc()
         .set(map);
+    if (chat.isActive == false) {
+      await firebaseChat.updateChatToActive(
+        idChat: chat.idChat,
+      );
+    }
     await firebaseChat.updateChatLastText(
       text: "👍",
-      chatID: chatID,
+      chatID: chat.idChat,
       typeMessage: TypeMessage.like,
     );
   }
 
   Future<void> createImageMessage(
       {required UserProfile ownerUserProfile,
-      required chatID,
+      required Chat chat,
       required BuildContext context}) async {
+    final firebaseChat = FirebaseChat();
     List<String> list = ["."];
     Map<String, dynamic> map = {
       idSenderField: ownerUserProfile.idUser,
@@ -116,8 +125,13 @@ class FirebaseChatMessage {
       messageStatusField: MessageStatus.notSent.toString(),
       stampTimeField: DateTime.now(),
     };
+    if (chat.isActive == false) {
+      await firebaseChat.updateChatToActive(
+        idChat: chat.idChat,
+      );
+    }
     await firebaseChatMessageDocument
-        .doc(chatID)
+        .doc(chat.idChat)
         .collection('message')
         .doc()
         .set(map);
@@ -125,10 +139,11 @@ class FirebaseChatMessage {
 
   Future<void> createAudioMessage({
     required UserProfile ownerUserProfile,
-    required chatID,
+    required Chat chat,
     required BuildContext context,
   }) async {
     final String message = context.loc.message_recording;
+    final firebaseChat = FirebaseChat();
     Map<String, dynamic> map = {
       idSenderField: ownerUserProfile.idUser!,
       hasSenderField: true,
@@ -138,8 +153,13 @@ class FirebaseChatMessage {
       messageStatusField: MessageStatus.notSent.toString(),
       stampTimeField: DateTime.now(),
     };
+    if (chat.isActive == false) {
+      await firebaseChat.updateChatToActive(
+        idChat: chat.idChat,
+      );
+    }
     await firebaseChatMessageDocument
-        .doc(chatID)
+        .doc(chat.idChat)
         .collection('message')
         .doc()
         .set(map);
@@ -186,7 +206,7 @@ class FirebaseChatMessage {
   }
 
   Future<void> uploadImageMessageNotSent({
-    required String chatID,
+    required String idChat,
     required List<String> listUrlImage,
     required String nameSender,
     required ChatMessage lastMessageUserOwner,
@@ -200,13 +220,14 @@ class FirebaseChatMessage {
       messageStatusField: MessageStatus.sent.toString(),
     };
     await firebaseChatMessageDocument
-        .doc(chatID)
+        .doc(idChat)
         .collection('message')
         .doc(lastMessageUserOwner.idMessage)
         .update(map);
+
     await firebaseChat.updateChatLastText(
       text: message,
-      chatID: chatID,
+      chatID: idChat,
       typeMessage: TypeMessage.image,
     );
   }
@@ -293,6 +314,11 @@ class FirebaseChatMessage {
         .collection('message')
         .doc()
         .set(mapCreate);
+    if (chat.isActive == false) {
+      await firebaseChat.updateChatToActive(
+        idChat: chat.idChat,
+      );
+    }
     await firebaseChat.updateChatLastText(
       text: text,
       chatID: chat.idChat,
@@ -317,7 +343,7 @@ class FirebaseChatMessage {
         .get()
         .then(
       (value) {
-        if (value.docs.first.id.isNotEmpty) {
+        if (value.docs.isNotEmpty) {
           return value.docs.first.id == idMessage ? true : false;
         } else {
           return false;
@@ -325,7 +351,7 @@ class FirebaseChatMessage {
       },
     );
     if (lastMessage) {
-      return userProfile.getUserProfile(userID:userIDFriend);
+      return userProfile.getUserProfile(userID: userIDFriend);
     } else {
       return null;
     }
@@ -347,7 +373,7 @@ class FirebaseChatMessage {
         .get()
         .then(
       (value) {
-        if (value.docs.first.id.isNotEmpty) {
+        if (value.docs.isNotEmpty) {
           return value.docs.first.id == idMessage ? true : false;
         } else {
           return false;

@@ -125,7 +125,7 @@ class Storage {
             listUrlImage.add(urlImage!);
             if (listUrlImage.length == listFile.length) {
               await firebaseChatMessage.uploadImageMessageNotSent(
-                chatID: idChat,
+                idChat: idChat,
                 lastMessageUserOwner: lastMessageUserOwner,
                 listUrlImage: listUrlImage,
                 nameSender: ownerUserProfile.fullName,

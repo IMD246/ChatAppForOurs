@@ -12,7 +12,6 @@ import 'package:chatappforours/services/auth/crud/firebase_friend_list.dart';
 import 'package:chatappforours/services/auth/models/request_friend.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/send_notification_message.dart';
-import 'package:chatappforours/services/notification/utils_download_file.dart';
 import 'package:chatappforours/utilities/button/filled_outline_button.dart';
 import 'package:chatappforours/utilities/handle/handle_value.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +41,7 @@ class _RequestCardState extends State<RequestCard> {
     firebaseChat = FirebaseChat();
     firebaseUserPresence = FirebaseUserPresence();
     firebaseRequestFriend = FirebaseRequestFriend();
+    firebaseFriendList = FirebaseFriendList();
     super.initState();
   }
 
@@ -141,7 +141,6 @@ class _RequestCardState extends State<RequestCard> {
                         FillOutlineButton(
                           press: () async {
                             final userProfile = widget.ownerUserProfile;
-
                             final Map<String, dynamic> notification = {
                               'title':
                                   context.loc.accept_friend_notification_title,
@@ -152,9 +151,6 @@ class _RequestCardState extends State<RequestCard> {
                             final urlImage = userProfile.urlImage.isEmpty
                                 ? userProfile.urlImage
                                 : "https://i.stack.imgur.com/l60Hf.png";
-                            final largeIconPath =
-                                await UtilsDownloadFile.downloadFile(
-                                    urlImage, 'largeIcon');
                             if (widget.requestFriend.userID
                                     .compareTo(userProfile.idUser!) !=
                                 0) {
@@ -163,30 +159,32 @@ class _RequestCardState extends State<RequestCard> {
                                 'id': '1',
                                 'messageType':
                                     TypeNotification.acceptFriend.toString(),
-                                'image': largeIconPath,
+                                'image': urlImage,
                                 'status': 'done',
                               };
-                              sendMessage(
+                              await sendMessage(
                                 notification: notification,
                                 tokenUserFriend: userProfileFriend.tokenUser!,
                                 data: data,
+                                tokenOwnerUser:
+                                    widget.ownerUserProfile.tokenUser!,
+                              );
+                              await firebaseFriendList.createNewFriend(
+                                ownerUserID: userProfile.idUser!,
+                                userIDFriend: widget.requestFriend.userID,
+                                isAccepted: true,
+                              );
+                              await firebaseFriendList.updateAcceptedFriend(
+                                ownerUserID: widget.requestFriend.userID,
+                                userIDFriend: userProfile.idUser!,
+                                isAccepted: true
+                              );
+                              await firebaseRequestFriend.deleteRequestFriend(
+                                ownerUserID: widget.ownerUserProfile.idUser!,
+                                idUserRequestFriend:
+                                    widget.requestFriend.userID,
                               );
                             }
-                            await firebaseFriendList.createNewFriend(
-                              ownerUserID: userProfile.idUser!,
-                              userIDFriend: widget.requestFriend.userID,
-                            );
-                             await firebaseRequestFriend.deleteRequestFriend(
-                                ownerUserID: widget.ownerUserProfile.idUser!,
-                                idUserRequestFriend: widget.requestFriend.userID,
-                              );
-                            await firebaseChat.createChat(
-                              typeChat: TypeChat.normal,
-                              listUserID: [
-                                userProfile.idUser!,
-                                widget.requestFriend.userID
-                              ],
-                            );
                           },
                           text: context.loc.accept,
                         ),
@@ -197,10 +195,11 @@ class _RequestCardState extends State<RequestCard> {
                             press: () async {
                               await firebaseRequestFriend.deleteRequestFriend(
                                 ownerUserID: widget.ownerUserProfile.idUser!,
-                                idUserRequestFriend: widget.requestFriend.userID,
+                                idUserRequestFriend:
+                                    widget.requestFriend.userID,
                               );
                             },
-                            text: context.loc.cancel,
+                            text: context.loc.refuse,
                           ),
                         ),
                       ],

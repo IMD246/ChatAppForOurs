@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
+import 'package:chatappforours/enum/enum.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
@@ -53,12 +54,20 @@ class _ContactCardState extends State<ContactCard> {
               final userProfileFriend = snapshot.data!;
               return InkWell(
                 onTap: () async {
+                  await firebaseChat.createChat(
+                    typeChat: TypeChat.normal,
+                    listUserID: [
+                      widget.ownerUserProfile.idUser!,
+                      widget.friend.userID,
+                    ],
+                  );
                   final chat = await firebaseChat.getChatByListIDUser(
                     listUserID: [
                       widget.ownerUserProfile.idUser!,
                       widget.friend.userID
                     ],
                   );
+                  if (chat == null) {}
                   if (chat != null) {
                     chat.presenceUserChat = userProfileFriend.presence;
                     chat.stampTimeUser = userProfileFriend.stampTime;

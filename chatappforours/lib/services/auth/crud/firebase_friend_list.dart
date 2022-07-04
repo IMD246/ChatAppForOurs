@@ -1,112 +1,113 @@
+import 'dart:async';
+
 import 'package:chatappforours/constants/list_friend_constant_field.dart';
 import 'package:chatappforours/constants/user_join_chat_field.dart';
 import 'package:chatappforours/constants/user_profile_constant_field.dart';
+import 'package:chatappforours/services/auth/crud/firebase_request_friend.dart';
 import 'package:chatappforours/services/auth/models/friend.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseFriendList {
-  final friendListDocumentDefault =
-      FirebaseFirestore.instance.collection('friendList');
-  final friendListDocument = FirebaseFirestore.instance;
-  Future<void> createNewFriend(
-      {required String ownerUserID,
-      required String userIDFriend,
-      }) async {
+  final String listFriendCollection = "listFriend";
+  final String friendCollection = "friend";
+  final friendListDoc = FirebaseFirestore.instance.collection('listFriend');
+  final friendDoc = FirebaseFirestore.instance.collection('friend');
+  Future<void> createNewFriend({
+    required String ownerUserID,
+    required String userIDFriend,
+    required bool isAccepted,
+  }) async {
     Map<String, dynamic> map = <String, dynamic>{
       userIDField: userIDFriend,
+      isAcceptedField: isAccepted,
       stampTimeField: DateTime.now(),
     };
-    await friendListDocumentDefault
+    await friendDoc
         .doc(ownerUserID)
-        .collection('friend')
+        .collection(listFriendCollection)
         .doc(userIDFriend)
         .set(map);
   }
 
-  Future<String?> getIDFriendListDocument(
-      {required String ownerUserID,
-      required String userID,
-      bool? isRequest}) async {
-    final id = await friendListDocumentDefault
+  Future<void> updateAcceptedFriend({
+    required String ownerUserID,
+    required String userIDFriend,
+    required bool isAccepted,
+  }) async {
+    Map<String, dynamic> map = <String, dynamic>{
+      isAcceptedField: isAccepted,
+    };
+    await friendDoc
         .doc(ownerUserID)
-        .collection('friend')
-        .where(userIDField, isEqualTo: userID)
-        .limit(1)
+        .collection(listFriendCollection)
+        .doc(userIDFriend)
+        .update(map);
+  }
+
+  Future<String?> getIDFriendListDocument({
+    required String ownerUserID,
+    required String userID,
+  }) async {
+    return await friendDoc
+        .doc(ownerUserID)
+        .collection(listFriendCollection)
+        .doc(userID)
         .get()
         .then(
       (value) {
-        if (value.docs.isNotEmpty) {
-          return value.docs.first.id;
+        if (value.reference.path.isNotEmpty && value.exists) {
+          return value.id;
         } else {
           return null;
         }
       },
     );
-    return id;
   }
-  Future<void> deleteFriend(
-      {required String ownerUserID, required String userID}) async {
-    String? id = await getIDFriendListDocument(
+
+  Future<bool?> checkAddedUserYet({
+    required String ownerUserID,
+    required String userID,
+  }) async {
+    final firebaseRequestFriend = FirebaseRequestFriend();
+    final check1 = await firebaseRequestFriend.checkIfIDRequestFriendExist(
       ownerUserID: ownerUserID,
-      userID: userID,
+      idUserRequestFriend: userID,
     );
-    await friendListDocumentDefault
-        .doc(ownerUserID)
-        .collection('friend')
-        .doc(id)
-        .delete();
+    if (check1 == false) {
+      return await checkIfIDFriendListExist(
+        ownerUserID: ownerUserID,
+        userID: userID,
+      );
+    } else {
+      return null;
+    }
   }
 
-  Stream<Iterable<Friend>?> getAllFriendIsAccepted(
-      {required String ownerUserID}) {
-    final friendList = friendListDocument
-        .collection('friendList')
+  Future<bool> checkIfIDFriendListExist({
+    required String ownerUserID,
+    required String userID,
+  }) {
+    return friendDoc
         .doc(ownerUserID)
-        .collection('friend')
-        .where(isRequestField, isEqualTo: true)
-        .orderBy(stampTimeField, descending: true)
-        .snapshots()
-        .map((event) {
-      if (event.docs.isNotEmpty) {
-        return event.docs.map(
-          (e) => Friend.fromSnapshot(snapshot: e),
-        );
-      } else {
-        return null;
-      }
-    });
-    return friendList;
-  }
-
-  Stream<Iterable<Friend>?> getAllFriendIsRequested(
-      {required String ownerUserID}) {
-    final friendList = friendListDocument
-        .collection('friendList')
-        .doc(ownerUserID)
-        .collection('friend')
-        .where(isRequestField, isEqualTo: false)
-        .orderBy(stampTimeField, descending: true)
-        .snapshots()
-        .map(
-      (event) {
-        if (event.docs.isNotEmpty) {
-          return event.docs.map(
-            (e) => Friend.fromSnapshot(snapshot: e),
-          );
+        .collection(listFriendCollection)
+        .doc(userID)
+        .get()
+        .then(
+      (value) {
+        if (value.exists) {
+          return true;
         } else {
-          return null;
+          return false;
         }
       },
     );
-    return friendList;
   }
 
   Stream<Iterable<Friend>?> getAllFriend({required String ownerUserID}) {
-    final friendList = friendListDocument
-        .collection('friendList')
+    final friendList = friendDoc
         .doc(ownerUserID)
-        .collection('friend')
-        .orderBy(stampTimeField, descending: true)
+        .collection(listFriendCollection)
+        .where(isAcceptedField, isEqualTo: true)
         .snapshots()
         .map(
       (event) {
@@ -122,19 +123,22 @@ class FirebaseFriendList {
     return friendList;
   }
 
-  Future<int?> countAllFriend({required String ownerUserID}) async {
-    final friendRequestCount = await friendListDocument
-        .collection('friendList')
+  Stream<int?> countAllFriend({
+    required String ownerUserID,
+  }) {
+    return friendDoc
         .doc(ownerUserID)
-        .collection('friend')
-        .get()
-        .then((value) {
-      if (value.docs.isNotEmpty && value.size > 0) {
-        return value.size;
-      } else {
-        return null;
-      }
-    },);
-    return friendRequestCount;
+        .collection(listFriendCollection)
+        .where(isAcceptedField, isEqualTo: true)
+        .snapshots()
+        .map(
+      (event) {
+        if (event.docs.isNotEmpty) {
+          return event.docs.length;
+        } else {
+          return null;
+        }
+      },
+    );
   }
 }
