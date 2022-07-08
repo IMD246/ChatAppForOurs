@@ -34,8 +34,9 @@ class ImageMessageCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: CachedNetworkImage(
-          fit: BoxFit.fill,
           imageUrl: urlImage,
+          width: MediaQuery.of(context).size.width,
+          fit: BoxFit.fill,
           placeholder: (context, url) => const CircularProgressIndicator(),
           errorWidget: (context, url, error) => const Icon(Icons.error),
           colorBlendMode: BlendMode.softLight,

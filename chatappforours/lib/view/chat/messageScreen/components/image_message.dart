@@ -2,6 +2,7 @@ import 'package:chatappforours/constants/constants.dart';
 import 'package:chatappforours/services/auth/models/chat_message.dart';
 import 'package:chatappforours/view/chat/messageScreen/components/image_message_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class ImageMessage extends StatefulWidget {
   const ImageMessage({Key? key, required this.chatMessage}) : super(key: key);
@@ -38,22 +39,40 @@ class _ImageMessageState extends State<ImageMessage> {
                       ? const EdgeInsets.only(left: kDefaultPadding)
                       : const EdgeInsets.only(right: kDefaultPadding)
                   : null,
-          child: GridView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: list.length,
-            shrinkWrap: true,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: list.length <= 1 ? 0.5 : 1,
-              crossAxisSpacing: 2,
-            ),
-            itemBuilder: (BuildContext context, int index) {
-              return ImageMessageCard(
-                urlImage: list.elementAt(index),
-                chatMessage: widget.chatMessage,
-              );
-            },
-          ),
+          child: list.length <= 1
+              ? StaggeredGridView.countBuilder(
+                  shrinkWrap: true,
+                  itemCount: list.length,
+                  padding: widget.chatMessage.isSender!
+                      ? const EdgeInsets.only(left: 40)
+                      : const EdgeInsets.only(right: 40),
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 24,
+                  crossAxisSpacing: 24,
+                  itemBuilder: (context, index) {
+                    return ImageMessageCard(
+                      urlImage: list.elementAt(index),
+                      chatMessage: widget.chatMessage,
+                    );
+                  },
+                  staggeredTileBuilder: (index) => const StaggeredTile.fit(3),
+                )
+              : GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: list.length,
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 2,
+                  ),
+                  itemBuilder: (BuildContext context, int index) {
+                    return ImageMessageCard(
+                      urlImage: list.elementAt(index),
+                      chatMessage: widget.chatMessage,
+                    );
+                  },
+                ),
         ),
       ),
     );

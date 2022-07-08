@@ -10,7 +10,7 @@ import 'package:chatappforours/services/auth/crud/firebase_chat.dart';
 import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
 import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/services/notification/notification.dart';
-import 'package:chatappforours/services/notification/utils_download_file.dart';
+import 'package:chatappforours/utilities/image/utils_download_file.dart';
 import 'package:chatappforours/view/chat/addFriend/add_friend_screen.dart';
 import 'package:chatappforours/view/chat/chatScreen/components/body_chat_screen.dart';
 import 'package:chatappforours/view/chat/contacts/body_contact_screen.dart';

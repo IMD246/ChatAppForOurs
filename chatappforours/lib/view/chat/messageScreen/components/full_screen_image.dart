@@ -25,40 +25,45 @@ class _FullScreenImageState extends State<FullScreenImage> {
       },
       child: SafeArea(
         child: Scaffold(
-          body: Stack(
-            children: [
-              CachedNetworkImage(
-                fit: BoxFit.fill,
-                width: size.width,
-                height: size.height,
-                imageUrl: widget.urlImage,
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-              ),
-              Visibility(
-                visible: isSelected,
-                child: Positioned(
-                  top: 5,
-                  left: 0,
-                  child: Row(
-                    children: [
-                      const BackButton(
-                        color: Colors.white,
-                      ),
-                      const SizedBox(
-                        width: kDefaultPadding,
-                      ),
-                      Text(
-                        widget.fullName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
+          body: Container(
+            color: Colors.black,
+            child: Stack(
+              children: [
+                Center(
+                  child: CachedNetworkImage(
+                    fit: BoxFit.fill,
+                    width: size.width,
+                    imageUrl: widget.urlImage,
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
                   ),
                 ),
-              ),
-            ],
+                Visibility(
+                  visible: isSelected,
+                  child: Positioned(
+                    top: 5,
+                    left: 0,
+                    child: Row(
+                      children: [
+                        const BackButton(
+                          color: Colors.white,
+                        ),
+                        const SizedBox(
+                          width: kDefaultPadding,
+                        ),
+                        Text(
+                          widget.fullName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
