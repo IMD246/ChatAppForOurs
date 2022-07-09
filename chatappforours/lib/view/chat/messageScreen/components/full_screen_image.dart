@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatappforours/constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 
 class FullScreenImage extends StatefulWidget {
   const FullScreenImage(
@@ -16,7 +16,6 @@ class _FullScreenImageState extends State<FullScreenImage> {
   bool isSelected = false;
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -30,12 +29,11 @@ class _FullScreenImageState extends State<FullScreenImage> {
             child: Stack(
               children: [
                 Center(
-                  child: CachedNetworkImage(
-                    fit: BoxFit.fill,
-                    width: size.width,
-                    imageUrl: widget.urlImage,
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                  child: PhotoView(
+                    imageProvider: Image.network(
+                      widget.urlImage,
+                      fit: BoxFit.fill,
+                    ).image,
                   ),
                 ),
                 Visibility(
