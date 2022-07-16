@@ -238,7 +238,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) {
-                      return const SettingScreen();
+                      return SettingScreen(
+                        ownerUserProfile: widget.userProfile,
+                      );
                     },
                   ),
                 );
@@ -266,7 +268,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) {
-                    return const SettingScreen();
+                    return SettingScreen(
+                      ownerUserProfile: widget.userProfile,
+                    );
                   }),
                 );
               },

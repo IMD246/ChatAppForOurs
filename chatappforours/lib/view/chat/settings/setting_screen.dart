@@ -3,14 +3,15 @@ import 'package:chatappforours/extensions/locallization.dart';
 import 'package:chatappforours/services/auth/bloc/auth_bloc.dart';
 import 'package:chatappforours/services/auth/bloc/auth_state.dart';
 import 'package:chatappforours/services/auth/models/auth_user.dart';
+import 'package:chatappforours/services/auth/models/user_profile.dart';
 
 import 'package:chatappforours/view/chat/settings/components/body_setting.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SettingScreen extends StatefulWidget {
-  const SettingScreen({Key? key}) : super(key: key);
-
+  const SettingScreen({Key? key, required this.ownerUserProfile}) : super(key: key);
+  final UserProfile ownerUserProfile;
   @override
   State<SettingScreen> createState() => _SettingScreenState();
 }
@@ -22,7 +23,7 @@ class _SettingScreenState extends State<SettingScreen> {
       builder: (context, state) {
         return Scaffold(
           appBar: buildAppbar(themeMode: ThemeMode.light, context: context),
-          body: const BodySetting(),
+          body: BodySetting(ownerUserProfile: widget.ownerUserProfile,),
         );
       },
     );

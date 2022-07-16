@@ -11,8 +11,9 @@ import 'package:flutter/material.dart';
 import '../../../../../constants/constants.dart';
 
 class BodyUpdateUserProfile extends StatefulWidget {
-  const BodyUpdateUserProfile({Key? key}) : super(key: key);
-
+  const BodyUpdateUserProfile({Key? key, required this.fullnameNotifier})
+      : super(key: key);
+  final ValueNotifier<String> fullnameNotifier;
   @override
   State<BodyUpdateUserProfile> createState() => _BodyUpdateUserProfileState();
 }
@@ -22,11 +23,12 @@ class _BodyUpdateUserProfileState extends State<BodyUpdateUserProfile> {
   late final TextEditingController lastName;
   String errorStringFirstName = '';
   String errorStringLastName = '';
-  final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
+  late final FirebaseUserProfile firebaseUserProfile;
   @override
   void initState() {
     firstName = TextEditingController();
     lastName = TextEditingController();
+    firebaseUserProfile = FirebaseUserProfile();
     super.initState();
   }
 
@@ -102,6 +104,8 @@ class _BodyUpdateUserProfileState extends State<BodyUpdateUserProfile> {
                           text: context.loc.update_user_profile_successfully,
                           title: context.loc.update_user_profile_notification,
                         );
+                        widget.fullnameNotifier.value =
+                            "${firstName.text} ${lastName.text.trim()}";
                         firstName.clear();
                         lastName.clear();
                       }
@@ -159,6 +163,8 @@ class _BodyUpdateUserProfileState extends State<BodyUpdateUserProfile> {
                       text: context.loc.update_user_profile_successfully,
                       title: context.loc.update_user_profile_notification,
                     );
+                    widget.fullnameNotifier.value =
+                        "${firstName.text} ${lastName.text.trim()}";
                     firstName.clear();
                     lastName.clear();
                   }

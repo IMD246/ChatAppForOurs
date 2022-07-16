@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserProfile {
   final String? idUser;
   final String email;
-  final String fullName;
+  late final String fullName;
   final String urlImage;
   final String language;
   final String? tokenUser;

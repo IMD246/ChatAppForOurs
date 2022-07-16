@@ -3,8 +3,8 @@ import 'package:chatappforours/view/chat/settings/components/updateUserProfile/b
 import 'package:flutter/material.dart';
 
 class UpdateUserProfileScreen extends StatefulWidget {
-  const UpdateUserProfileScreen({Key? key}) : super(key: key);
-
+  const UpdateUserProfileScreen({Key? key, required this.fullNameNotifier}) : super(key: key);
+  final ValueNotifier<String> fullNameNotifier;
   @override
   State<UpdateUserProfileScreen> createState() =>
       _UpdateUserProfileScreenState();
@@ -32,7 +32,7 @@ class _UpdateUserProfileScreenState extends State<UpdateUserProfileScreen> {
         centerTitle: true,
       ),
       backgroundColor: Colors.white,
-      body: const BodyUpdateUserProfile(),
+      body: BodyUpdateUserProfile(fullnameNotifier: widget.fullNameNotifier,),
     );
   }
 }

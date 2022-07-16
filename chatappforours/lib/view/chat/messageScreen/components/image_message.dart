@@ -47,7 +47,7 @@ class _ImageMessageState extends State<ImageMessage> {
                       ? const EdgeInsets.only(left: 40)
                       : const EdgeInsets.only(right: 40),
                   physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
+                  crossAxisCount: 1,
                   mainAxisSpacing: 24,
                   crossAxisSpacing: 24,
                   itemBuilder: (context, index) {
@@ -56,7 +56,7 @@ class _ImageMessageState extends State<ImageMessage> {
                       chatMessage: widget.chatMessage,
                     );
                   },
-                  staggeredTileBuilder: (index) => const StaggeredTile.fit(3),
+                  staggeredTileBuilder: (index) => const StaggeredTile.fit(1),
                 )
               : GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),

@@ -1,6 +1,4 @@
 import 'package:chatappforours/extensions/locallization.dart';
-import 'package:chatappforours/services/auth/crud/firebase_user_profile.dart';
-import 'package:chatappforours/services/auth/models/user_profile.dart';
 import 'package:chatappforours/utilities/button/primary_button.dart';
 import 'package:chatappforours/utilities/dialogs/error_dialog.dart';
 import 'package:chatappforours/utilities/textField/text_field.dart';
@@ -13,7 +11,6 @@ import '../../../../../constants/constants.dart';
 
 class BodyUpdatePassword extends StatefulWidget {
   const BodyUpdatePassword({Key? key}) : super(key: key);
-
   @override
   State<BodyUpdatePassword> createState() => _BodyUpdatePasswordState();
 }
@@ -25,9 +22,7 @@ class _BodyUpdatePasswordState extends State<BodyUpdatePassword> {
   String errorStringVerifyPassWord = '';
   bool isVisiblePassWord = false;
   bool isVisibleVerifyPassWord = false;
-  final FirebaseUserProfile firebaseUserProfile = FirebaseUserProfile();
   final authUser = FirebaseAuth.instance.currentUser;
-  late final UserProfile? userProfile;
   @override
   void initState() {
     password = TextEditingController();

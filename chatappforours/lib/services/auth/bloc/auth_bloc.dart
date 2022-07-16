@@ -366,7 +366,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                 userProfile: userProfile,
               );
               final getUserProfile =
-                  await userProfileFirebase.getUserProfile(userID: user.id);
+                  await userProfileFirebase.getUserProfileByEmail(email: user.email);
               emit(
                 AuthStateLoggedIn(
                   userProfile: getUserProfile!,
