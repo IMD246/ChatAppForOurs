@@ -8,8 +8,8 @@ class NotificationService {
   Future<void> initNotification() async {
     const AndroidInitializationSettings androidInitializationSettings =
         AndroidInitializationSettings('@mipmap/ic_notification');
-    const IOSInitializationSettings iosInitializationSettings =
-        IOSInitializationSettings(
+    const DarwinInitializationSettings iosInitializationSettings =
+        DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
@@ -45,7 +45,7 @@ class NotificationService {
           largeIcon: FilePathAndroidBitmap(urlImage),
           channelDescription: "Main Channel Notifiaction",
         ),
-        iOS: const IOSNotificationDetails(
+        iOS: const DarwinNotificationDetails(
           sound: 'default.wav',
           presentAlert: true,
           presentBadge: true,
@@ -54,7 +54,6 @@ class NotificationService {
       ),
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      androidAllowWhileIdle: true,
     );
   }
 }

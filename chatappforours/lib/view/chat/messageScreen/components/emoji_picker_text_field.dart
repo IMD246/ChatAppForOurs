@@ -32,7 +32,7 @@ class EmojiPickerTextField extends StatelessWidget {
       child: SizedBox(
         height: 250,
         child: EmojiPicker(
-          onEmojiSelected: (Category category, Emoji emoji) {
+          onEmojiSelected: (Category? category, Emoji emoji) {
             _onEmojiSelected(emoji);
           },
           onBackspacePressed: _onBackspacePressed,
@@ -47,12 +47,11 @@ class EmojiPickerTextField extends StatelessWidget {
             indicatorColor: Colors.blue,
             iconColor: Colors.grey,
             iconColorSelected: Colors.blue,
-            progressIndicatorColor: Colors.blue,
             backspaceColor: Colors.blue,
             skinToneDialogBgColor: Colors.white,
             skinToneIndicatorColor: Colors.grey,
             enableSkinTones: true,
-            showRecentsTab: true,
+            recentTabBehavior: RecentTabBehavior.RECENT,
             recentsLimit: 28,
             replaceEmojiOnLimitExceed: false,
             noRecents: const Text(

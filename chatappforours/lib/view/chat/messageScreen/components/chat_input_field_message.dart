@@ -214,6 +214,10 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
         margin: const EdgeInsets.symmetric(
           vertical: kDefaultPadding * 0.4,
         ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(40),
+          color: Theme.of(context).primaryColor.withOpacity(0.1),
+        ),
         child: Row(
           children: [
             Expanded(
@@ -306,10 +310,6 @@ class _ChatInputFieldMessageState extends State<ChatInputFieldMessage> {
                 ),
               ),
           ],
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(40),
-          color: Theme.of(context).primaryColor.withOpacity(0.1),
         ),
       ),
     );
